@@ -378,6 +378,14 @@ public class TTParserTest {
 				node.toString());
 	}
 
+    @Test
+    public void testRangeOperator() throws ParserError {
+        Node node = parse("[% 1..3 %]");
+        assertEquals(
+                "(template (expression (range (integer 3) (integer 1))))",
+                node.toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize(source);

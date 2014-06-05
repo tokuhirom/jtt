@@ -372,10 +372,10 @@ public class TTParser implements Parser {
 	}
 	
 	public Node parseConditionalOperator() throws ParserError {
-		Node n = parseComparationExpr();
+		Node n = parseRangeExpr();
 		if (n != null) {
 			if (EAT(TokenType.QUESTION)) {
-				Node c = parseComparationExpr();
+				Node c = parseRangeExpr();
 				if (c == null) {
 					throw new ParserError("Missing expression after '?' : "
 							+ CURRENT_TYPE(), this);
@@ -385,7 +385,7 @@ public class TTParser implements Parser {
 					throw new ParserError("Missing ':' after '?' : "
 							+ CURRENT_TYPE(), this);
 				}
-				Node l = parseComparationExpr();
+				Node l = parseRangeExpr();
 				if (l == null) {
 					throw new ParserError("Missing expression after ':' : "
 							+ CURRENT_TYPE(), this);
@@ -400,6 +400,25 @@ public class TTParser implements Parser {
 		}
 		return n;
 	}
+
+    public Node parseRangeExpr() throws ParserError {
+        Node n = parseComparationExpr();
+        if (n != null) {
+            if (EAT(TokenType.RANGE)) {
+                Node l = parseComparationExpr();
+                if (l == null) {
+                    throw new ParserError("Missing expression after ':' : "
+                            + CURRENT_TYPE(), this);
+                }
+
+                List<Node> children = new ArrayList<>();
+                children.add(l);
+                children.add(n);
+                n = new Node(NodeType.RANGE, children);
+            }
+        }
+        return n;
+    }
 
 	// comparationExpr : additive (
 	// '==' additive

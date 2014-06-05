@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import com.google.common.collect.Range;
 import com.google.common.net.UrlEscapers;
 
 import me.geso.jtt.Compiler;
@@ -222,15 +223,15 @@ public class VM {
 				Object container = stack.pop();
 
 				if (container instanceof Collection) {
-					// TODO better casting
-					@SuppressWarnings("unchecked")
-					Iterator<Object> iterator = ((Collection<Object>) container)
-							.iterator();
-					Loop loop = new Loop(iterator, pc);
-					loopStack.push(loop);
-					stack.push(loop.next());
+                    // TODO better casting
+                    @SuppressWarnings("unchecked")
+                    Iterator<Object> iterator = ((Collection<Object>) container)
+                            .iterator();
+                    Loop loop = new Loop(iterator, pc);
+                    loopStack.push(loop);
+                    stack.push(loop.next());
 
-					++pc;
+                    ++pc;
 				} else {
 					throw new RuntimeException(
 							"Non container type detected in FOREACH.");
@@ -332,13 +333,37 @@ public class VM {
 				++pc;
 				break;
 			}
+            case MAKE_RANGE: {
+                doMakeRange(stack);
+                ++pc;
+                break;
+            }
 			default:
 				throw new RuntimeException("SHOULD NOT REACH HERE: " + code.op);
 			}
 		}
 	}
 
-	private void doFuncall(int arglen, Stack<Object> stack) {
+    private void doMakeRange(Stack<Object> stack) throws JSlateException {
+        Object lhs = stack.pop();
+        Object rhs = stack.pop();
+        if (!(lhs instanceof Integer)) {
+            throw new JSlateException("Left side of range construction operator should be Integer but : " + lhs.getClass());
+        }
+        if (!(rhs instanceof Integer)) {
+            throw new JSlateException("Right side of range construction operator should be Integer but : " + rhs.getClass());
+        }
+
+        int l = ((Integer) lhs).intValue();
+        int r = ((Integer) rhs).intValue();
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i=l; i<=r; ++i) {
+            list.add(i);
+        }
+        stack.push(list);
+    }
+
+    private void doFuncall(int arglen, Stack<Object> stack) {
 		Object method = stack.get(stack.size() - arglen);
 		if (method instanceof String) {
 			Function function = this.functions.get(method);

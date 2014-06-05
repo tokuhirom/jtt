@@ -150,6 +150,13 @@ public class TTLexerTest {
 				lex("[% 3 ? 1 : 0 %]"));
 	}
 
+    @Test
+    public void testRangeConstructionOperator() {
+        assertEquals(
+                "[INTEGER 1],[RANGE],[INTEGER 3]",
+                lex("[% 1..3 %]"));
+    }
+
 	@Test
 	public void testError() {
 		JSlateLexerError e = null;

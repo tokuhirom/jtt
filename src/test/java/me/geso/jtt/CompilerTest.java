@@ -648,4 +648,17 @@ public class CompilerTest {
 		assertEquals("hehe 004, ahaha", got);
 	}
 
+    @Test
+    public void testRange() throws JSlateException, ParserError, IOException,
+            TemplateLoadingError {
+        Map<String, Object> vars = new HashMap<String, Object>();
+
+        Irep irep = compiler
+                .compile("[% FOR x IN 1..5 %][% x %],[% END %]");
+        // System.out.println(new Disassembler().disasm(irep));
+
+        String got = vm.run(irep, vars);
+        assertEquals("1,2,3,4,5,", got);
+    }
+
 }
