@@ -162,6 +162,10 @@ public class TTLexer {
                         tokens.add(new Token(TokenType.DIVIDE));
                         ++pos;
                         break;
+                    case '!':
+                        tokens.add(new Token(TokenType.NOT));
+                        ++pos;
+                        break;
                     case '.':
                         if (pos + 1 < string.length()) {
                             if (string.charAt(pos + 1) == '.') {

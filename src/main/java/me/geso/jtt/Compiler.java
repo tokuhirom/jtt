@@ -177,6 +177,11 @@ public class Compiler {
                     builder.add(OP.MAKE_RANGE);
                     break;
                 }
+                case NOT: {
+                    visitAst(node.getChildren().get(0));
+                    builder.add(OP.NOT);
+                    break;
+                }
                 case IDENT:
                     builder.addPool(OP.LOAD_VAR, node.getText());
                     break;

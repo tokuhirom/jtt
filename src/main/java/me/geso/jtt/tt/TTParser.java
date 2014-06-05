@@ -552,7 +552,7 @@ public class TTParser implements Parser {
 	}
 
 	private Node parseFuncall() throws ParserError {
-		Node n = parseAttr();
+		Node n = parseNot();
 		if (EAT(TokenType.LPAREN)) {
 			LinkedList<Node> args = parseArgs();
 			args.addFirst(n);
@@ -590,6 +590,18 @@ public class TTParser implements Parser {
 
 		throw new ParserError("Missing closing paren after arguments", this);
 	}
+
+    private Node parseNot() throws ParserError {
+        if (EAT(TokenType.NOT)) {
+            Node n = parseAttr();
+            if (n==null) {
+                throw new ParserError("Missing expression after '!'", this);
+            }
+            return new Node(NodeType.NOT, n);
+        } else {
+            return parseAttr();
+        }
+    }
 
 	private Node parseAttr() throws ParserError {
 		Node n = parseAtom();

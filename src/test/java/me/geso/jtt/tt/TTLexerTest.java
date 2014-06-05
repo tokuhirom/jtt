@@ -157,6 +157,13 @@ public class TTLexerTest {
                 lex("[% 1..3 %]"));
     }
 
+    @Test
+    public void testUnaryNot() {
+        assertEquals(
+                "[NOT],[TRUE]",
+                lex("[% !true %]"));
+    }
+
 	@Test
 	public void testError() {
 		JSlateLexerError e = null;

@@ -4,9 +4,6 @@ This file lists To-Does for JTT project.
 
 ## DOING
 
-* lex unary ! operator
-* parse unary ! operator
-* run unary ! operator
 
 ## TODO
 
@@ -14,8 +11,6 @@ This file lists To-Does for JTT project.
 * `[% INCLUDE "hoge" WITH foo=bar %]`
  * `[% [1,2,3].size() %]`
  * warnings listener
- * and
- * or
  * && operator
  * || operator
 
@@ -58,3 +53,7 @@ This file lists To-Does for JTT project.
 * run FOR `NEXT`
 * ? : operator
  * .. range constructor
+ * lex unary ! operator
+* parse unary ! operator
+* run unary ! operator
+

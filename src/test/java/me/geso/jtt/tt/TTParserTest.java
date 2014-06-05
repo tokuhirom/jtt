@@ -386,6 +386,14 @@ public class TTParserTest {
                 node.toString());
     }
 
+    @Test
+    public void testNot() throws ParserError {
+        Node node = parse("[% !true %]");
+        assertEquals(
+                "(template (expression (not (true))))",
+                node.toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize(source);
