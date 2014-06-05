@@ -1,0 +1,3 @@
+INC1_HEAD
+[% INCLUDE "inc2.tt" %]
+INC1_FOOT
