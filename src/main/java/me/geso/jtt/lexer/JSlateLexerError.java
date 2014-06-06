@@ -10,6 +10,7 @@ public class JSlateLexerError extends JTTError {
 	private final TTLexer lexer;
 
 	public JSlateLexerError(String message, TTLexer lexer) {
+		super(message);
 		this.message = message;
 		this.lexer = lexer;
 	}

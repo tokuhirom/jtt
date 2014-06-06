@@ -32,6 +32,12 @@
 			<version>6.0.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.esotericsoftware.reflectasm</groupId>
+			<artifactId>reflectasm</artifactId>
+			<version>1.09</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

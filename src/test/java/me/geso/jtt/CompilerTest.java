@@ -681,4 +681,42 @@ public class CompilerTest {
         assertEquals("hoge%2B%26", got);
     }
 
+    @Test
+    public void testMethodCall() throws JSlateException, ParserError, IOException,
+            TemplateLoadingError {
+        Map<String, Object> vars = new HashMap<String, Object>();
+
+        Irep irep = compiler
+                .compile("[% [5,9,6,3].size() %]");
+        // System.out.println(new Disassembler().disasm(irep));
+
+        String got = vm.run(irep, vars);
+        assertEquals("4", got);
+    }
+
+    @Test
+    public void testMethodCall2() throws JSlateException, ParserError, IOException,
+            TemplateLoadingError {
+        Map<String, Object> vars = new HashMap<String, Object>();
+
+        Irep irep = compiler
+                .compile("[% 'hoge'.substring(2) %]");
+        // System.out.println(new Disassembler().disasm(irep));
+
+        String got = vm.run(irep, vars);
+        assertEquals("ge", got);
+    }
+
+    @Test
+    public void testMethodCall3() throws JSlateException, ParserError, IOException,
+            TemplateLoadingError {
+        Map<String, Object> vars = new HashMap<String, Object>();
+
+        Irep irep = compiler
+                .compile("[%  'hamburger'.substring(4, 8) %]");
+        // System.out.println(new Disassembler().disasm(irep));
+
+        String got = vm.run(irep, vars);
+        assertEquals("urge", got);
+    }
 }

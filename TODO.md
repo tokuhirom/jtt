@@ -7,9 +7,10 @@ This file lists To-Does for JTT project.
 
 ## TODO
 
+* `[% map.$key %]`
+* `[% list.$key %]`
  * `[% loop.count %]`
 * `[% INCLUDE "hoge" WITH foo=bar %]`
- * `[% [1,2,3].size() %]`
  * warnings listener
  * && operator
  * || operator
@@ -58,3 +59,4 @@ This file lists To-Does for JTT project.
 * lex `[% hoge | uri %]`
 * parse `[% hoge | uri %]`
 * run `[% hoge | uri %]`
+* `[% [1,2,3].size() %]`

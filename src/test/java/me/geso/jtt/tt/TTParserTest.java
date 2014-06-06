@@ -402,6 +402,14 @@ public class TTParserTest {
                 node.toString());
     }
 
+    @Test
+    public void testMethodSize() throws ParserError {
+        Node node = parse("[% [1,2,3].size() %]");
+        assertEquals(
+                "(template (expression (funcall (attribute (array (integer 1) (integer 2) (integer 3)) (ident size)))))",
+                node.toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize(source);
