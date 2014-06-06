@@ -342,13 +342,32 @@ public class TTParser implements Parser {
 	// expr = int;
 	// expr = int '+' int;
 	public Node parseExpr() throws ParserError {
-		Node n = parseAssign();
+		Node n = parsePipe();
 		if (n != null) {
 			return n;
 		} else {
 			return null;
 		}
 	}
+
+    // pipe = assign '|' assign;
+    public Node parsePipe() throws ParserError {
+        Node n = parseAssign();
+        while (EAT(TokenType.PIPE)) {
+            Node lhs = parseAssign();
+            if (lhs == null) {
+                throw new ParserError("Missing expression after '|'", this);
+            }
+            if (lhs.getType() == NodeType.IDENT) {
+            	ArrayList<Node> list = new ArrayList<>();
+            	list.add(n);
+                n = new Node(NodeType.FUNCALL, lhs, n);
+            } else {
+                throw new ParserError("left side of pipe must be ident", this);
+            }
+        }
+        return n;
+    }
 
 	public Node parseAssign() throws ParserError {
 		Node n = parseConditionalOperator();
@@ -609,7 +628,7 @@ public class TTParser implements Parser {
 			if (EAT(TokenType.DOT)) {
 				Node rhs = parseIdent();
 				if (rhs == null) {
-					throw new ParserError("Missing ident after '.'.", this);
+					throw new ParserError("Missing identifier after '.'.", this);
 				}
 				n = new Node(NodeType.ATTRIBUTE, n, rhs);
 			} else {

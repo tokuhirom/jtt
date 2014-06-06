@@ -14,7 +14,6 @@ This file lists To-Does for JTT project.
  * && operator
  * || operator
 
-* `[% hoge | uri %]`
  * caching
 
 ## DONE
@@ -56,4 +55,6 @@ This file lists To-Does for JTT project.
  * lex unary ! operator
 * parse unary ! operator
 * run unary ! operator
-
+* lex `[% hoge | uri %]`
+* parse `[% hoge | uri %]`
+* run `[% hoge | uri %]`

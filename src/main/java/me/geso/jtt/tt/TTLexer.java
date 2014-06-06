@@ -166,6 +166,10 @@ public class TTLexer {
                         tokens.add(new Token(TokenType.NOT));
                         ++pos;
                         break;
+                    case '|':
+                        tokens.add(new Token(TokenType.PIPE));
+                        ++pos;
+                        break;
                     case '.':
                         if (pos + 1 < string.length()) {
                             if (string.charAt(pos + 1) == '.') {

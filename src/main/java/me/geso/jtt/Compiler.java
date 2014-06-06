@@ -332,7 +332,8 @@ public class Compiler {
                             builder.add(OP.FUNCALL, node.getChildren().size() - 1);
                         }
                     } else {
-                        builder.add(OP.FUNCALL, node.getChildren().size() - 1);
+                    	throw new RuntimeException("NIY");
+                        // builder.add(OP.FUNCALL, node.getChildren().size() - 1);
                     }
                     break;
                 }

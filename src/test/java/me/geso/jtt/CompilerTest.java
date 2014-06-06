@@ -668,4 +668,17 @@ public class CompilerTest {
         assertEquals("false,true", got);
     }
 
+    @Test
+    public void testPipe() throws JSlateException, ParserError, IOException,
+            TemplateLoadingError {
+        Map<String, Object> vars = new HashMap<String, Object>();
+
+        Irep irep = compiler
+                .compile("[% \"hoge+&\" | uri %]");
+        // System.out.println(new Disassembler().disasm(irep));
+
+        String got = vm.run(irep, vars);
+        assertEquals("hoge%2B%26", got);
+    }
+
 }

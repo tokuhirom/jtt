@@ -394,6 +394,14 @@ public class TTParserTest {
                 node.toString());
     }
 
+    @Test
+    public void testPipe() throws ParserError {
+        Node node = parse("[% 5963 | uri %]");
+        assertEquals(
+                "(template (expression (funcall (ident uri) (integer 5963))))",
+                node.toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize(source);

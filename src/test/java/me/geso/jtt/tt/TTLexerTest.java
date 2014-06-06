@@ -164,6 +164,13 @@ public class TTLexerTest {
                 lex("[% !true %]"));
     }
 
+    @Test
+    public void testPipe() {
+        assertEquals(
+                "[INTEGER 3],[PIPE],[IDENT uri]",
+                lex("[% 3 | uri %]"));
+    }
+
 	@Test
 	public void testError() {
 		JSlateLexerError e = null;
