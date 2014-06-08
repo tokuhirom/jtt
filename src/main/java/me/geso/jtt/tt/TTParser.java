@@ -421,10 +421,10 @@ public class TTParser implements Parser {
 	}
 
 	public Node parseRangeExpr() throws ParserError {
-		Node n = parseAndAnd();
+		Node n = parseOrOr();
 		if (n != null) {
 			if (EAT(TokenType.RANGE)) {
-				Node l = parseAndAnd();
+				Node l = parseOrOr();
 				if (l == null) {
 					throw new ParserError("Missing expression after ':' : "
 							+ CURRENT_TYPE(), this);
@@ -434,6 +434,25 @@ public class TTParser implements Parser {
 				children.add(l);
 				children.add(n);
 				n = new Node(NodeType.RANGE, children);
+			}
+		}
+		return n;
+	}
+	
+	public Node parseOrOr() throws ParserError {
+		Node n = parseAndAnd();
+		if (n != null) {
+			while (true) {
+				if (EAT(TokenType.OROR)) {
+					Node rhs = parseAndAnd();
+					if (rhs == null) {
+						throw new ParserError("Missing expression after '||': "
+								+ CURRENT_TYPE(), this);
+					}
+					n = new Node(NodeType.OROR, n, rhs);
+				} else {
+					break;
+				}
 			}
 		}
 		return n;
@@ -482,7 +501,6 @@ public class TTParser implements Parser {
 					}
 					n = new Node(NodeType.NE, n, rhs);
 				}
-				// TODO !=
 				break;
 			}
 		}

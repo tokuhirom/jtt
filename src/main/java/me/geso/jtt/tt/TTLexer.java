@@ -181,8 +181,19 @@ public class TTLexer {
 					}
 					break;
 				case '|':
-					tokens.add(new Token(TokenType.PIPE));
-					++pos;
+					if (pos + 1 < string.length()) {
+						if (string.charAt(pos + 1) == '|') {
+							tokens.add(new Token(TokenType.OROR));
+							++pos;
+							++pos;
+						} else {
+							tokens.add(new Token(TokenType.PIPE));
+							++pos;
+						}
+					} else {
+						tokens.add(new Token(TokenType.PIPE));
+						++pos;
+					}
 					break;
 				case '&':
 					if (pos + 1 < string.length()) {

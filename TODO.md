@@ -12,7 +12,6 @@ This file lists To-Does for JTT project.
  * `[% loop.count %]`
 * `[% INCLUDE "hoge" WITH foo=bar %]`
  * warnings listener
- * || operator
  * caching
  * `[% foo != bar %]`
  * Should we implement "Casting operator"?
@@ -66,3 +65,4 @@ This file lists To-Does for JTT project.
 * lex '!=' operator
 * parse '!=' operator
 * run '!=' operator
+* || operator

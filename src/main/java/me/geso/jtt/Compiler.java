@@ -84,6 +84,9 @@ public class Compiler {
 			case ANDAND:
 				compileBinOp(node, OP.ANDAND);
 				break;
+			case OROR:
+				compileBinOp(node, OP.OROR);
+				break;
 			case RAW_STRING:
 				builder.addPool(OP.LOAD_CONST, new JTTRawString(node.getText()));
 				builder.add(OP.APPEND);
