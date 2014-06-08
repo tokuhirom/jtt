@@ -16,6 +16,7 @@ This file lists To-Does for JTT project.
 * Make pool values unique.
   * Do not add same object twice in the constant pool.
   * It should be shared.
+* Support user's function
 
 ## DONE
 
