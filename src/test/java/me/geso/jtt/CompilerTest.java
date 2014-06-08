@@ -781,7 +781,7 @@ public class CompilerTest {
 	@Test
 	public void testMapDollarVarAccess() throws JSlateException, ParserError, IOException,
 			TemplateLoadingError {
-		assertEquals("fuga", eval("[% ary.$key %]", ImmutableMap.of("key", "hoge", "ary", ImmutableMap.of("hoge", "fuga", "hige", "hage"))));
+		assertEquals("fuga", eval("[% map.$key %]", ImmutableMap.of("key", "hoge", "map", ImmutableMap.of("hoge", "fuga", "hige", "hage"))));
 	}
 
 	@Test
