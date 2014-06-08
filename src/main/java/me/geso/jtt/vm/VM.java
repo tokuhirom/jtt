@@ -303,10 +303,11 @@ public class VM {
 				++pc;
 				break;
 			}
-			case ATTRIBUTE: {
-				Object attr = stack.pop();
-				Object target = stack.pop();
-				stack.push(this.getAttribute(target, attr));
+			case ATTRIBUTE: { // PUSH(POP()[POP()])
+				// container[index]
+				Object index = stack.pop();
+				Object container = stack.pop();
+				stack.push(this.getAttribute(container, index));
 				++pc;
 				break;
 			}
@@ -462,34 +463,34 @@ public class VM {
 		}
 	}
 
-	private Object getAttribute(Object target, Object attr) {
-		if (target instanceof Map) {
-			if (attr == null) {
+	private Object getAttribute(Object container, Object index) {
+		if (container instanceof Map) {
+			if (index == null) {
 				warn("attr is null");
 				return null;
 			}
 			// TODO: remove SuppressWarnigns
 			@SuppressWarnings("unchecked")
-			Map<String, Object> map = (Map<String, Object>) target;
-			Object value = map.get(attr.toString());
+			Map<String, Object> map = (Map<String, Object>) container;
+			Object value = map.get(index.toString());
 			return value;
-		} else if (target instanceof List) {
-			if (attr == null) {
+		} else if (container instanceof List) {
+			if (index == null) {
 				warn("null index for list index");
 				return null;
-			} else if (!(attr instanceof Integer)) {
-				warn("array index must be Integer but " + attr.getClass());
+			} else if (!(index instanceof Integer)) {
+				warn("array index must be Integer but " + index.getClass());
 				return null;
 			}
 			// TODO: remove SuppressWarnigns
 			@SuppressWarnings("unchecked")
-			List<Object> list = (List<Object>) target;
-			return list.get((Integer)attr);
-		} else if (target == null) {
+			List<Object> list = (List<Object>) container;
+			return list.get((Integer)index);
+		} else if (container == null) {
 			warn("container is null");
 			return null;
 		} else {
-			warn("Unsupported container");
+			warn("Unsupported container: " + container.getClass());
 			// TODO: s
 			return null;
 		}

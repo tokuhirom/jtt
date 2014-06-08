@@ -738,6 +738,18 @@ public class TTParser implements Parser {
 					throw new ParserError(
 							"Missing (identifier|variable) after '.'.", this);
 				}
+			} else if (EAT(TokenType.LBRACKET)) { // ary[idx]
+				Node key = parseExpr();
+				if (key == null) {
+					throw new ParserError("Missing expression after '['", this);
+				}
+
+				if (!EAT(TokenType.RBRACKET)) {
+					throw new ParserError(
+							"Missing closing bracket after '['.", this);
+				}
+				
+				n = new Node(NodeType.GET, n, key);
 			} else {
 				break;
 			}

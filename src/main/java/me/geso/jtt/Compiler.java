@@ -295,6 +295,12 @@ public class Compiler {
 				builder.add(OP.ATTRIBUTE);
 				break;
 			}
+			case GET: { // ary[index]
+				visitAst(node.getChildren().get(0));
+				visitAst(node.getChildren().get(1));
+				builder.add(OP.ATTRIBUTE);
+				break;
+			}
 			case MAP: {
 				List<Node> children = node.getChildren();
 				for (int i = 0; i < children.size(); i += 2) {
@@ -349,7 +355,8 @@ public class Compiler {
 					}
 				} else if (func.getType() == NodeType.ATTRIBUTE) {
 					visitAst(func.getChildren().get(0)); // object
-					builder.addPool(OP.LOAD_CONST, func.getChildren().get(1).getText()); // method name
+					builder.addPool(OP.LOAD_CONST, func.getChildren().get(1)
+							.getText()); // method name
 					for (int i = 1; i < node.getChildren().size(); ++i) {
 						visitAst(node.getChildren().get(i));
 					}

@@ -213,6 +213,13 @@ public class TTLexerTest {
                 lex("[% list.$key %]"));
     }
 
+    @Test
+    public void testArrayIndex() {
+        assertEquals(
+                "[IDENT list],[LBRACKET],[IDENT idx],[RBRACKET]",
+                lex("[% list[idx] %]"));
+    }
+
 	@Test
 	public void testError() {
 		JSlateLexerError e = null;

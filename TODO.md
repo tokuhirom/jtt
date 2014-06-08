@@ -13,6 +13,9 @@ This file lists To-Does for JTT project.
  * caching
  * Should we implement "Casting operator"?
    * How do I parse casting operator?
+* Make pool values unique.
+  * Do not add same object twice in the constant pool.
+  * It should be shared.
 
 ## DONE
 
@@ -69,3 +72,4 @@ This file lists To-Does for JTT project.
 * loose OR
 * `[% list.$key %]`
 * `[% map.$key %]`
+* `[% a[i] %]`

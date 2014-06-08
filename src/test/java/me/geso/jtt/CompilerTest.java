@@ -773,6 +773,19 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void testArrayAccess() throws JSlateException, ParserError, IOException,
+			TemplateLoadingError {
+		assertEquals("9", eval("[% ary[$i] %]", ImmutableMap.of("i", 1, "ary", Lists.newArrayList(5,9,6,3))));
+	}
+
+	@Test
+	public void testMapIndex() throws JSlateException, ParserError, IOException,
+			TemplateLoadingError {
+		assertEquals("fuga", eval("[% map[$k] %]", ImmutableMap.of("k", "hoge", "map", ImmutableMap.of("hoge", "fuga"))));
+		assertEquals("fuga", eval("[% map[k] %]", ImmutableMap.of("k", "hoge", "map", ImmutableMap.of("hoge", "fuga"))));
+	}
+
+	@Test
 	public void testArrayDollarVarAccess() throws JSlateException, ParserError, IOException,
 			TemplateLoadingError {
 		assertEquals("9", eval("[% ary.$i %]", ImmutableMap.of("i", 1, "ary", Lists.newArrayList(5,9,6,3))));

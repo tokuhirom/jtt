@@ -461,6 +461,19 @@ public class TTParserTest {
                 node.toString());
     }
 
+    @Test
+    public void testArrayIndex() throws ParserError {
+        assertEquals(
+                "(template (expression (get (ident list) (dollarvar var))))",
+                parse("[% list[$var] %]").toString());
+        assertEquals(
+                "(template (expression (get (get (ident list) (dollarvar var)) (ident boo))))",
+                parse("[% list[$var][boo] %]").toString());
+        assertEquals(
+                "(template (expression (get (ident list) (ident var))))",
+                parse("[% list[var] %]").toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize(source);
