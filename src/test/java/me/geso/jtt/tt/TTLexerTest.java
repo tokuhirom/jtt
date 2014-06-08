@@ -192,6 +192,13 @@ public class TTLexerTest {
                 lex("[% 3 || 4 %]"));
     }
 
+    @Test
+    public void testLooseAnd() {
+        assertEquals(
+                "[INTEGER 3],[LOOSE_AND],[INTEGER 4]",
+                lex("[% 3 AND 4 %]"));
+    }
+
 	@Test
 	public void testError() {
 		JSlateLexerError e = null;

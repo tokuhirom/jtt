@@ -418,6 +418,17 @@ public class TTParserTest {
                 node.toString());
     }
 
+    // left AND
+    @Test
+    public void testLooseAnd() throws ParserError {
+        assertEquals(
+                "(template (expression (andand (true) (false))))",
+                parse("[% true AND false %]").toString());
+        assertEquals(
+                "(template (expression (andand (andand (true) (false)) (true))))",
+                parse("[% true AND false AND true %]").toString());
+    }
+
     @Test
     public void testOrOr() throws ParserError {
         Node node = parse("[% true || false %]");

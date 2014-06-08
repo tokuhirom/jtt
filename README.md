@@ -30,7 +30,9 @@ We need ER Diagram.
   left	||
   nonassoc	..
   right	?:
-  right	= last next
+  right	=
+  left   AND
+  left   OR
 
 ## INCOMPATIBILITY WITH Templte-Toolkit
 

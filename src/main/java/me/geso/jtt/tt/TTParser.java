@@ -352,9 +352,9 @@ public class TTParser implements Parser {
 
 	// pipe = assign '|' assign;
 	public Node parsePipe() throws ParserError {
-		Node n = parseAssign();
+		Node n = parseLooseAnd();
 		while (EAT(TokenType.PIPE)) {
-			Node lhs = parseAssign();
+			Node lhs = parseLooseAnd();
 			if (lhs == null) {
 				throw new ParserError("Missing expression after '|'", this);
 			}
@@ -364,6 +364,26 @@ public class TTParser implements Parser {
 				n = new Node(NodeType.FUNCALL, lhs, n);
 			} else {
 				throw new ParserError("left side of pipe must be ident", this);
+			}
+		}
+		return n;
+	}
+
+	// left AND
+	public Node parseLooseAnd() throws ParserError {
+		Node n = parseAssign();
+		if (n != null) {
+			while (true) {
+				if (EAT(TokenType.LOOSE_AND)) {
+					Node lhs = parseConditionalOperator();
+					if (lhs == null) {
+						throw new ParserError("Missing expression after '=' : "
+								+ CURRENT_TYPE(), this);
+					}
+					n = new Node(NodeType.ANDAND, n, lhs);
+				} else {
+					break;
+				}
 			}
 		}
 		return n;
@@ -438,7 +458,7 @@ public class TTParser implements Parser {
 		}
 		return n;
 	}
-	
+
 	public Node parseOrOr() throws ParserError {
 		Node n = parseAndAnd();
 		if (n != null) {

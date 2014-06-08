@@ -734,6 +734,15 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void testLooseAnd() throws JSlateException, ParserError, IOException,
+			TemplateLoadingError {
+		assertEquals("true", eval("[% true AND true %]", ImmutableMap.of()));
+		assertEquals("false", eval("[% true AND false %]", ImmutableMap.of()));
+		assertEquals("false", eval("[% false AND true %]", ImmutableMap.of()));
+		assertEquals("false", eval("[% false AND false %]", ImmutableMap.of()));
+	}
+
+	@Test
 	public void testOrOr() throws JSlateException, ParserError, IOException,
 			TemplateLoadingError {
 		assertEquals("true", eval("[% true || true %]", ImmutableMap.of()));
