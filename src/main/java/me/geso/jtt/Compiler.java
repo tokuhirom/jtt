@@ -284,20 +284,8 @@ public class Compiler {
 				Node val = node.getChildren().get(1);
 
 				visitAst(key);
-				if (val.getType() == NodeType.IDENT) {
-					builder.addPool(OP.LOAD_CONST, val.getText());
-				} else if (val.getType() == NodeType.IDENT) {
-					builder.addPool(OP.LOAD_CONST, val.getText());
-				} else {
-					visitAst(val);
-				}
+				visitAst(val);
 
-				builder.add(OP.ATTRIBUTE);
-				break;
-			}
-			case GET: { // ary[index]
-				visitAst(node.getChildren().get(0));
-				visitAst(node.getChildren().get(1));
 				builder.add(OP.ATTRIBUTE);
 				break;
 			}

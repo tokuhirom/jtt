@@ -333,7 +333,7 @@ public class TTParserTest {
 	public void testHashAccess() throws ParserError {
 		Node node = parse("[% hoge.fuga %]");
 		assertEquals(
-				"(template (expression (attribute (ident hoge) (ident fuga))))",
+				"(template (expression (attribute (ident hoge) (string fuga))))",
 				node.toString());
 	}
 
@@ -366,7 +366,7 @@ public class TTParserTest {
 	public void testFuncall3() throws ParserError {
 		Node node = parse("[% foo.bar(a, b) %]");
 		assertEquals(
-				"(template (expression (funcall (attribute (ident foo) (ident bar)) (ident a) (ident b))))",
+				"(template (expression (funcall (attribute (ident foo) (string bar)) (ident a) (ident b))))",
 				node.toString());
 	}
 
@@ -404,10 +404,9 @@ public class TTParserTest {
 
     @Test
     public void testMethodSize() throws ParserError {
-        Node node = parse("[% [1,2,3].size() %]");
         assertEquals(
-                "(template (expression (funcall (attribute (array (integer 1) (integer 2) (integer 3)) (ident size)))))",
-                node.toString());
+                "(template (expression (funcall (attribute (array (integer 1) (integer 2) (integer 3)) (string size)))))",
+                parse("[% [1,2,3].size() %]").toString());
     }
 
     @Test
@@ -464,13 +463,13 @@ public class TTParserTest {
     @Test
     public void testArrayIndex() throws ParserError {
         assertEquals(
-                "(template (expression (get (ident list) (dollarvar var))))",
+                "(template (expression (attribute (ident list) (dollarvar var))))",
                 parse("[% list[$var] %]").toString());
         assertEquals(
-                "(template (expression (get (get (ident list) (dollarvar var)) (ident boo))))",
+                "(template (expression (attribute (attribute (ident list) (dollarvar var)) (ident boo))))",
                 parse("[% list[$var][boo] %]").toString());
         assertEquals(
-                "(template (expression (get (ident list) (ident var))))",
+                "(template (expression (attribute (ident list) (ident var))))",
                 parse("[% list[var] %]").toString());
     }
 

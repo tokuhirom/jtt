@@ -727,7 +727,8 @@ public class TTParser implements Parser {
 					if (rhs == null) {
 						throw new ParserError("SHOULD NOT REACH HERE", this);
 					}
-					n = new Node(NodeType.ATTRIBUTE, n, rhs);
+					Node key = new Node(NodeType.STRING, rhs.getText()); // Convert to STRING from IDENT.
+					n = new Node(NodeType.ATTRIBUTE, n, key);
 				} else if (CURRENT_TYPE() == TokenType.DOLLARVAR) {
 					Node rhs = parseDollarVar();
 					if (rhs == null) {
@@ -749,7 +750,7 @@ public class TTParser implements Parser {
 							"Missing closing bracket after '['.", this);
 				}
 				
-				n = new Node(NodeType.GET, n, key);
+				n = new Node(NodeType.ATTRIBUTE, n, key);
 			} else {
 				break;
 			}
