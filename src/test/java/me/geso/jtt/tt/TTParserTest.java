@@ -438,6 +438,14 @@ public class TTParserTest {
     }
 
     @Test
+    public void testLooseOr() throws ParserError {
+        Node node = parse("[% true OR false %]");
+        assertEquals(
+                "(template (expression (oror (true) (false))))",
+                node.toString());
+    }
+
+    @Test
     public void testNE() throws ParserError {
         Node node = parse("[% true != false %]");
         assertEquals(

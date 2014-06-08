@@ -352,18 +352,35 @@ public class TTParser implements Parser {
 
 	// pipe = assign '|' assign;
 	public Node parsePipe() throws ParserError {
-		Node n = parseLooseAnd();
+		Node n = parseLooseOr();
 		while (EAT(TokenType.PIPE)) {
-			Node lhs = parseLooseAnd();
+			Node lhs = parseLooseOr();
 			if (lhs == null) {
 				throw new ParserError("Missing expression after '|'", this);
 			}
 			if (lhs.getType() == NodeType.IDENT) {
-				ArrayList<Node> list = new ArrayList<>();
-				list.add(n);
 				n = new Node(NodeType.FUNCALL, lhs, n);
 			} else {
 				throw new ParserError("left side of pipe must be ident", this);
+			}
+		}
+		return n;
+	}
+	
+	public Node parseLooseOr() throws ParserError {
+		Node n = parseLooseAnd();
+		if (n != null) {
+			while (true) {
+				if (EAT(TokenType.LOOSE_OR)) {
+					Node rhs = parseLooseAnd();
+					if (rhs == null) {
+						throw new ParserError("Missing expression after 'OR' : "
+								+ CURRENT_TYPE(), this);
+					}
+					n = new Node(NodeType.OROR, n, rhs);
+				} else {
+					break;
+				}
 			}
 		}
 		return n;
@@ -375,12 +392,12 @@ public class TTParser implements Parser {
 		if (n != null) {
 			while (true) {
 				if (EAT(TokenType.LOOSE_AND)) {
-					Node lhs = parseConditionalOperator();
-					if (lhs == null) {
-						throw new ParserError("Missing expression after '=' : "
+					Node rhs = parseAssign();
+					if (rhs == null) {
+						throw new ParserError("Missing expression after 'AND' : "
 								+ CURRENT_TYPE(), this);
 					}
-					n = new Node(NodeType.ANDAND, n, lhs);
+					n = new Node(NodeType.ANDAND, n, rhs);
 				} else {
 					break;
 				}

@@ -4,6 +4,7 @@ This file lists To-Does for JTT project.
 
 ## DOING
 
+* loose OR
 
 ## TODO
 
@@ -13,9 +14,8 @@ This file lists To-Does for JTT project.
 * `[% INCLUDE "hoge" WITH foo=bar %]`
  * warnings listener
  * caching
- * `[% foo != bar %]`
  * Should we implement "Casting operator"?
-* loose OR
+   * How do I parse casting operator?
 
 ## DONE
 
@@ -68,3 +68,4 @@ This file lists To-Does for JTT project.
 * run '!=' operator
 * || operator
 * loose AND
+* `[% foo != bar %]`
