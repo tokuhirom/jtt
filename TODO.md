@@ -4,8 +4,6 @@ This file lists To-Does for JTT project.
 
 ## DOING
 
-* parse && operator
-* run && operator
 
 ## TODO
 
@@ -63,3 +61,8 @@ This file lists To-Does for JTT project.
 * run `[% hoge | uri %]`
 * `[% [1,2,3].size() %]`
 * lex && operator
+* parse && operator
+* run && operator
+* lex '!=' operator
+* parse '!=' operator
+* run '!=' operator

@@ -178,6 +178,13 @@ public class TTLexerTest {
                 lex("[% 3 && 4 %]"));
     }
 
+    @Test
+    public void testNE() {
+        assertEquals(
+                "[INTEGER 3],[NE],[INTEGER 4]",
+                lex("[% 3 != 4 %]"));
+    }
+
 	@Test
 	public void testError() {
 		JSlateLexerError e = null;

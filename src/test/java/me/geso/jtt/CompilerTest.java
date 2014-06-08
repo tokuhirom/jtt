@@ -725,6 +725,18 @@ public class CompilerTest {
 		assertEquals("false", eval("[% false && false %]", ImmutableMap.of()));
 	}
 
+	@Test
+	public void testNE() throws JSlateException, ParserError, IOException,
+			TemplateLoadingError {
+		assertEquals("true", eval("[% 3 != 2 %]", ImmutableMap.of()));
+		assertEquals("false", eval("[% 3 != 3 %]", ImmutableMap.of()));
+		assertEquals("true", eval("[% 'hoge' != 'fuga' %]", ImmutableMap.of()));
+		assertEquals("false", eval("[% 'hoge' != 'hoge' %]", ImmutableMap.of()));
+		assertEquals("true", eval("[% null != 'hoge' %]", ImmutableMap.of()));
+		assertEquals("true", eval("[% 'hoge' != null %]", ImmutableMap.of()));
+		assertEquals("false", eval("[% null != null %]", ImmutableMap.of()));
+	}
+
 	private String eval(String src, Map<String, Object> vars)
 			throws ParserError, JSlateException, IOException,
 			TemplateLoadingError {

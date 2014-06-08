@@ -474,6 +474,13 @@ public class TTParser implements Parser {
 					children.add(n);
 					children.add(rhs);
 					n = new Node(NodeType.EQAULS, children);
+				} else if (EAT(TokenType.NE)) {
+					Node rhs = parseComparationExpr();
+					if (rhs == null) {
+						throw new ParserError(
+								"Missing additive expression after '!='", this);
+					}
+					n = new Node(NodeType.NE, n, rhs);
 				}
 				// TODO !=
 				break;

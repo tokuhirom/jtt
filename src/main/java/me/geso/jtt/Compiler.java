@@ -75,6 +75,9 @@ public class Compiler {
 			case LE:
 				compileBinOp(node, OP.LE);
 				break;
+			case NE:
+				compileBinOp(node, OP.NE);
+				break;
 			case CONCAT:
 				compileBinOp(node, OP.CONCAT);
 				break;

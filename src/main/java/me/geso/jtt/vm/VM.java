@@ -127,6 +127,13 @@ public class VM {
 				++pc;
 				break;
 			}
+			case NE: {
+				Object lhs = stack.pop();
+				Object rhs = stack.pop();
+				stack.push(doNotEqauls(lhs, rhs));
+				++pc;
+				break;
+			}
 			case GT: {
 				assert stack.size() >= 2;
 				Object lhs = stack.pop();
@@ -644,6 +651,14 @@ public class VM {
 	private Boolean doEqauls(Object lhs, Object rhs) {
 		return new Boolean(lhs.equals(rhs));
 	}
+
+	private Object doNotEqauls(Object lhs, Object rhs) {
+		if (lhs == null) {
+			return rhs != null;
+		}
+		return new Boolean(! lhs.equals(rhs));
+	}
+
 
 	// lhs > rhs
 	private Object doGT(Object lhs, Object rhs) throws TypeException {

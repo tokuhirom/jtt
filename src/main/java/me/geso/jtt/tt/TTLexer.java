@@ -47,6 +47,8 @@ public class TTLexer {
 			new TokenPair("SET", TokenType.SET), //
 			new TokenPair("LAST", TokenType.LAST), //
 			new TokenPair("NEXT", TokenType.NEXT), //
+			new TokenPair("AND", TokenType.AND), //
+			new TokenPair("OR", TokenType.OR), //
 			new TokenPair("loop", TokenType.LOOP), //
 			new TokenPair("true", TokenType.TRUE), //
 			new TokenPair("false", TokenType.FALSE), //
@@ -163,8 +165,20 @@ public class TTLexer {
 					++pos;
 					break;
 				case '!':
-					tokens.add(new Token(TokenType.NOT));
-					++pos;
+					if (pos + 1 < string.length()) {
+						if (string.charAt(pos + 1) == '=') {
+							// !=
+							tokens.add(new Token(TokenType.NE));
+							++pos;
+							++pos;
+						} else {
+							tokens.add(new Token(TokenType.NOT));
+							++pos;
+						}
+					} else {
+						tokens.add(new Token(TokenType.NOT));
+						++pos;
+					}
 					break;
 				case '|':
 					tokens.add(new Token(TokenType.PIPE));
