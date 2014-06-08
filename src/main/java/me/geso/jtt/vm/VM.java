@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import me.geso.jtt.Compiler;
+import me.geso.jtt.JTTMessageListener;
 import me.geso.jtt.TemplateLoader;
 import me.geso.jtt.TemplateLoadingError;
 import me.geso.jtt.escape.Escaper;
@@ -35,7 +36,8 @@ public class VM {
 	private TemplateLoader loader;
 	private Compiler compiler;
 	private final Map<String, Function> functions;
-	private boolean strictMode = false;
+	// private boolean strictMode = false;
+	private JTTMessageListener warningListener = null;
 
 	public VM(Compiler compiler, TemplateLoader loader,
 			Map<String, Function> functions) {
@@ -494,7 +496,7 @@ public class VM {
 			// TODO: remove SuppressWarnigns
 			@SuppressWarnings("unchecked")
 			List<Object> list = (List<Object>) container;
-			return list.get((Integer)index);
+			return list.get((Integer) index);
 		} else if (container == null) {
 			warn("container is null");
 			return null;
@@ -520,10 +522,13 @@ public class VM {
 		return builder.toString();
 	}
 
-	private void warn(String string) {
-		// We should provide a WarningListener interface.
+	private void warn(String message) {
 		// TODO We should show line number.
-		System.out.println(string);
+		if (warningListener != null) {
+			warningListener.sendMessage(message, -1, "-");
+		} else {
+			System.out.println(message);
+		}
 	}
 
 	private boolean isTrue(Object pop) {
@@ -690,9 +695,8 @@ public class VM {
 		if (lhs == null) {
 			return rhs != null;
 		}
-		return new Boolean(! lhs.equals(rhs));
+		return new Boolean(!lhs.equals(rhs));
 	}
-
 
 	// lhs > rhs
 	private Object doGT(Object lhs, Object rhs) throws TypeException {

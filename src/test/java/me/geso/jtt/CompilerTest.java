@@ -1,7 +1,12 @@
 package me.geso.jtt;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
@@ -13,14 +18,8 @@ import me.geso.jtt.vm.VM;
 
 import org.junit.Test;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 public class CompilerTest {
 	Compiler compiler = new Compiler();
