@@ -18,6 +18,7 @@ We need ER Diagram.
 
 ## Operators
 
+```
   left	terms and list operators (leftward)
   left	.
   right	!
@@ -33,6 +34,7 @@ We need ER Diagram.
   right	=
   left   AND
   left   OR
+```
 
 ## INCOMPATIBILITY WITH Templte-Toolkit
 

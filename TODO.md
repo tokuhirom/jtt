@@ -4,12 +4,11 @@ This file lists To-Does for JTT project.
 
 ## DOING
 
-* loose OR
+* `[% list.$key %]`
 
 ## TODO
 
 * `[% map.$key %]`
-* `[% list.$key %]`
  * `[% loop.count %]`
 * `[% INCLUDE "hoge" WITH foo=bar %]`
  * warnings listener
@@ -69,3 +68,4 @@ This file lists To-Does for JTT project.
 * || operator
 * loose AND
 * `[% foo != bar %]`
+* loose OR
