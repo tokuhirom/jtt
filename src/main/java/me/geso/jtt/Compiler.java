@@ -97,6 +97,9 @@ public class Compiler {
 			case DOUBLE:
 				builder.addPool(OP.LOAD_CONST, Double.valueOf(node.getText()));
 				break;
+			case LOOP:
+				builder.add(OP.LOOP);
+				break;
 			case TRUE:
 				builder.addPool(OP.LOAD_TRUE, node.getText());
 				break;

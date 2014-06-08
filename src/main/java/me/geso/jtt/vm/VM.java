@@ -47,6 +47,10 @@ public class VM {
 	public String run(Irep irep, Map<String, Object> vars)
 			throws JSlateException, IOException, ParserError,
 			TemplateLoadingError {
+		if (vars == null) {
+			throw new NullPointerException();
+		}
+
 		int pc = 0;
 
 		Code[] codes = irep.getIseq();
@@ -371,6 +375,11 @@ public class VM {
 			}
 			case METHOD_CALL: {
 				stack.push(doMethodCall(code.arg1, stack));
+				++pc;
+				break;
+			}
+			case LOOP: {
+				stack.push(loopStack.lastElement());
 				++pc;
 				break;
 			}

@@ -34,7 +34,7 @@ public class VMTest {
 		builder.add(OP.APPEND);
 		builder.add(OP.RETURN);
 		Irep irep = builder.build();
-		String got = vm.run(irep, null);
+		String got = vm.run(irep, new HashMap<>());
 		assertEquals("hoge", got);
 	}
 
@@ -47,7 +47,7 @@ public class VMTest {
 		builder.add(OP.APPEND);
 		builder.add(OP.RETURN);
 		Irep irep = builder.build();
-		String got = vm.run(irep, null);
+		String got = vm.run(irep, new HashMap<>());
 		assertEquals("7", got);
 	}
 
@@ -60,7 +60,7 @@ public class VMTest {
 		builder.add(OP.APPEND);
 		builder.add(OP.RETURN);
 		Irep irep = builder.build();
-		String got = vm.run(irep, null);
+		String got = vm.run(irep, new HashMap<>());
 		assertEquals("1", got);
 	}
 
@@ -76,7 +76,7 @@ public class VMTest {
 		builder.add(OP.APPEND);
 		builder.add(OP.RETURN);
 		Irep irep = builder.build();
-		String got = vm.run(irep, null);
+		String got = vm.run(irep, new HashMap<>());
 		assertEquals("fuga", got);
 	}
 
@@ -93,7 +93,7 @@ public class VMTest {
 		builder.add(OP.APPEND);
 		builder.add(OP.RETURN);
 		Irep irep = builder.build();
-		String got = vm.run(irep, null);
+		String got = vm.run(irep, new HashMap<>());
 		assertEquals("Huh", got);
 	}
 

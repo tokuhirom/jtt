@@ -15,6 +15,7 @@ import me.geso.jtt.vm.JSlateException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class JSlateTest {
 			InstantiationException, ParserError, JSlateException, TemplateLoadingError {
 		JTTBuilder builder = new JTTBuilder();
 		JTT jslate = builder.build();
-		assertEquals("hoge", jslate.renderString("hoge", null));
+		assertEquals("hoge", jslate.renderString("hoge", new HashMap<>()));
 	}
 
 	@Test
@@ -39,12 +40,12 @@ public class JSlateTest {
 		List<Path> paths = new ArrayList<>();
 		paths.add(includePath.toPath());
 		JTT jslate = new JTTBuilder().setIncludePaths(paths).build();
-		assertEquals("foo\n", jslate.render(new File("foo.tt"), null));
+		assertEquals("foo\n", jslate.render(new File("foo.tt"), new HashMap<>()));
 	}
 
 	@Test
 	public void testRenderFile2() throws IOException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, ParserError, JSlateException, TemplateLoadingError {
-		assertEquals("INC1_HEAD\nINC2\n\nINC1_FOOT\n", render("inc1.tt", null));
+		assertEquals("INC1_HEAD\nINC2\n\nINC1_FOOT\n", render("inc1.tt", new HashMap<>()));
 	}
 	
 	private String render(String fileName, Map<String, Object> vars) throws IOException, ParserError, JSlateException, TemplateLoadingError {

@@ -473,6 +473,13 @@ public class TTParserTest {
                 parse("[% list[var] %]").toString());
     }
 
+    @Test
+    public void testLoopCount() throws ParserError {
+        assertEquals(
+                "(template (expression (funcall (attribute (loop) (string getCount)))))",
+                parse("[% loop.getCount() %]").toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize(source);

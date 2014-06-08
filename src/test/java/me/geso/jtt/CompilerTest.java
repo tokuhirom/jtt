@@ -30,36 +30,25 @@ public class CompilerTest {
 	@Test
 	public void test() throws JSlateException, ParserError, IOException,
 			TemplateLoadingError {
-		Irep irep = compiler.compile("hoge");
-		assertNotEquals(0, irep.getIseq().length);
-		String got = vm.run(irep, null);
-		assertEquals("hoge", got);
+		assertEquals("hoge", eval("hoge"));
 	}
 
 	@Test
 	public void testInt() throws JSlateException, ParserError, IOException,
 			TemplateLoadingError {
-		Irep irep = compiler.compile("hoge[% 5963 %]");
-		String got = vm.run(irep, null);
-		assertEquals("hoge5963", got);
+		assertEquals("hoge5963", eval("hoge[% 5963 %]"));
 	}
 
 	@Test
 	public void testAdd() throws JSlateException, ParserError, IOException,
 			TemplateLoadingError {
-		Irep irep = compiler.compile("hoge[% 5900 + 63 %]");
-
-		String got = vm.run(irep, null);
-		assertEquals("hoge5963", got);
+		assertEquals("hoge5963", eval("hoge[% 5900 + 63 %]"));
 	}
 
 	@Test
 	public void testSub() throws JSlateException, ParserError, IOException,
 			TemplateLoadingError {
-		Irep irep = compiler.compile("hoge[% 5900 - 63 %]");
-
-		String got = vm.run(irep, null);
-		assertEquals("hoge5837", got);
+		assertEquals("hoge5837", eval("hoge[% 5900 - 63 %]"));
 	}
 
 	@Test
@@ -734,8 +723,8 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testLooseAnd() throws JSlateException, ParserError, IOException,
-			TemplateLoadingError {
+	public void testLooseAnd() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
 		assertEquals("true", eval("[% true AND true %]", ImmutableMap.of()));
 		assertEquals("false", eval("[% true AND false %]", ImmutableMap.of()));
 		assertEquals("false", eval("[% false AND true %]", ImmutableMap.of()));
@@ -773,34 +762,70 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testArrayAccess() throws JSlateException, ParserError, IOException,
-			TemplateLoadingError {
-		assertEquals("9", eval("[% ary[$i] %]", ImmutableMap.of("i", 1, "ary", Lists.newArrayList(5,9,6,3))));
+	public void testArrayAccess() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals(
+				"9",
+				eval("[% ary[$i] %]",
+						ImmutableMap.of("i", 1, "ary",
+								Lists.newArrayList(5, 9, 6, 3))));
 	}
 
 	@Test
-	public void testMapIndex() throws JSlateException, ParserError, IOException,
-			TemplateLoadingError {
-		assertEquals("fuga", eval("[% map[$k] %]", ImmutableMap.of("k", "hoge", "map", ImmutableMap.of("hoge", "fuga"))));
-		assertEquals("fuga", eval("[% map[k] %]", ImmutableMap.of("k", "hoge", "map", ImmutableMap.of("hoge", "fuga"))));
+	public void testMapIndex() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals(
+				"fuga",
+				eval("[% map[$k] %]",
+						ImmutableMap.of("k", "hoge", "map",
+								ImmutableMap.of("hoge", "fuga"))));
+		assertEquals(
+				"fuga",
+				eval("[% map[k] %]",
+						ImmutableMap.of("k", "hoge", "map",
+								ImmutableMap.of("hoge", "fuga"))));
 	}
 
 	@Test
-	public void testArrayDollarVarAccess() throws JSlateException, ParserError, IOException,
-			TemplateLoadingError {
-		assertEquals("9", eval("[% ary.$i %]", ImmutableMap.of("i", 1, "ary", Lists.newArrayList(5,9,6,3))));
+	public void testArrayDollarVarAccess() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals(
+				"9",
+				eval("[% ary.$i %]",
+						ImmutableMap.of("i", 1, "ary",
+								Lists.newArrayList(5, 9, 6, 3))));
 	}
 
 	@Test
-	public void testMapDollarVarAccess() throws JSlateException, ParserError, IOException,
-			TemplateLoadingError {
-		assertEquals("fuga", eval("[% map.$key %]", ImmutableMap.of("key", "hoge", "map", ImmutableMap.of("hoge", "fuga", "hige", "hage"))));
+	public void testMapDollarVarAccess() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals(
+				"fuga",
+				eval("[% map.$key %]", ImmutableMap.of("key", "hoge", "map",
+						ImmutableMap.of("hoge", "fuga", "hige", "hage"))));
 	}
 
 	@Test
-	public void testDollarVarAccess() throws JSlateException, ParserError, IOException,
-			TemplateLoadingError {
+	public void testDollarVarAccess() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
 		assertEquals("4", eval("[% $i %]", ImmutableMap.of("i", 4)));
+	}
+
+	@Test
+	public void testLoopCount() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals("1234", eval("[% FOR x IN [5,9,6,3] %][% loop.getCount() %][% END %]"));
+	}
+
+	@Test
+	public void testLoopHasNext() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals("truefalse", eval("[% FOR x IN [5,9] %][% loop.hasNext() %][% END %]"));
+	}
+
+	private String eval(String src) throws ParserError, JSlateException,
+			IOException, TemplateLoadingError {
+		return eval(src, new HashMap<String, Object>());
 	}
 
 	private String eval(String src, Map<String, Object> vars)

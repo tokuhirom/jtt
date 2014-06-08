@@ -727,7 +727,11 @@ public class TTParser implements Parser {
 					if (rhs == null) {
 						throw new ParserError("SHOULD NOT REACH HERE", this);
 					}
-					Node key = new Node(NodeType.STRING, rhs.getText()); // Convert to STRING from IDENT.
+					Node key = new Node(NodeType.STRING, rhs.getText()); // Convert
+																			// to
+																			// STRING
+																			// from
+																			// IDENT.
 					n = new Node(NodeType.ATTRIBUTE, n, key);
 				} else if (CURRENT_TYPE() == TokenType.DOLLARVAR) {
 					Node rhs = parseDollarVar();
@@ -746,10 +750,10 @@ public class TTParser implements Parser {
 				}
 
 				if (!EAT(TokenType.RBRACKET)) {
-					throw new ParserError(
-							"Missing closing bracket after '['.", this);
+					throw new ParserError("Missing closing bracket after '['.",
+							this);
 				}
-				
+
 				n = new Node(NodeType.ATTRIBUTE, n, key);
 			} else {
 				break;
@@ -793,7 +797,17 @@ public class TTParser implements Parser {
 			return parseIdent();
 		case DOLLARVAR:
 			return parseDollarVar();
+		case LOOP:
+			return parseLoop();
 		default:
+			return null;
+		}
+	}
+
+	private Node parseLoop() {
+		if (EAT(TokenType.LOOP)) {
+			return new Node(NodeType.LOOP);
+		} else {
 			return null;
 		}
 	}
