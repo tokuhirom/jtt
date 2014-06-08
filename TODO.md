@@ -15,6 +15,8 @@ This file lists To-Does for JTT project.
  * caching
  * `[% foo != bar %]`
  * Should we implement "Casting operator"?
+* loose AND
+* loose OR
 
 ## DONE
 

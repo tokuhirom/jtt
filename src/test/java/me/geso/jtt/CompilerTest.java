@@ -185,6 +185,14 @@ public class CompilerTest {
 
 		String got = vm.run(irep, vars);
 		assertEquals("falsetrue", got);
+
+		assertEquals("false", eval("[% 3 == 2 %]", ImmutableMap.of()));
+		assertEquals("true", eval("[% 3 == 3 %]", ImmutableMap.of()));
+		assertEquals("false", eval("[% 'hoge' == 'fuga' %]", ImmutableMap.of()));
+		assertEquals("true", eval("[% 'hoge' == 'hoge' %]", ImmutableMap.of()));
+		assertEquals("false", eval("[% null == 'hoge' %]", ImmutableMap.of()));
+		assertEquals("false", eval("[% 'hoge' == null %]", ImmutableMap.of()));
+		assertEquals("true", eval("[% null == null %]", ImmutableMap.of()));
 	}
 
 	@Test

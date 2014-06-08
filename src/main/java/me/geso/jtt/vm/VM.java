@@ -656,6 +656,9 @@ public class VM {
 	}
 
 	private Boolean doEqauls(Object lhs, Object rhs) {
+		if (lhs == null) {
+			return rhs == null;
+		}
 		return new Boolean(lhs.equals(rhs));
 	}
 
