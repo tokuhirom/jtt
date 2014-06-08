@@ -40,15 +40,16 @@ public class VM {
 	private JTTMessageListener warningListener = null;
 
 	public VM(Compiler compiler, TemplateLoader loader,
-			Map<String, Function> functions) {
+			Map<String, Function> functions, JTTMessageListener warningListener) {
 		this.loader = loader;
 		this.compiler = compiler;
 		this.functions = functions;
+		this.warningListener = warningListener;
 	}
 
 	public String run(Irep irep, Map<String, Object> vars)
-			throws JSlateException, IOException, ParserError,
-			TemplateLoadingError {
+			throws JSlateException, ParserError,
+			TemplateLoadingError, IOException {
 		if (vars == null) {
 			throw new NullPointerException();
 		}
@@ -453,15 +454,15 @@ public class VM {
 	}
 
 	private void doFuncall(int arglen, Stack<Object> stack) {
-		Object method = stack.get(stack.size() - arglen);
+		Object method = stack.pop();
 		if (method instanceof String) {
 			Function function = this.functions.get(method);
 			if (function != null) {
 				Object[] objects = new Object[arglen];
-				for (int i = 0; i < arglen + 1; ++i) {
-					objects[i] = stack.pop();
+				for (int i = 0; i < arglen; ++i) {
+					objects[arglen-i-1] = stack.pop();
 				}
-				function.call(objects);
+				stack.push(function.call(objects));
 			} else {
 				warn("Unknown function: " + method);
 				for (int i = 0; i < arglen + 1; ++i) {
@@ -470,7 +471,7 @@ public class VM {
 				stack.push(null);
 			}
 		} else {
-			throw new RuntimeException("NIY");
+			throw new RuntimeException("NIY: " + method.getClass());
 		}
 	}
 

@@ -9,14 +9,12 @@ This file lists To-Does for JTT project.
 
  * `[% loop.count %]`
 * `[% INCLUDE "hoge" WITH foo=bar %]`
- * warnings listener
  * caching
  * Should we implement "Casting operator"?
    * How do I parse casting operator?
 * Make pool values unique.
   * Do not add same object twice in the constant pool.
   * It should be shared.
-* Support user's function
 
 ## DONE
 
@@ -74,3 +72,5 @@ This file lists To-Does for JTT project.
 * `[% list.$key %]`
 * `[% map.$key %]`
 * `[% a[i] %]`
+* Support user's function
+* warnings listener

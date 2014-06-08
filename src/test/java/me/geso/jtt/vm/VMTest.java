@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
 public class VMTest {
 	TemplateLoader loader = new TemplateLoader(null, null);
 	Compiler compiler = new Compiler();
-	VM vm = new VM(compiler, loader, null);
+	VM vm = new VM(compiler, loader, null, null);
 
 	@Test
 	public void test() throws JSlateException, IOException, ParserError, TemplateLoadingError {

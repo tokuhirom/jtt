@@ -2,6 +2,7 @@ package me.geso.jtt;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import me.geso.jtt.parser.ParserError;
@@ -26,7 +27,10 @@ public class JTT {
 		return result;
 	}
 
-	public String renderString(String src, Map<String, Object> vars) throws ParserError, JSlateException, IOException, TemplateLoadingError {
+	public String renderString(String src, Map<String, Object> vars) throws ParserError, JSlateException, TemplateLoadingError, IOException {
+		if (vars == null) {
+			vars = new HashMap<>();
+		}
 		Irep irep = compiler.compile(src);
 		String result = vm.run(irep, vars);
 		return result;

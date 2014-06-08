@@ -342,6 +342,7 @@ public class Compiler {
 						builder.add(OP.URI_ESCAPE,
 								node.getChildren().size() - 1);
 					} else {
+						builder.addPool(OP.LOAD_CONST, func.getText());
 						builder.add(OP.FUNCALL, node.getChildren().size() - 1);
 					}
 				} else if (func.getType() == NodeType.ATTRIBUTE) {
