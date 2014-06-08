@@ -1,8 +1,7 @@
-package me.geso.jtt.tt;
+package me.geso.jtt.lexer;
 
-import me.geso.jtt.lexer.TokenType;
 
-class TokenPair {
+public class TokenPair {
 	public final String pattern;
 	public final TokenType type;
 
