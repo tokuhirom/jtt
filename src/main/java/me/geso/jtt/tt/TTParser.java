@@ -366,7 +366,7 @@ public class TTParser implements Parser {
 		}
 		return n;
 	}
-	
+
 	public Node parseLooseOr() throws ParserError {
 		Node n = parseLooseAnd();
 		if (n != null) {
@@ -374,8 +374,9 @@ public class TTParser implements Parser {
 				if (EAT(TokenType.LOOSE_OR)) {
 					Node rhs = parseLooseAnd();
 					if (rhs == null) {
-						throw new ParserError("Missing expression after 'OR' : "
-								+ CURRENT_TYPE(), this);
+						throw new ParserError(
+								"Missing expression after 'OR' : "
+										+ CURRENT_TYPE(), this);
 					}
 					n = new Node(NodeType.OROR, n, rhs);
 				} else {
@@ -394,8 +395,9 @@ public class TTParser implements Parser {
 				if (EAT(TokenType.LOOSE_AND)) {
 					Node rhs = parseAssign();
 					if (rhs == null) {
-						throw new ParserError("Missing expression after 'AND' : "
-								+ CURRENT_TYPE(), this);
+						throw new ParserError(
+								"Missing expression after 'AND' : "
+										+ CURRENT_TYPE(), this);
 					}
 					n = new Node(NodeType.ANDAND, n, rhs);
 				} else {
@@ -720,11 +722,22 @@ public class TTParser implements Parser {
 		Node n = parseAtom();
 		while (true) {
 			if (EAT(TokenType.DOT)) {
-				Node rhs = parseIdent();
-				if (rhs == null) {
-					throw new ParserError("Missing identifier after '.'.", this);
+				if (CURRENT_TYPE() == TokenType.IDENT) {
+					Node rhs = parseIdent();
+					if (rhs == null) {
+						throw new ParserError("SHOULD NOT REACH HERE", this);
+					}
+					n = new Node(NodeType.ATTRIBUTE, n, rhs);
+				} else if (CURRENT_TYPE() == TokenType.DOLLARVAR) {
+					Node rhs = parseDollarVar();
+					if (rhs == null) {
+						throw new ParserError("SHOULD NOT REACH HERE", this);
+					}
+					n = new Node(NodeType.ATTRIBUTE, n, rhs);
+				} else {
+					throw new ParserError(
+							"Missing (identifier|variable) after '.'.", this);
 				}
-				n = new Node(NodeType.ATTRIBUTE, n, rhs);
 			} else {
 				break;
 			}
@@ -765,7 +778,19 @@ public class TTParser implements Parser {
 			return parseNull();
 		case IDENT:
 			return parseIdent();
+		case DOLLARVAR:
+			return parseDollarVar();
 		default:
+			return null;
+		}
+	}
+
+	private Node parseDollarVar() {
+		if (CURRENT_TYPE() == TokenType.DOLLARVAR) {
+			String name = CURRENT_STRING();
+			++pos;
+			return new Node(NodeType.DOLLARVAR, name);
+		} else {
 			return null;
 		}
 	}
@@ -962,7 +987,11 @@ public class TTParser implements Parser {
 	}
 
 	private String CURRENT_STRING() {
-		return tokens.get(pos).getString();
+		if (pos < tokens.size()) {
+			return tokens.get(pos).getString();
+		} else {
+			return null;
+		}
 	}
 
 	public Node parseIdent() {

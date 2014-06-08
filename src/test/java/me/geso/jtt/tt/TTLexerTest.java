@@ -206,6 +206,13 @@ public class TTLexerTest {
                 lex("[% 3 OR 4 %]"));
     }
 
+    @Test
+    public void testDollarVar() {
+        assertEquals(
+                "[IDENT list],[DOT],[DOLLARVAR key]",
+                lex("[% list.$key %]"));
+    }
+
 	@Test
 	public void testError() {
 		JSlateLexerError e = null;

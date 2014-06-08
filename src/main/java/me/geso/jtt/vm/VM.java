@@ -215,10 +215,12 @@ public class VM {
 				++pc;
 				break;
 			}
-			case LOAD_VAR:
-				stack.push(vars.get(pool[code.arg1]));
+			case LOAD_VAR: {
+				Object v = vars.get(pool[code.arg1]);
+				stack.push(v);
 				++pc;
 				break;
+			}
 			case SET_VAR: {
 				// vars[pool[arg1]]=POP()
 				Object tos = stack.pop();
@@ -471,6 +473,18 @@ public class VM {
 			Map<String, Object> map = (Map<String, Object>) target;
 			Object value = map.get(attr.toString());
 			return value;
+		} else if (target instanceof List) {
+			if (attr == null) {
+				warn("null index for list index");
+				return null;
+			} else if (!(attr instanceof Integer)) {
+				warn("array index must be Integer but " + attr.getClass());
+				return null;
+			}
+			// TODO: remove SuppressWarnigns
+			@SuppressWarnings("unchecked")
+			List<Object> list = (List<Object>) target;
+			return list.get((Integer)attr);
 		} else if (target == null) {
 			warn("container is null");
 			return null;

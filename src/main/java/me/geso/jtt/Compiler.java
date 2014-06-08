@@ -286,6 +286,8 @@ public class Compiler {
 				visitAst(key);
 				if (val.getType() == NodeType.IDENT) {
 					builder.addPool(OP.LOAD_CONST, val.getText());
+				} else if (val.getType() == NodeType.IDENT) {
+					builder.addPool(OP.LOAD_CONST, val.getText());
 				} else {
 					visitAst(val);
 				}
@@ -307,6 +309,10 @@ public class Compiler {
 				}
 
 				builder.add(OP.MAKE_MAP, children.size() / 2);
+				break;
+			}
+			case DOLLARVAR: {
+				builder.addPool(OP.LOAD_VAR, node.getText());
 				break;
 			}
 			case FUNCALL: {

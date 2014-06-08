@@ -293,6 +293,10 @@ public class TTLexer {
 				case '9':
 					tokens.add(lexNumber(string));
 					break;
+				case '$':
+					++pos;
+					tokens.add(lexDollarVar());
+					break;
 				case '#': {
 					// [% # comment %]
 					lexLineComment();
@@ -303,6 +307,17 @@ public class TTLexer {
 					break;
 				}
 			}
+		}
+	}
+
+	private Token lexDollarVar() {
+		Matcher matcher = identRe.matcher(source.substring(pos));
+		if (matcher.find()) {
+			String name = matcher.group(0);
+			pos += name.length();
+			return new Token(TokenType.DOLLARVAR, name);
+		} else {
+			throw this.createError("Invalid token after '$'");
 		}
 	}
 
