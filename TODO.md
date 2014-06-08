@@ -4,6 +4,8 @@ This file lists To-Does for JTT project.
 
 ## DOING
 
+* parse && operator
+* run && operator
 
 ## TODO
 
@@ -12,10 +14,10 @@ This file lists To-Does for JTT project.
  * `[% loop.count %]`
 * `[% INCLUDE "hoge" WITH foo=bar %]`
  * warnings listener
- * && operator
  * || operator
-
  * caching
+ * `[% foo != bar %]`
+ * Should we implement "Casting operator"?
 
 ## DONE
 
@@ -60,3 +62,4 @@ This file lists To-Does for JTT project.
 * parse `[% hoge | uri %]`
 * run `[% hoge | uri %]`
 * `[% [1,2,3].size() %]`
+* lex && operator

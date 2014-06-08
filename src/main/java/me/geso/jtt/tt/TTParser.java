@@ -350,24 +350,24 @@ public class TTParser implements Parser {
 		}
 	}
 
-    // pipe = assign '|' assign;
-    public Node parsePipe() throws ParserError {
-        Node n = parseAssign();
-        while (EAT(TokenType.PIPE)) {
-            Node lhs = parseAssign();
-            if (lhs == null) {
-                throw new ParserError("Missing expression after '|'", this);
-            }
-            if (lhs.getType() == NodeType.IDENT) {
-            	ArrayList<Node> list = new ArrayList<>();
-            	list.add(n);
-                n = new Node(NodeType.FUNCALL, lhs, n);
-            } else {
-                throw new ParserError("left side of pipe must be ident", this);
-            }
-        }
-        return n;
-    }
+	// pipe = assign '|' assign;
+	public Node parsePipe() throws ParserError {
+		Node n = parseAssign();
+		while (EAT(TokenType.PIPE)) {
+			Node lhs = parseAssign();
+			if (lhs == null) {
+				throw new ParserError("Missing expression after '|'", this);
+			}
+			if (lhs.getType() == NodeType.IDENT) {
+				ArrayList<Node> list = new ArrayList<>();
+				list.add(n);
+				n = new Node(NodeType.FUNCALL, lhs, n);
+			} else {
+				throw new ParserError("left side of pipe must be ident", this);
+			}
+		}
+		return n;
+	}
 
 	public Node parseAssign() throws ParserError {
 		Node n = parseConditionalOperator();
@@ -389,7 +389,7 @@ public class TTParser implements Parser {
 			return null;
 		}
 	}
-	
+
 	public Node parseConditionalOperator() throws ParserError {
 		Node n = parseRangeExpr();
 		if (n != null) {
@@ -399,7 +399,7 @@ public class TTParser implements Parser {
 					throw new ParserError("Missing expression after '?' : "
 							+ CURRENT_TYPE(), this);
 				}
-				
+
 				if (!EAT(TokenType.KOLON)) {
 					throw new ParserError("Missing ':' after '?' : "
 							+ CURRENT_TYPE(), this);
@@ -420,24 +420,67 @@ public class TTParser implements Parser {
 		return n;
 	}
 
-    public Node parseRangeExpr() throws ParserError {
-        Node n = parseComparationExpr();
-        if (n != null) {
-            if (EAT(TokenType.RANGE)) {
-                Node l = parseComparationExpr();
-                if (l == null) {
-                    throw new ParserError("Missing expression after ':' : "
-                            + CURRENT_TYPE(), this);
-                }
+	public Node parseRangeExpr() throws ParserError {
+		Node n = parseAndAnd();
+		if (n != null) {
+			if (EAT(TokenType.RANGE)) {
+				Node l = parseAndAnd();
+				if (l == null) {
+					throw new ParserError("Missing expression after ':' : "
+							+ CURRENT_TYPE(), this);
+				}
 
-                List<Node> children = new ArrayList<>();
-                children.add(l);
-                children.add(n);
-                n = new Node(NodeType.RANGE, children);
-            }
-        }
-        return n;
-    }
+				List<Node> children = new ArrayList<>();
+				children.add(l);
+				children.add(n);
+				n = new Node(NodeType.RANGE, children);
+			}
+		}
+		return n;
+	}
+
+	public Node parseAndAnd() throws ParserError {
+		Node n = parseEqualityExpr();
+		if (n != null) {
+			while (true) {
+				if (EAT(TokenType.ANDAND)) {
+					Node rhs = parseEqualityExpr();
+					if (rhs == null) {
+						throw new ParserError("Missing expression after '&&': "
+								+ CURRENT_TYPE(), this);
+					}
+					n = new Node(NodeType.ANDAND, n, rhs);
+				} else {
+					break;
+				}
+			}
+		}
+		return n;
+	}
+
+	public Node parseEqualityExpr() throws ParserError {
+		Node n = parseComparationExpr();
+		if (n != null) {
+			while (true) {
+				// ==
+				if (EAT(TokenType.EQAULS)) {
+					Node rhs = parseComparationExpr();
+					if (rhs == null) {
+						throw new ParserError(
+								"Missing additive expression after '=='", this);
+					}
+
+					List<Node> children = new ArrayList<>();
+					children.add(n);
+					children.add(rhs);
+					n = new Node(NodeType.EQAULS, children);
+				}
+				// TODO !=
+				break;
+			}
+		}
+		return n;
+	}
 
 	// comparationExpr : additive (
 	// '==' additive
@@ -449,18 +492,7 @@ public class TTParser implements Parser {
 		}
 
 		while (true) {
-			if (EAT(TokenType.EQAULS)) {
-				Node rhs = parseAdditive();
-				if (rhs == null) {
-					throw new ParserError(
-							"Missing additive expression after '=='", this);
-				}
-
-				List<Node> children = new ArrayList<>();
-				children.add(n);
-				children.add(rhs);
-				n = new Node(NodeType.EQAULS, children);
-			} else if (EAT(TokenType.GE)) {
+			if (EAT(TokenType.GE)) {
 				Node rhs = parseAdditive();
 				if (rhs == null) {
 					throw new ParserError(
@@ -610,17 +642,17 @@ public class TTParser implements Parser {
 		throw new ParserError("Missing closing paren after arguments", this);
 	}
 
-    private Node parseNot() throws ParserError {
-        if (EAT(TokenType.NOT)) {
-            Node n = parseAttr();
-            if (n==null) {
-                throw new ParserError("Missing expression after '!'", this);
-            }
-            return new Node(NodeType.NOT, n);
-        } else {
-            return parseAttr();
-        }
-    }
+	private Node parseNot() throws ParserError {
+		if (EAT(TokenType.NOT)) {
+			Node n = parseAttr();
+			if (n == null) {
+				throw new ParserError("Missing expression after '!'", this);
+			}
+			return new Node(NodeType.NOT, n);
+		} else {
+			return parseAttr();
+		}
+	}
 
 	private Node parseAttr() throws ParserError {
 		Node n = parseAtom();

@@ -171,6 +171,13 @@ public class TTLexerTest {
                 lex("[% 3 | uri %]"));
     }
 
+    @Test
+    public void testAnd() {
+        assertEquals(
+                "[INTEGER 3],[ANDAND],[INTEGER 4]",
+                lex("[% 3 && 4 %]"));
+    }
+
 	@Test
 	public void testError() {
 		JSlateLexerError e = null;

@@ -112,6 +112,13 @@ public class VM {
 				++pc;
 				break;
 			}
+			case ANDAND: { // && operator
+				Object lhs = stack.pop();
+				Object rhs = stack.pop();
+				stack.push(convertToBoolean(lhs) && convertToBoolean(rhs));
+				++pc;
+				break;
+			}
 			case MATCH: // Smart match for SWITCH.
 			case EQAULS: {
 				Object lhs = stack.pop();

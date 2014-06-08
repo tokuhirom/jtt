@@ -410,6 +410,14 @@ public class TTParserTest {
                 node.toString());
     }
 
+    @Test
+    public void testAndAnd() throws ParserError {
+        Node node = parse("[% true && false %]");
+        assertEquals(
+                "(template (expression (andand (true) (false))))",
+                node.toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize(source);
