@@ -22,7 +22,6 @@ public class TemplateLoader {
 	}
 
 	public Irep compile(Path fileName, Compiler compiler) throws JTTError {
-		// TODO We should cache the compilation result.
 		for (Path path : includePaths) {
 			Path fullpath = path.resolve(fileName);
 			if (fullpath.toFile().exists()) {
