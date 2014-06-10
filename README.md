@@ -51,6 +51,13 @@ We need ER Diagram.
  * Some methods are not supported.
  * VMethod is not supported. Because Java objects have own built-in methods.
 
+## Caching
+
+You can cache the compilation result.
+I recommend to use JCS(Java Caching System).
+
+JTT's parser/compiler is slow. If you are using JTT in the web application, I recommend to use caching feature.
+
 ## FAQ
 
 ### Why  JTT doesn't support MACRO?
