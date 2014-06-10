@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import me.geso.jtt.Compiler;
 import me.geso.jtt.Function;
 import me.geso.jtt.JTTMessageListener;
+import me.geso.jtt.Syntax;
 import me.geso.jtt.TemplateLoader;
 import me.geso.jtt.escape.Escaper;
 import me.geso.jtt.escape.HTMLEscaper;
@@ -38,15 +38,15 @@ import com.google.common.net.UrlEscapers;
 public class VM {
 	private Escaper escaper = new HTMLEscaper();
 	private TemplateLoader loader;
-	private Compiler compiler;
+	private final Syntax syntax;
 	private final Map<String, Function> functions;
 	// private boolean strictMode = false;
 	private JTTMessageListener warningListener = null;
 
-	public VM(Compiler compiler, TemplateLoader loader,
+	public VM(Syntax syntax, TemplateLoader loader,
 			Map<String, Function> functions, JTTMessageListener warningListener) {
 		this.loader = loader;
-		this.compiler = compiler;
+		this.syntax = syntax;
 		this.functions = functions;
 		this.warningListener = warningListener;
 	}
@@ -308,7 +308,7 @@ public class VM {
 			}
 			case INCLUDE: {
 				String path = (String) stack.pop();
-				Irep compiledIrep = loader.compile(Paths.get(path), compiler);
+				Irep compiledIrep = loader.compile(Paths.get(path), syntax);
 				String result = this.run(compiledIrep, vars);
 				stack.push(result);
 				++pc;

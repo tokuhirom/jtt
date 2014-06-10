@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import me.geso.jtt.Function;
+import me.geso.jtt.tt.TTSyntax;
 import me.geso.jtt.vm.VM;
 
 /**
@@ -19,6 +20,7 @@ public class JTTBuilder {
 	private JTTMessageListener warningListener;
 	private final Map<String, Function> functions = new HashMap<String,Function>();
 	private TemplateCache templateCache = new NullTemplateCache();
+	private Syntax syntax = new TTSyntax();
 	
 	public JTTBuilder() {
 	}
@@ -30,9 +32,8 @@ public class JTTBuilder {
 	 */
 	public JTT build() {
 		TemplateLoader loader = new TemplateLoader(getIncludePaths(), this.templateCache);
-		Compiler compiler = new Compiler();
-		VM vm = new VM(compiler, loader, functions, warningListener);
-		JTT jtt = new JTT(vm, loader, compiler);
+		VM vm = new VM(this.syntax, loader, functions, warningListener);
+		JTT jtt = new JTT(vm, loader, this.syntax);
 		return jtt;
 	}
 
@@ -57,5 +58,10 @@ public class JTTBuilder {
 
 	public void setTemplateCache(TemplateCache templateCache) {
 		this.templateCache = templateCache;
+	}
+
+	public JTTBuilder setSyntax(Syntax syntax) {
+		this.syntax = syntax;
+		return this;
 	}
 }

@@ -4,11 +4,15 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import me.geso.jtt.exception.JTTCompilerError;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.exception.TemplateLoadingError;
+import me.geso.jtt.lexer.Token;
+import me.geso.jtt.parser.Node;
+import me.geso.jtt.tt.TTSyntax;
 import me.geso.jtt.vm.Irep;
 import me.geso.jtt.vm.VM;
 
@@ -18,9 +22,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 public class CompilerTest {
-	Compiler compiler = new Compiler();
+	Syntax syntax = new TTSyntax();
 	TemplateLoader loader = new TemplateLoader(null, null);
-	VM vm = new VM(compiler, loader, null, null);
+	VM vm = new VM(syntax, loader, null, null);
 
 	@Test
 	public void test() throws JTTCompilerError, ParserError, IOException,
@@ -105,8 +109,8 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testForeach() throws JTTCompilerError, ParserError, IOException,
-			TemplateLoadingError {
+	public void testForeach() throws JTTCompilerError, ParserError,
+			IOException, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("y", Lists.newArrayList(5, 9, 6, 3));
 
@@ -190,8 +194,8 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testIfFalse() throws JTTCompilerError, ParserError, IOException,
-			TemplateLoadingError {
+	public void testIfFalse() throws JTTCompilerError, ParserError,
+			IOException, TemplateLoadingError {
 		assertEquals("fuga", eval("[% IF false %]hoge[% END %]fuga"));
 	}
 
@@ -203,8 +207,8 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testIfElsIf() throws JTTCompilerError, ParserError, IOException,
-			TemplateLoadingError {
+	public void testIfElsIf() throws JTTCompilerError, ParserError,
+			IOException, TemplateLoadingError {
 		assertEquals("piyofuga",
 				eval("[% IF false %]hoge[% ELSIF true %]piyo[% END %]fuga"));
 	}
@@ -265,8 +269,8 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testForLast() throws JTTCompilerError, ParserError, IOException,
-			TemplateLoadingError {
+	public void testForLast() throws JTTCompilerError, ParserError,
+			IOException, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("o", Lists.newArrayList("a", "b", "c", "d"));
 
@@ -282,7 +286,10 @@ public class CompilerTest {
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("o", Lists.newArrayList("a", "b", "c", "d"));
 
-		assertEquals("54ok", eval("[% SET x=5 %][% WHILE x>0 %][% IF x==3 %][% LAST %][% END %][% x %][% SET x=x-1 %][% END %]ok", vars));
+		assertEquals(
+				"54ok",
+				eval("[% SET x=5 %][% WHILE x>0 %][% IF x==3 %][% LAST %][% END %][% x %][% SET x=x-1 %][% END %]ok",
+						vars));
 	}
 
 	@Test
@@ -292,12 +299,15 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testForNext() throws JTTCompilerError, ParserError, IOException,
-			TemplateLoadingError {
+	public void testForNext() throws JTTCompilerError, ParserError,
+			IOException, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("o", Lists.newArrayList("a", "b", "c", "d"));
 
-		assertEquals("124ok", eval("[% x=5 %][% FOR x IN [1,2,3,4] %][% IF x==3 %][% NEXT %][% END %][% x %][% x=x-1 %][% END %]ok", vars));
+		assertEquals(
+				"124ok",
+				eval("[% x=5 %][% FOR x IN [1,2,3,4] %][% IF x==3 %][% NEXT %][% END %][% x %][% x=x-1 %][% END %]ok",
+						vars));
 	}
 
 	@Test
@@ -324,42 +334,20 @@ public class CompilerTest {
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("o", map);
 
-		assertEquals("fuga", eval("[% {hoge=>\"fuga\", gogo=>4649}.hoge %]", vars));
+		assertEquals("fuga",
+				eval("[% {hoge=>\"fuga\", gogo=>4649}.hoge %]", vars));
 	}
 
 	@Test
 	public void testSwitch() throws JTTCompilerError, ParserError, IOException,
 			TemplateLoadingError {
-		Irep irep = compiler
-				.compile("-", "[% SWITCH n %][% CASE 1 %]one[% CASE 2 %]two[% CASE %]more[% END %]");
+		String src = "[% SWITCH n %][% CASE 1 %]one[% CASE 2 %]two[% CASE %]more[% END %]";
 		// System.out.println(new Disassembler().disasm(irep));
 
-		{
-			Map<String, Object> vars = new HashMap<String, Object>();
-			vars.put("n", 1);
-			String got = vm.run(irep, vars);
-			assertEquals("one", got);
-		}
-
-		{
-			Map<String, Object> vars = new HashMap<String, Object>();
-			vars.put("n", 2);
-			String got = vm.run(irep, vars);
-			assertEquals("two", got);
-		}
-
-		{
-			Map<String, Object> vars = new HashMap<String, Object>();
-			vars.put("n", 3);
-			String got = vm.run(irep, vars);
-			assertEquals("more", got);
-		}
-
-		{
-			Map<String, Object> vars = new HashMap<String, Object>();
-			String got = vm.run(irep, vars);
-			assertEquals("more", got);
-		}
+		assertEquals("one", eval(src, ImmutableMap.of("n", 1)));
+		assertEquals("two", eval(src, ImmutableMap.of("n", 2)));
+		assertEquals("more", eval(src, ImmutableMap.of("n", 3)));
+		assertEquals("more", eval(src, ImmutableMap.of()));
 	}
 
 	@Test
@@ -398,15 +386,16 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testSprintf() throws JTTCompilerError, ParserError, IOException,
-			TemplateLoadingError {
+	public void testSprintf() throws JTTCompilerError, ParserError,
+			IOException, TemplateLoadingError {
 		Map<String, Object> map = new HashMap<>();
 		map.put("hoge", "fuga");
 
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("o", map);
 
-		assertEquals("hehe 004, ahaha", eval("[% sprintf(\"hehe %03d, %s\", 4, \"ahaha\") %]"));
+		assertEquals("hehe 004, ahaha",
+				eval("[% sprintf(\"hehe %03d, %s\", 4, \"ahaha\") %]"));
 	}
 
 	@Test
@@ -473,8 +462,8 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testLooseOr() throws JTTCompilerError, ParserError, IOException,
-			TemplateLoadingError {
+	public void testLooseOr() throws JTTCompilerError, ParserError,
+			IOException, TemplateLoadingError {
 		assertEquals("true", eval("[% true OR true %]", ImmutableMap.of()));
 		assertEquals("true", eval("[% true OR false %]", ImmutableMap.of()));
 		assertEquals("true", eval("[% false OR true %]", ImmutableMap.of()));
@@ -519,8 +508,8 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testArrayDollarVarAccess() throws JTTCompilerError, ParserError,
-			IOException, TemplateLoadingError {
+	public void testArrayDollarVarAccess() throws JTTCompilerError,
+			ParserError, IOException, TemplateLoadingError {
 		assertEquals(
 				"9",
 				eval("[% ary.$i %]",
@@ -558,17 +547,15 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testFile() throws JTTCompilerError, ParserError,
-			IOException, TemplateLoadingError {
-		assertEquals("-",
-				eval("[% __FILE__ %]"));
+	public void testFile() throws JTTCompilerError, ParserError, IOException,
+			TemplateLoadingError {
+		assertEquals("-", eval("[% __FILE__ %]"));
 	}
 
 	@Test
-	public void testLine() throws JTTCompilerError, ParserError,
-			IOException, TemplateLoadingError {
-		assertEquals("1\n2",
-				eval("[% __LINE__ %]\n[% __LINE__ %]"));
+	public void testLine() throws JTTCompilerError, ParserError, IOException,
+			TemplateLoadingError {
+		assertEquals("1\n2", eval("[% __LINE__ %]\n[% __LINE__ %]"));
 	}
 
 	// ---------------------------------------------------------------------
@@ -585,7 +572,10 @@ public class CompilerTest {
 	private String eval(String src, Map<String, Object> vars)
 			throws ParserError, JTTCompilerError, IOException,
 			TemplateLoadingError {
-		Irep irep = compiler.compile("-", src);
+		Syntax syntax = new TTSyntax("[%", "%]");
+		List<Token> tokens = syntax.tokenize("-", src);
+		Node ast = syntax.parse(src, tokens);
+		Irep irep = syntax.compile(ast);
 		return vm.run(irep, vars);
 	}
 }

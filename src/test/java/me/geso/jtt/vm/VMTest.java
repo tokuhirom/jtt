@@ -1,6 +1,8 @@
 package me.geso.jtt.vm;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,15 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.geso.jtt.Compiler;
+import me.geso.jtt.Syntax;
 import me.geso.jtt.TemplateLoader;
 import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.exception.TemplateLoadingError;
-import me.geso.jtt.vm.Irep;
-import me.geso.jtt.vm.IrepBuilder;
-import me.geso.jtt.vm.OP;
-import me.geso.jtt.vm.VM;
+import me.geso.jtt.tt.TTSyntax;
 
 import org.junit.Test;
 
@@ -24,8 +23,8 @@ import com.google.common.collect.Lists;
 
 public class VMTest {
 	TemplateLoader loader = new TemplateLoader(null, null);
-	Compiler compiler = new Compiler();
-	VM vm = new VM(compiler, loader, null, null);
+	Syntax syntax = new TTSyntax();
+	VM vm = new VM(syntax, loader, null, null);
 
 	@Test
 	public void test() throws JTTError, IOException, ParserError, TemplateLoadingError {

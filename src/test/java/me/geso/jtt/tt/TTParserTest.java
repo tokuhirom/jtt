@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import me.geso.jtt.Syntax;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
@@ -495,7 +496,7 @@ public class TTParserTest {
     }
 
 	private Node parse(String source) throws ParserError {
-		TTSyntax syntax = new TTSyntax("[%", "%]");
+		Syntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize("-", source);
 		Node node = syntax.parse(source, tokens);
 		return node;

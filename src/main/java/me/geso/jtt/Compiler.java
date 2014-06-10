@@ -1,16 +1,17 @@
 package me.geso.jtt;
 
-import me.geso.jtt.exception.JTTCompilerError;
-import me.geso.jtt.exception.ParserError;
-import me.geso.jtt.lexer.Token;
-import me.geso.jtt.parser.Node;
-import me.geso.jtt.parser.NodeType;
-import me.geso.jtt.tt.TTSyntax;
-import me.geso.jtt.vm.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+
+import me.geso.jtt.exception.JTTCompilerError;
+import me.geso.jtt.exception.ParserError;
+import me.geso.jtt.parser.Node;
+import me.geso.jtt.parser.NodeType;
+import me.geso.jtt.vm.Code;
+import me.geso.jtt.vm.Irep;
+import me.geso.jtt.vm.IrepBuilder;
+import me.geso.jtt.vm.OP;
 
 public class Compiler {
 
@@ -397,13 +398,4 @@ public class Compiler {
 		visitor.start(ast);
 		return visitor.getResult();
 	}
-
-	public Irep compile(String fileName, String src) throws ParserError, JTTCompilerError {
-		// TODO remove this entry point.
-		TTSyntax syntax = new TTSyntax("[%", "%]");
-		List<Token> tokens = syntax.tokenize(fileName, src);
-		Node ast = syntax.parse(src, tokens);
-		return this.compile(ast);
-	}
-
 }

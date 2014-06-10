@@ -8,6 +8,8 @@ import java.util.List;
 
 import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.TemplateLoadingError;
+import me.geso.jtt.lexer.Token;
+import me.geso.jtt.parser.Node;
 import me.geso.jtt.vm.Irep;
 
 import org.apache.commons.io.IOUtils;
@@ -21,7 +23,9 @@ public class TemplateLoader {
 		this.templateCache = templateCache;
 	}
 
-	public Irep compile(Path fileName, Compiler compiler) throws JTTError {
+	public Irep compile(Path fileName, Syntax syntax) throws JTTError {
+		assert syntax != null;
+
 		for (Path path : includePaths) {
 			Path fullpath = path.resolve(fileName);
 			if (fullpath.toFile().exists()) {
@@ -32,7 +36,7 @@ public class TemplateLoader {
 					}
 				}
 
-				Irep irep = this.compileFile(fullpath, compiler);
+				Irep irep = this.compileFile(fullpath, syntax);
 				this.templateCache.set(fullpath, irep);
 				return irep;
 			}
@@ -40,10 +44,12 @@ public class TemplateLoader {
 		throw new TemplateLoadingError(fileName, this.includePaths);
 	}
 
-	private Irep compileFile(Path fullpath, Compiler compiler) throws JTTError {
+	private Irep compileFile(Path fullpath, Syntax syntax) throws JTTError {
 		try (InputStream is = Files.newInputStream(fullpath)) {
-			String str = IOUtils.toString(is, "UTF-8");
-			return compiler.compile(fullpath.toString(), str);
+			String src = IOUtils.toString(is, "UTF-8");
+			List<Token> tokens = syntax.tokenize(fullpath.toString(), src);
+			Node ast = syntax.parse(src, tokens);
+			return syntax.compile(ast);
 		} catch (IOException e) {
 			throw new JTTError("Cannot load " + fullpath + " : "
 					+ e.getMessage());
