@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import me.geso.jtt.Compiler;
-import me.geso.jtt.JTTError;
 import me.geso.jtt.TemplateLoader;
-import me.geso.jtt.TemplateLoadingError;
+import me.geso.jtt.exception.JTTError;
+import me.geso.jtt.exception.TemplateLoadingError;
 import me.geso.jtt.parser.ParserError;
 import me.geso.jtt.vm.Irep;
 import me.geso.jtt.vm.IrepBuilder;

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import me.geso.jtt.exception.JTTCompilerError;
+import me.geso.jtt.exception.TemplateLoadingError;
 import me.geso.jtt.parser.ParserError;
 import me.geso.jtt.vm.Irep;
 import me.geso.jtt.vm.VM;

@@ -1,6 +1,5 @@
-package me.geso.jtt.lexer;
+package me.geso.jtt.exception;
 
-import me.geso.jtt.JTTError;
 import me.geso.jtt.tt.TTLexer;
 
 public class JSlateLexerError extends JTTError {

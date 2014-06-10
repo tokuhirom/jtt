@@ -2,7 +2,7 @@ package me.geso.jtt.tt;
 
 import com.google.common.collect.Lists;
 
-import me.geso.jtt.lexer.JSlateLexerError;
+import me.geso.jtt.exception.JSlateLexerError;
 import me.geso.jtt.lexer.LexerMode;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.lexer.TokenPair;

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import me.geso.jtt.lexer.JSlateLexerError;
+import me.geso.jtt.exception.JSlateLexerError;
 import me.geso.jtt.lexer.Token;
 
 import org.junit.Test;

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
+import me.geso.jtt.exception.TemplateLoadingError;
 import me.geso.jtt.parser.ParserError;
 import me.geso.jtt.vm.Irep;
 

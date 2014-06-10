@@ -1,4 +1,5 @@
-package me.geso.jtt;
+package me.geso.jtt.exception;
+
 
 public class JTTCompilerError extends JTTError {
 	public JTTCompilerError(String string) {

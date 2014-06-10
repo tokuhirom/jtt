@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.geso.jtt.exception.JTTError;
+import me.geso.jtt.exception.TemplateLoadingError;
 import me.geso.jtt.parser.ParserError;
 
 import org.junit.Test;

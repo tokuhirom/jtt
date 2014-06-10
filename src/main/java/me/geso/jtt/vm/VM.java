@@ -16,12 +16,15 @@ import java.util.Map;
 import java.util.Stack;
 
 import me.geso.jtt.Compiler;
-import me.geso.jtt.JTTError;
+import me.geso.jtt.Function;
 import me.geso.jtt.JTTMessageListener;
 import me.geso.jtt.TemplateLoader;
-import me.geso.jtt.TemplateLoadingError;
 import me.geso.jtt.escape.Escaper;
 import me.geso.jtt.escape.HTMLEscaper;
+import me.geso.jtt.exception.JTTError;
+import me.geso.jtt.exception.MethodInvokeError;
+import me.geso.jtt.exception.TemplateLoadingError;
+import me.geso.jtt.exception.TypeError;
 import me.geso.jtt.parser.ParserError;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
@@ -543,13 +546,13 @@ public class VM {
 		return true;
 	}
 
-	private Object elem(Object key, Object container) throws TypeException {
+	private Object elem(Object key, Object container) throws TypeError {
 		if (container instanceof Map) {
 			return ((Map<?, ?>) container).get(key);
 		} else if (container instanceof List) {
 			return ((List<?>) container).get((Integer) key);
 		} else {
-			throw new TypeException("Container must be List or Map: "
+			throw new TypeError("Container must be List or Map: "
 					+ container.getClass());
 		}
 	}
@@ -567,17 +570,17 @@ public class VM {
 			Object retval = meth.invokeWithArguments(self);
 			return retval;
 		} catch (Throwable e) {
-			throw new MethodInvokeException(e);
+			throw new MethodInvokeError(e);
 		}
 	}
 
-	private Object doAdd(Object lhs, Object rhs) throws TypeException {
+	private Object doAdd(Object lhs, Object rhs) throws TypeError {
 		if (lhs instanceof Integer) {
 			if (rhs instanceof Integer) {
 				return Integer.valueOf(((Integer) lhs).intValue()
 						+ ((Integer) rhs).intValue());
 			} else {
-				throw new TypeException("rhs for '+' must be Number");
+				throw new TypeError("rhs for '+' must be Number");
 			}
 		} else if (lhs instanceof Double) {
 			if (rhs instanceof Integer) {
@@ -587,20 +590,20 @@ public class VM {
 				return Double.valueOf(((Double) lhs).doubleValue()
 						+ ((Double) rhs).doubleValue());
 			} else {
-				throw new TypeException("rhs for '+' must be Number");
+				throw new TypeError("rhs for '+' must be Number");
 			}
 		} else {
-			throw new TypeException("lhs for '+' must be Number");
+			throw new TypeError("lhs for '+' must be Number");
 		}
 	}
 
-	private Object doSubtract(Object lhs, Object rhs) throws TypeException {
+	private Object doSubtract(Object lhs, Object rhs) throws TypeError {
 		if (lhs instanceof Integer) {
 			if (rhs instanceof Integer) {
 				return Integer.valueOf(((Integer) lhs).intValue()
 						- ((Integer) rhs).intValue());
 			} else {
-				throw new TypeException("rhs for '-' must be Number");
+				throw new TypeError("rhs for '-' must be Number");
 			}
 		} else if (lhs instanceof Double) {
 			if (rhs instanceof Integer) {
@@ -610,20 +613,20 @@ public class VM {
 				return Double.valueOf(((Double) lhs).doubleValue()
 						- ((Double) rhs).doubleValue());
 			} else {
-				throw new TypeException("rhs for '-' must be Number");
+				throw new TypeError("rhs for '-' must be Number");
 			}
 		} else {
-			throw new TypeException("lhs for '-' must be Number");
+			throw new TypeError("lhs for '-' must be Number");
 		}
 	}
 
-	private Object doMultiply(Object lhs, Object rhs) throws TypeException {
+	private Object doMultiply(Object lhs, Object rhs) throws TypeError {
 		if (lhs instanceof Integer) {
 			if (rhs instanceof Integer) {
 				return Integer.valueOf(((Integer) lhs).intValue()
 						* ((Integer) rhs).intValue());
 			} else {
-				throw new TypeException("rhs for '*' must be Number");
+				throw new TypeError("rhs for '*' must be Number");
 			}
 		} else if (lhs instanceof Double) {
 			if (rhs instanceof Integer) {
@@ -633,20 +636,20 @@ public class VM {
 				return Double.valueOf(((Double) lhs).doubleValue()
 						* ((Double) rhs).doubleValue());
 			} else {
-				throw new TypeException("rhs for '*' must be Number");
+				throw new TypeError("rhs for '*' must be Number");
 			}
 		} else {
-			throw new TypeException("lhs for '*' must be Number");
+			throw new TypeError("lhs for '*' must be Number");
 		}
 	}
 
-	private Object doDivide(Object lhs, Object rhs) throws TypeException {
+	private Object doDivide(Object lhs, Object rhs) throws TypeError {
 		if (lhs instanceof Integer) {
 			if (rhs instanceof Integer) {
 				return Integer.valueOf(((Integer) lhs).intValue()
 						/ ((Integer) rhs).intValue());
 			} else {
-				throw new TypeException("rhs for '/' must be Number");
+				throw new TypeError("rhs for '/' must be Number");
 			}
 		} else if (lhs instanceof Double) {
 			if (rhs instanceof Integer) {
@@ -656,20 +659,20 @@ public class VM {
 				return Double.valueOf(((Double) lhs).doubleValue()
 						/ ((Double) rhs).doubleValue());
 			} else {
-				throw new TypeException("rhs for '/' must be Number");
+				throw new TypeError("rhs for '/' must be Number");
 			}
 		} else {
-			throw new TypeException("lhs for '/' must be Number");
+			throw new TypeError("lhs for '/' must be Number");
 		}
 	}
 
-	private Object doModulo(Object lhs, Object rhs) throws TypeException {
+	private Object doModulo(Object lhs, Object rhs) throws TypeError {
 		if (lhs instanceof Integer) {
 			if (rhs instanceof Integer) {
 				return Integer.valueOf(((Integer) lhs).intValue()
 						% ((Integer) rhs).intValue());
 			} else {
-				throw new TypeException("rhs for '+' must be Number");
+				throw new TypeError("rhs for '+' must be Number");
 			}
 		} else if (lhs instanceof Double) {
 			if (rhs instanceof Integer) {
@@ -679,10 +682,10 @@ public class VM {
 				return Double.valueOf(((Double) lhs).doubleValue()
 						% ((Double) rhs).doubleValue());
 			} else {
-				throw new TypeException("rhs for '+' must be Number");
+				throw new TypeError("rhs for '+' must be Number");
 			}
 		} else {
-			throw new TypeException("lhs for '+' must be Number");
+			throw new TypeError("lhs for '+' must be Number");
 		}
 	}
 
@@ -701,48 +704,48 @@ public class VM {
 	}
 
 	// lhs > rhs
-	private Object doGT(Object lhs, Object rhs) throws TypeException {
+	private Object doGT(Object lhs, Object rhs) throws TypeError {
 		// TODO better casting
 		if (lhs instanceof Comparable) {
 			@SuppressWarnings("unchecked")
 			int ret = ((Comparable<Object>) lhs).compareTo(rhs);
 			return ret > 0;
 		} else {
-			throw new TypeException("lhs for '>' must implement Comparable");
+			throw new TypeError("lhs for '>' must implement Comparable");
 		}
 	}
 
 	// lhs >= rhs
-	boolean doGE(Object lhs, Object rhs) throws TypeException {
+	boolean doGE(Object lhs, Object rhs) throws TypeError {
 		// TODO better casting
 		if (lhs instanceof Comparable) {
 			@SuppressWarnings("unchecked")
 			int ret = ((Comparable<Object>) lhs).compareTo(rhs);
 			return ret >= 0;
 		} else {
-			throw new TypeException("lhs for '>' must implement Comparable");
+			throw new TypeError("lhs for '>' must implement Comparable");
 		}
 	}
 
-	private Object doLT(Object lhs, Object rhs) throws TypeException {
+	private Object doLT(Object lhs, Object rhs) throws TypeError {
 		// TODO better casting
 		if (lhs instanceof Comparable) {
 			@SuppressWarnings("unchecked")
 			int ret = ((Comparable<Object>) lhs).compareTo(rhs);
 			return ret < 0;
 		} else {
-			throw new TypeException("lhs for '<' must implement Comparable");
+			throw new TypeError("lhs for '<' must implement Comparable");
 		}
 	}
 
-	private Object doLE(Object lhs, Object rhs) throws TypeException {
+	private Object doLE(Object lhs, Object rhs) throws TypeError {
 		// TODO better casting
 		if (lhs instanceof Comparable) {
 			@SuppressWarnings("unchecked")
 			int ret = ((Comparable<Object>) lhs).compareTo(rhs);
 			return ret <= 0;
 		} else {
-			throw new TypeException("lhs for '<=' must implement Comparable");
+			throw new TypeError("lhs for '<=' must implement Comparable");
 		}
 	}
 

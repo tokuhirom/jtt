@@ -1,6 +1,5 @@
-package me.geso.jtt.vm;
+package me.geso.jtt.exception;
 
-import me.geso.jtt.JTTError;
 
 public class JTTRuntimeError extends JTTError {
 	private static final long serialVersionUID = 1L;

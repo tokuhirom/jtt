@@ -1,4 +1,4 @@
-package me.geso.jtt.vm;
+package me.geso.jtt;
 
 /**
  * Function object for JSlate template.

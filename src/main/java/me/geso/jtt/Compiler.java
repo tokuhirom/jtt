@@ -1,5 +1,6 @@
 package me.geso.jtt;
 
+import me.geso.jtt.exception.JTTCompilerError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
 import me.geso.jtt.parser.NodeType;

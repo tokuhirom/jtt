@@ -1,7 +1,7 @@
 package me.geso.jtt;
 
 /**
- * Warning listener interface for JTT.
+ * Warning/Error message listener interface for JTT.
  * 
  * @author tokuhirom
  *

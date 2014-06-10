@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.geso.jtt.vm.Function;
+import me.geso.jtt.Function;
 import me.geso.jtt.vm.VM;
 
 /**

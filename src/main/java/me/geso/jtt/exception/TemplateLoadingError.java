@@ -1,4 +1,4 @@
-package me.geso.jtt;
+package me.geso.jtt.exception;
 
 import java.nio.file.Path;
 import java.util.List;
