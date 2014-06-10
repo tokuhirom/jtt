@@ -7,14 +7,16 @@ import me.geso.jtt.parser.Node;
 import me.geso.jtt.parser.ParserError;
 
 public class TTSyntax {
-	private TTLexerBuilder lexerBuilder;
+	private final String openTag;
+	private final String closeTag;
 
 	public TTSyntax(String openTag, String closeTag) {
-		this.lexerBuilder = new TTLexerBuilder(openTag, closeTag);
+		this.openTag = openTag;
+		this.closeTag = closeTag;
 	}
 
 	public List<Token> tokenize(String fileName, String src) {
-		TTLexer lexer = lexerBuilder.build(fileName, src);
+		TTLexer lexer = new TTLexer(fileName, src, openTag, closeTag);
 		return lexer.lex();
 	}
 	

@@ -1,20 +1,19 @@
 package me.geso.jtt.tt;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
 import me.geso.jtt.lexer.JSlateLexerError;
 import me.geso.jtt.lexer.Token;
-import me.geso.jtt.tt.TTLexerBuilder;
 
 import org.junit.Test;
 
 public class TTLexerTest {
-	TTLexerBuilder lexer = new TTLexerBuilder("[%", "%]");
-
 	private String lex(String src) {
-		return s(lexer.build("-", src).lex());
+		TTLexer lexer = new TTLexer("-", src, "[%", "%]");
+		return s(lexer.lex());
 	}
 
 	@Test
@@ -214,7 +213,7 @@ public class TTLexerTest {
 	public void testError() {
 		JSlateLexerError e = null;
 		try {
-			lexer.build("-", "[%").lex();
+			new TTLexer("-", "[%", "[%", "%]").lex();
 		} catch (JSlateLexerError err) {
 			e = err;
 		}
