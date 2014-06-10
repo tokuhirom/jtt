@@ -26,7 +26,8 @@ public class TTLexer {
 			.compile("\\A(?:[a-zA-Z][_a-zA-Z0-9]*)");
 
 	// TODO negative forward lookup \W
-	private static final Pattern fileRe = Pattern.compile("\\A__FILE__");
+	private static final Pattern positionRe = Pattern
+			.compile("\\A__(FILE|LINE)__");
 
 	private int pos;
 	private int lineNumber;
@@ -75,7 +76,7 @@ public class TTLexer {
 		this.tokens = new ArrayList<Token>();
 		this.mode = LexerMode.IN_RAW;
 		this.pos = 0;
-		this.lineNumber = 0;
+		this.lineNumber = 1;
 
 		while (pos < source.length()) {
 			if (mode == LexerMode.IN_RAW) {
@@ -317,10 +318,10 @@ public class TTLexer {
 	}
 
 	private Token lexUnderScore() {
-		Matcher matcher = fileRe.matcher(source.substring(pos));
+		Matcher matcher = positionRe.matcher(source.substring(pos));
 		if (matcher.find()) {
 			pos += matcher.group(0).length();
-			return this.createToken(TokenType.FILE);
+			return this.createToken(matcher.group(1).equals("FILE") ? TokenType.FILE : TokenType.LINE);
 		} else {
 			++pos;
 			return this.createToken(TokenType.CONCAT);

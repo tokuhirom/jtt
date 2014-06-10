@@ -129,103 +129,86 @@ public class TTLexerTest {
 
 	@Test
 	public void testComment() {
-		assertEquals(
-				"[RAW aaa],[RAW bbb]",
-				lex("aaa[%# this is a comment\n"
-						+ "  theta = 20      # so is this\n"
-						+ "  rho   = 30      # <aol>me too!</aol>\n" + "%]bbb"));
+		assertEquals("[RAW aaa],[RAW bbb]", lex("aaa[%# this is a comment\n"
+				+ "  theta = 20      # so is this\n"
+				+ "  rho   = 30      # <aol>me too!</aol>\n" + "%]bbb"));
 	}
 
 	@Test
 	public void testFuncall() {
-		assertEquals(
-				"[IDENT lc],[LPAREN],[STRING HOGE],[RPAREN]",
+		assertEquals("[IDENT lc],[LPAREN],[STRING HOGE],[RPAREN]",
 				lex("[% lc(\"HOGE\") %]"));
 	}
 
 	@Test
 	public void testConditionalOperator() {
-		assertEquals(
-				"[INTEGER 3],[QUESTION],[INTEGER 1],[KOLON],[INTEGER 0]",
+		assertEquals("[INTEGER 3],[QUESTION],[INTEGER 1],[KOLON],[INTEGER 0]",
 				lex("[% 3 ? 1 : 0 %]"));
 	}
 
-    @Test
-    public void testRangeConstructionOperator() {
-        assertEquals(
-                "[INTEGER 1],[RANGE],[INTEGER 3]",
-                lex("[% 1..3 %]"));
-    }
+	@Test
+	public void testRangeConstructionOperator() {
+		assertEquals("[INTEGER 1],[RANGE],[INTEGER 3]", lex("[% 1..3 %]"));
+	}
 
-    @Test
-    public void testUnaryNot() {
-        assertEquals(
-                "[NOT],[TRUE]",
-                lex("[% !true %]"));
-    }
+	@Test
+	public void testUnaryNot() {
+		assertEquals("[NOT],[TRUE]", lex("[% !true %]"));
+	}
 
-    @Test
-    public void testPipe() {
-        assertEquals(
-                "[INTEGER 3],[PIPE],[IDENT uri]",
-                lex("[% 3 | uri %]"));
-    }
+	@Test
+	public void testPipe() {
+		assertEquals("[INTEGER 3],[PIPE],[IDENT uri]", lex("[% 3 | uri %]"));
+	}
 
-    @Test
-    public void testAnd() {
-        assertEquals(
-                "[INTEGER 3],[ANDAND],[INTEGER 4]",
-                lex("[% 3 && 4 %]"));
-    }
+	@Test
+	public void testAnd() {
+		assertEquals("[INTEGER 3],[ANDAND],[INTEGER 4]", lex("[% 3 && 4 %]"));
+	}
 
-    @Test
-    public void testNE() {
-        assertEquals(
-                "[INTEGER 3],[NE],[INTEGER 4]",
-                lex("[% 3 != 4 %]"));
-    }
+	@Test
+	public void testNE() {
+		assertEquals("[INTEGER 3],[NE],[INTEGER 4]", lex("[% 3 != 4 %]"));
+	}
 
-    @Test
-    public void testOrOr() {
-        assertEquals(
-                "[INTEGER 3],[OROR],[INTEGER 4]",
-                lex("[% 3 || 4 %]"));
-    }
+	@Test
+	public void testOrOr() {
+		assertEquals("[INTEGER 3],[OROR],[INTEGER 4]", lex("[% 3 || 4 %]"));
+	}
 
-    @Test
-    public void testLooseAnd() {
-        assertEquals(
-                "[INTEGER 3],[LOOSE_AND],[INTEGER 4]",
-                lex("[% 3 AND 4 %]"));
-    }
+	@Test
+	public void testLooseAnd() {
+		assertEquals("[INTEGER 3],[LOOSE_AND],[INTEGER 4]",
+				lex("[% 3 AND 4 %]"));
+	}
 
-    @Test
-    public void testLooseOr() {
-        assertEquals(
-                "[INTEGER 3],[LOOSE_OR],[INTEGER 4]",
-                lex("[% 3 OR 4 %]"));
-    }
+	@Test
+	public void testLooseOr() {
+		assertEquals("[INTEGER 3],[LOOSE_OR],[INTEGER 4]", lex("[% 3 OR 4 %]"));
+	}
 
-    @Test
-    public void testDollarVar() {
-        assertEquals(
-                "[IDENT list],[DOT],[DOLLARVAR key]",
-                lex("[% list.$key %]"));
-    }
+	@Test
+	public void testDollarVar() {
+		assertEquals("[IDENT list],[DOT],[DOLLARVAR key]",
+				lex("[% list.$key %]"));
+	}
 
-    @Test
-    public void testArrayIndex() {
-        assertEquals(
-                "[IDENT list],[LBRACKET],[IDENT idx],[RBRACKET]",
-                lex("[% list[idx] %]"));
-    }
+	@Test
+	public void testArrayIndex() {
+		assertEquals("[IDENT list],[LBRACKET],[IDENT idx],[RBRACKET]",
+				lex("[% list[idx] %]"));
+	}
 
-    @Test
-    public void testFile() {
-        assertEquals(
-                "[FILE]",
-                lex("[% __FILE__ %]"));
-    }
+	@Test
+	public void testFile() {
+		assertEquals("[FILE]", lex("[% __FILE__ %]"));
+	}
+
+	@Test
+	public void testLine() {
+		assertEquals("[LINE]", lex("[% __LINE__ %]"));
+
+	}
 
 	@Test
 	public void testError() {

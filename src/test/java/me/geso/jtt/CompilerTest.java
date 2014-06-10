@@ -563,6 +563,13 @@ public class CompilerTest {
 				eval("[% __FILE__ %]"));
 	}
 
+	@Test
+	public void testLine() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals("1\n2",
+				eval("[% __LINE__ %]\n[% __LINE__ %]"));
+	}
+
 	// ---------------------------------------------------------------------
 	//
 	// UTILITY FUNCTIONS...

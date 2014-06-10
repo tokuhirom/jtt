@@ -800,6 +800,8 @@ public class TTParser implements Parser {
 			return parseLoop();
 		case FILE:
 			return parseFile();
+		case LINE:
+			return parseLine();
 		default:
 			return null;
 		}
@@ -810,6 +812,16 @@ public class TTParser implements Parser {
 			String fileName = CURRENT_FILENAME();
 			++pos;
 			return new Node(NodeType.STRING, fileName);
+		} else {
+			return null;
+		}
+	}
+
+	private Node parseLine() {
+		if (CURRENT_TYPE() == TokenType.LINE) {
+			int lineNumber = CURRENT_LINE_NUMBER();
+			++pos;
+			return new Node(NodeType.INTEGER, "" + lineNumber);
 		} else {
 			return null;
 		}
@@ -1014,6 +1026,10 @@ public class TTParser implements Parser {
 		} else {
 			return false;
 		}
+	}
+
+	private int CURRENT_LINE_NUMBER() {
+		return tokens.get(pos).getLineNumber();
 	}
 
 	private String CURRENT_FILENAME() {

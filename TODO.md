@@ -7,7 +7,6 @@ This file lists To-Does for JTT project.
 
 ## TODO
 
-* `[% __LINE__ %]`
 * Deprecate TTLexBuilder.
 * `[% INCLUDE "hoge" WITH foo=bar %]`
  * caching
@@ -77,3 +76,4 @@ This file lists To-Does for JTT project.
 * warnings listener
 * `[% loop.getCount() %]`
 * `[% __FILE__ %]`
+* `[% __LINE__ %]`

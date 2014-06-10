@@ -487,6 +487,13 @@ public class TTParserTest {
                 parse("[% __FILE__ %]").toString());
     }
 
+    @Test
+    public void testLine() throws ParserError {
+        assertEquals(
+                "(template (expression (integer 1)) (raw_string \n) (expression (integer 2)))",
+                parse("[% __LINE__ %]\n[% __LINE__ %]").toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize("-", source);
