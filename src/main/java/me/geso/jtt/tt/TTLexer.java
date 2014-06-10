@@ -2,7 +2,6 @@ package me.geso.jtt.tt;
 
 import com.google.common.collect.Lists;
 
-import me.geso.jtt.exception.JSlateLexerError;
 import me.geso.jtt.lexer.LexerMode;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.lexer.TokenPair;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TTLexer {
+class TTLexer {
 	private final Pattern closeTagRe;
 	private final Pattern openTagRe;
 
@@ -91,7 +90,7 @@ public class TTLexer {
 		}
 
 		if (mode == LexerMode.IN_TAG) {
-			throw new JSlateLexerError("Missing closing tag", this);
+			throw new TTLexerError("Missing closing tag", this);
 		}
 
 		return tokens;
@@ -466,8 +465,8 @@ public class TTLexer {
 		throw this.createError("Cannot tokenize number");
 	}
 
-	private JSlateLexerError createError(String message) {
-		return new JSlateLexerError(message, this);
+	private TTLexerError createError(String message) {
+		return new TTLexerError(message, this);
 	}
 
 	private String lexRaw(String string) {
@@ -505,7 +504,7 @@ public class TTLexer {
 			this.pos += commentMatcher.group(0).length();
 			this.mode = LexerMode.IN_RAW;
 		} else {
-			throw new JSlateLexerError(
+			throw new TTLexerError(
 					"Missing closing tag after tag comments.", this);
 		}
 

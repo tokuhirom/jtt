@@ -15,7 +15,7 @@ import me.geso.jtt.parser.Parser;
 
 import com.google.common.collect.Lists;
 
-public class TTParser implements Parser {
+class TTParser implements Parser {
 	private int pos = 0;
 	private String source;
 	private int line = 1;

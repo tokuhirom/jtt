@@ -1,14 +1,14 @@
-package me.geso.jtt.exception;
+package me.geso.jtt.tt;
 
-import me.geso.jtt.tt.TTLexer;
+import me.geso.jtt.exception.JTTError;
 
-public class JSlateLexerError extends JTTError {
+public class TTLexerError extends JTTError {
 	private static final long serialVersionUID = 1L;
 
 	private final String message;
 	private final TTLexer lexer;
 
-	public JSlateLexerError(String message, TTLexer lexer) {
+	public TTLexerError(String message, TTLexer lexer) {
 		super(message);
 		this.message = message;
 		this.lexer = lexer;

@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import me.geso.jtt.exception.JSlateLexerError;
 import me.geso.jtt.lexer.Token;
 
 import org.junit.Test;
@@ -215,10 +214,10 @@ public class TTLexerTest {
 
 	@Test
 	public void testError() {
-		JSlateLexerError e = null;
+		TTLexerError e = null;
 		try {
 			new TTLexer("-", "[%", "[%", "%]").lex();
-		} catch (JSlateLexerError err) {
+		} catch (TTLexerError err) {
 			e = err;
 		}
 		assertNotNull(e);
