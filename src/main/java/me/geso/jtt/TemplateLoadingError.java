@@ -3,7 +3,7 @@ package me.geso.jtt;
 import java.nio.file.Path;
 import java.util.List;
 
-public class TemplateLoadingError extends Exception {
+public class TemplateLoadingError extends JTTError {
 	private static final long serialVersionUID = 1L;
 
 	@Override

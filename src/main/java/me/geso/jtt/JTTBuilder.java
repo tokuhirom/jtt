@@ -8,6 +8,12 @@ import java.util.Map;
 import me.geso.jtt.vm.Function;
 import me.geso.jtt.vm.VM;
 
+/**
+ * This is a builder class for the JTT class.
+ * 
+ * @author tokuhirom
+ *
+ */
 public class JTTBuilder {
 	private TemplateLoader.CacheLevel cacheLevel;
 	private List<Path> includePaths;
@@ -17,6 +23,11 @@ public class JTTBuilder {
 	public JTTBuilder() {
 	}
 
+	/**
+	 * Build JTT class instance.
+	 * 
+	 * @return Created instance.
+	 */
 	public JTT build() {
 		TemplateLoader loader = new TemplateLoader(getIncludePaths(), cacheLevel);
 		Compiler compiler = new Compiler();

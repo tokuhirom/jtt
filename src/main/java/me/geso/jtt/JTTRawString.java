@@ -1,5 +1,11 @@
 package me.geso.jtt;
 
+/**
+ * This class indicates the string does not need to escape.
+ * 
+ * @author tokuhirom
+ *
+ */
 public class JTTRawString {
 	private String str;
 
