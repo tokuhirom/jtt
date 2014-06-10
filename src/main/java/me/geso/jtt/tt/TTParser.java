@@ -521,7 +521,7 @@ public class TTParser implements Parser {
 		if (n != null) {
 			while (true) {
 				// ==
-				if (EAT(TokenType.EQAULS)) {
+				if (EAT(TokenType.EQUALS)) {
 					Node rhs = parseComparationExpr();
 					if (rhs == null) {
 						throw new ParserError(
@@ -531,7 +531,7 @@ public class TTParser implements Parser {
 					List<Node> children = new ArrayList<>();
 					children.add(n);
 					children.add(rhs);
-					n = new Node(NodeType.EQAULS, children);
+					n = new Node(NodeType.EQUALS, children);
 				} else if (EAT(TokenType.NE)) {
 					Node rhs = parseComparationExpr();
 					if (rhs == null) {

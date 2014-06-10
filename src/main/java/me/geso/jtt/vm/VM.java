@@ -134,17 +134,17 @@ public class VM {
 				break;
 			}
 			case MATCH: // Smart match for SWITCH.
-			case EQAULS: {
+			case EQUALS: {
 				Object lhs = stack.pop();
 				Object rhs = stack.pop();
-				stack.push(doEqauls(lhs, rhs));
+				stack.push(doEquals(lhs, rhs));
 				++pc;
 				break;
 			}
 			case NE: {
 				Object lhs = stack.pop();
 				Object rhs = stack.pop();
-				stack.push(doNotEqauls(lhs, rhs));
+				stack.push(doNotEquals(lhs, rhs));
 				++pc;
 				break;
 			}
@@ -685,14 +685,14 @@ public class VM {
 		}
 	}
 
-	private Boolean doEqauls(Object lhs, Object rhs) {
+	private Boolean doEquals(Object lhs, Object rhs) {
 		if (lhs == null) {
 			return rhs == null;
 		}
 		return new Boolean(lhs.equals(rhs));
 	}
 
-	private Object doNotEqauls(Object lhs, Object rhs) {
+	private Object doNotEquals(Object lhs, Object rhs) {
 		if (lhs == null) {
 			return rhs != null;
 		}

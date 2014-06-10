@@ -60,8 +60,8 @@ public class Compiler {
 			case MODULO:
 				compileBinOp(node, OP.MODULO);
 				break;
-			case EQAULS:
-				compileBinOp(node, OP.EQAULS);
+			case EQUALS:
+				compileBinOp(node, OP.EQUALS);
 				break;
 			case GT:
 				compileBinOp(node, OP.GT);

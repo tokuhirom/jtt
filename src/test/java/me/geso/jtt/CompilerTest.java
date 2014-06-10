@@ -113,7 +113,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testEqauls() throws JSlateException, ParserError, IOException,
+	public void testEquals() throws JSlateException, ParserError, IOException,
 			TemplateLoadingError {
 		assertEquals("falsetrue", eval("[% 5==3 %][% 3 == 3 %]"));
 

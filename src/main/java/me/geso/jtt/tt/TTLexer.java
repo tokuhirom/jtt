@@ -266,7 +266,7 @@ public class TTLexer {
 				case '=':
 					if (pos + 1 < string.length()) {
 						if (source.substring(pos).startsWith("==")) {
-							tokens.add(this.createToken(TokenType.EQAULS));
+							tokens.add(this.createToken(TokenType.EQUALS));
 							pos += 2;
 						} else if (source.substring(pos).startsWith("=>")) {
 							tokens.add(this.createToken(TokenType.ARROW));

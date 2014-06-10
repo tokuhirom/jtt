@@ -96,7 +96,7 @@ public class TTParserTest {
 		Node node = parse("[% 3 == 4 %]");
 
 		assertEquals(
-				"(template (expression (eqauls (integer 3) (integer 4))))",
+				"(template (expression (equals (integer 3) (integer 4))))",
 				node.toString());
 	}
 

@@ -66,7 +66,7 @@ public class TTLexerTest {
 
 	@Test
 	public void testEquals() {
-		assertEquals("[IDENT x],[EQAULS],[INTEGER 3]", lex("[% x==3 %]"));
+		assertEquals("[IDENT x],[EQUALS],[INTEGER 3]", lex("[% x==3 %]"));
 	}
 
 	@Test

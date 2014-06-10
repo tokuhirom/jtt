@@ -149,11 +149,11 @@ public class VMTest {
 		IrepBuilder builder = new IrepBuilder();
 		builder.addPool(OP.LOAD_CONST, "foo");
 		builder.addPool(OP.LOAD_CONST, "foo");
-		builder.add(OP.EQAULS);
+		builder.add(OP.EQUALS);
 		builder.add(OP.APPEND);
 		builder.addPool(OP.LOAD_CONST, "foo");
 		builder.addPool(OP.LOAD_CONST, "bar");
-		builder.add(OP.EQAULS);
+		builder.add(OP.EQUALS);
 		builder.add(OP.APPEND);
 		builder.add(OP.RETURN);
 
