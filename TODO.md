@@ -8,7 +8,6 @@ This file lists To-Does for JTT project.
 ## TODO
 
 * `[% INCLUDE "hoge" WITH foo=bar %]`
- * caching
  * Should we implement "Casting operator"?
    * How do I parse casting operator?
 * Make pool values unique.
@@ -77,3 +76,4 @@ This file lists To-Does for JTT project.
 * `[% __FILE__ %]`
 * `[% __LINE__ %]`
 * Deprecate TTLexBuilder.
+* caching

@@ -1,10 +1,15 @@
 package me.geso.jtt;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.ParserError;
@@ -55,7 +60,8 @@ public class JTTTest {
 	}
 
 	@Test
-	public void testWarningsHandler() throws ParserError, JTTError, TemplateLoadingError, IOException {
+	public void testWarningsHandler() throws ParserError, JTTError,
+			TemplateLoadingError, IOException {
 		final List<String> messages = new ArrayList<>();
 		assertEquals(
 				"(null)",
@@ -65,5 +71,36 @@ public class JTTTest {
 						}).build().renderString("[% null %]", null));
 		assertEquals(1, messages.size());
 		assertEquals("Appending null", messages.get(0));
+	}
+
+	@Test
+	public void testRenderFile() throws IOException {
+		assertEquals("foo\n",
+				render("foo.tt", new HashMap<>()));
+	}
+
+	@Test
+	public void testRenderFile2() throws IOException, JTTError {
+		assertEquals("INC1_HEAD\nINC2\n\nINC1_FOOT\n",
+				render("inc1.tt", new HashMap<>()));
+	}
+
+	private String render(String fileName, Map<String, Object> vars)
+			throws JTTError, TemplateLoadingError, IOException {
+		JTT jslate = new JTTBuilder().setIncludePaths(buildIncludePaths())
+				.build();
+		return jslate.render(new File(fileName), vars);
+	}
+
+	private List<Path> buildIncludePaths() {
+		URL resource = this.getClass().getResource("/");
+		File includePath = new File(resource.getFile());
+
+		// Note: You can't use Lists.newArrayList() here.
+		// Because Path is iterable.
+		List<Path> paths = new ArrayList<>();
+		paths.add(includePath.toPath());
+
+		return paths;
 	}
 }

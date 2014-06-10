@@ -12,8 +12,8 @@ public class TemplateLoadingError extends JTTError {
 				+ ", fileName=" + fileName + "]";
 	}
 
-	List<Path> includePaths;
-	private Path fileName;
+	private final List<Path> includePaths;
+	private final Path fileName;
 
 	public TemplateLoadingError(Path fileName, List<Path> includePaths) {
 		this.fileName = fileName;
