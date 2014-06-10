@@ -26,12 +26,13 @@ public class TTLexer {
 			.compile("\\A(?:[a-zA-Z][_a-zA-Z0-9]*)");
 
 	private int pos;
-	private int line;
+	private int lineNumber;
 	private final String source;
 
 	private LexerMode mode;
 	private List<Token> tokens;
 	private final String closeTag;
+	private final String fileName;
 
 	private static final List<TokenPair> keywords = Lists.newArrayList(
 			new TokenPair("END", TokenType.END),//
@@ -57,7 +58,8 @@ public class TTLexer {
 			new TokenPair("null", TokenType.NULL) //
 			);
 
-	public TTLexer(String src, String openTag, String closeTag) {
+	public TTLexer(String fileName, String src, String openTag, String closeTag) {
+		this.fileName = fileName;
 		this.source = src;
 		this.closeTag = closeTag;
 		this.openTagRe = Pattern.compile(String.format("\\A(?:\\n?[ ]*%s-|%s)",
@@ -70,13 +72,13 @@ public class TTLexer {
 		this.tokens = new ArrayList<Token>();
 		this.mode = LexerMode.IN_RAW;
 		this.pos = 0;
-		this.line = 0;
+		this.lineNumber = 0;
 
 		while (pos < source.length()) {
 			if (mode == LexerMode.IN_RAW) {
 				String raw = lexRaw(source);
 				if (raw.length() > 0) {
-					tokens.add(new Token(TokenType.RAW, raw));
+					tokens.add(this.createToken(TokenType.RAW, raw));
 				}
 			} else if (mode == LexerMode.IN_TAG) {
 				lexTagBody(source, tokens);
@@ -93,7 +95,7 @@ public class TTLexer {
 	}
 
 	public int getLine() {
-		return this.line;
+		return this.lineNumber;
 	}
 
 	private void lexTagBody(String string, List<Token> tokens) {
@@ -107,7 +109,7 @@ public class TTLexer {
 			} else {
 				switch (string.charAt(pos)) {
 				case '\n':
-					++line;
+					++lineNumber;
 					++pos;
 					break;
 				case ' ':
@@ -115,92 +117,92 @@ public class TTLexer {
 					++pos;
 					break;
 				case '+':
-					tokens.add(new Token(TokenType.PLUS));
+					tokens.add(this.createToken(TokenType.PLUS));
 					++pos;
 					break;
 				case '<':
 					if (pos + 1 < string.length()) {
 						if (string.charAt(pos + 1) == '=') {
-							tokens.add(new Token(TokenType.LE));
+							tokens.add(this.createToken(TokenType.LE));
 							pos += 2;
 						} else {
-							tokens.add(new Token(TokenType.LT));
+							tokens.add(this.createToken(TokenType.LT));
 							pos++;
 						}
 					} else {
-						tokens.add(new Token(TokenType.LT));
+						tokens.add(this.createToken(TokenType.LT));
 						++pos;
 					}
 					break;
 				case '>':
 					if (pos + 1 < string.length()) {
 						if (string.charAt(pos + 1) == '=') {
-							tokens.add(new Token(TokenType.GE));
+							tokens.add(this.createToken(TokenType.GE));
 							pos += 2;
 						} else {
-							tokens.add(new Token(TokenType.GT));
+							tokens.add(this.createToken(TokenType.GT));
 							pos++;
 						}
 					} else {
-						tokens.add(new Token(TokenType.GT));
+						tokens.add(this.createToken(TokenType.GT));
 						++pos;
 					}
 					break;
 				case '_':
-					tokens.add(new Token(TokenType.CONCAT));
+					tokens.add(this.createToken(TokenType.CONCAT));
 					++pos;
 					break;
 				case '%':
-					tokens.add(new Token(TokenType.MODULO));
+					tokens.add(this.createToken(TokenType.MODULO));
 					++pos;
 					break;
 				case '*':
-					tokens.add(new Token(TokenType.MUL));
+					tokens.add(this.createToken(TokenType.MUL));
 					++pos;
 					break;
 				case '-':
-					tokens.add(new Token(TokenType.MINUS));
+					tokens.add(this.createToken(TokenType.MINUS));
 					++pos;
 					break;
 				case '/':
-					tokens.add(new Token(TokenType.DIVIDE));
+					tokens.add(this.createToken(TokenType.DIVIDE));
 					++pos;
 					break;
 				case '!':
 					if (pos + 1 < string.length()) {
 						if (string.charAt(pos + 1) == '=') {
 							// !=
-							tokens.add(new Token(TokenType.NE));
+							tokens.add(this.createToken(TokenType.NE));
 							++pos;
 							++pos;
 						} else {
-							tokens.add(new Token(TokenType.NOT));
+							tokens.add(this.createToken(TokenType.NOT));
 							++pos;
 						}
 					} else {
-						tokens.add(new Token(TokenType.NOT));
+						tokens.add(this.createToken(TokenType.NOT));
 						++pos;
 					}
 					break;
 				case '|':
 					if (pos + 1 < string.length()) {
 						if (string.charAt(pos + 1) == '|') {
-							tokens.add(new Token(TokenType.OROR));
+							tokens.add(this.createToken(TokenType.OROR));
 							++pos;
 							++pos;
 						} else {
-							tokens.add(new Token(TokenType.PIPE));
+							tokens.add(this.createToken(TokenType.PIPE));
 							++pos;
 						}
 					} else {
-						tokens.add(new Token(TokenType.PIPE));
+						tokens.add(this.createToken(TokenType.PIPE));
 						++pos;
 					}
 					break;
 				case '&':
 					if (pos + 1 < string.length()) {
 						if (string.charAt(pos + 1) == '&') {
-							tokens.add(new Token(TokenType.ANDAND));
+							tokens.add(this.createToken(TokenType.ANDAND));
 							++pos;
 							++pos;
 						} else {
@@ -213,64 +215,64 @@ public class TTLexer {
 				case '.':
 					if (pos + 1 < string.length()) {
 						if (string.charAt(pos + 1) == '.') {
-							tokens.add(new Token(TokenType.RANGE));
+							tokens.add(this.createToken(TokenType.RANGE));
 							++pos;
 							++pos;
 						} else {
-							tokens.add(new Token(TokenType.DOT));
+							tokens.add(this.createToken(TokenType.DOT));
 							++pos;
 						}
 					} else {
-						tokens.add(new Token(TokenType.DOT));
+						tokens.add(this.createToken(TokenType.DOT));
 						++pos;
 					}
 					break;
 				case '[':
-					tokens.add(new Token(TokenType.LBRACKET));
+					tokens.add(this.createToken(TokenType.LBRACKET));
 					++pos;
 					break;
 				case ']':
-					tokens.add(new Token(TokenType.RBRACKET));
+					tokens.add(this.createToken(TokenType.RBRACKET));
 					++pos;
 					break;
 				case '{':
-					tokens.add(new Token(TokenType.LBRACE));
+					tokens.add(this.createToken(TokenType.LBRACE));
 					++pos;
 					break;
 				case '?':
-					tokens.add(new Token(TokenType.QUESTION));
+					tokens.add(this.createToken(TokenType.QUESTION));
 					++pos;
 					break;
 				case ':':
-					tokens.add(new Token(TokenType.KOLON));
+					tokens.add(this.createToken(TokenType.KOLON));
 					++pos;
 					break;
 				case '}':
-					tokens.add(new Token(TokenType.RBRACE));
+					tokens.add(this.createToken(TokenType.RBRACE));
 					++pos;
 					break;
 				case '(':
-					tokens.add(new Token(TokenType.LPAREN));
+					tokens.add(this.createToken(TokenType.LPAREN));
 					++pos;
 					break;
 				case ')':
-					tokens.add(new Token(TokenType.RPAREN));
+					tokens.add(this.createToken(TokenType.RPAREN));
 					++pos;
 					break;
 				case ',':
-					tokens.add(new Token(TokenType.COMMA));
+					tokens.add(this.createToken(TokenType.COMMA));
 					++pos;
 					break;
 				case '=':
 					if (pos + 1 < string.length()) {
 						if (source.substring(pos).startsWith("==")) {
-							tokens.add(new Token(TokenType.EQAULS));
+							tokens.add(this.createToken(TokenType.EQAULS));
 							pos += 2;
 						} else if (source.substring(pos).startsWith("=>")) {
-							tokens.add(new Token(TokenType.ARROW));
+							tokens.add(this.createToken(TokenType.ARROW));
 							pos += 2;
 						} else {
-							tokens.add(new Token(TokenType.ASSIGN));
+							tokens.add(this.createToken(TokenType.ASSIGN));
 							++pos;
 						}
 					} else {
@@ -317,7 +319,7 @@ public class TTLexer {
 		if (matcher.find()) {
 			String name = matcher.group(0);
 			pos += name.length();
-			return new Token(TokenType.DOLLARVAR, name);
+			return this.createToken(TokenType.DOLLARVAR, name);
 		} else {
 			throw this.createError("Invalid token after '$'");
 		}
@@ -362,7 +364,7 @@ public class TTLexer {
 				++pos;
 			}
 		}
-		return new Token(TokenType.STRING, new String(builder));
+		return this.createToken(TokenType.STRING, new String(builder));
 	}
 
 	private Token lexDqString() {
@@ -402,7 +404,7 @@ public class TTLexer {
 				++pos;
 			}
 		}
-		return new Token(TokenType.STRING, new String(builder));
+		return this.createToken(TokenType.STRING, new String(builder));
 	}
 
 	private Token lexOthers() {
@@ -410,7 +412,7 @@ public class TTLexer {
 		for (TokenPair keyword : keywords) {
 			if (source.substring(pos).startsWith(keyword.pattern)) {
 				pos += keyword.pattern.length();
-				return new Token(keyword.type);
+				return this.createToken(keyword.type);
 			}
 		}
 
@@ -420,7 +422,7 @@ public class TTLexer {
 			if (matcher.find()) {
 				String s = matcher.group(0);
 				pos += s.length();
-				return new Token(TokenType.IDENT, s);
+				return this.createToken(TokenType.IDENT, s);
 			}
 		}
 
@@ -434,7 +436,7 @@ public class TTLexer {
 			if (matcher.find()) {
 				String s = matcher.group(0);
 				pos += s.length();
-				return new Token(TokenType.DOUBLE, s);
+				return this.createToken(TokenType.DOUBLE, s);
 			}
 		}
 
@@ -444,7 +446,7 @@ public class TTLexer {
 			if (matcher.find()) {
 				String s = matcher.group(0);
 				pos += s.length();
-				return new Token(TokenType.INTEGER, s);
+				return this.createToken(TokenType.INTEGER, s);
 			}
 		}
 
@@ -473,7 +475,7 @@ public class TTLexer {
 			} else {
 				char c = string.charAt(pos);
 				if (c == '\n') {
-					++line;
+					++lineNumber;
 				}
 				builder.append(string.charAt(pos));
 				++pos;
@@ -503,4 +505,19 @@ public class TTLexer {
 	public String getSource() {
 		return source;
 	}
+
+	/**
+	 * Shorthand for `createToken(type, null)`
+	 * 
+	 * @param type
+	 * @return
+	 */
+	private Token createToken(TokenType type) {
+		return this.createToken(type, null);
+	}
+
+	private Token createToken(TokenType type, String string) {
+		return new Token(type, string, lineNumber, fileName);
+	}
+
 }

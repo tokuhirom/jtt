@@ -7,7 +7,8 @@ This file lists To-Does for JTT project.
 
 ## TODO
 
- * `[% loop.count %]`
+* `[% __LINE__ %]`
+* `[% __FILE__ %]`
 * `[% INCLUDE "hoge" WITH foo=bar %]`
  * caching
  * Should we implement "Casting operator"?
@@ -74,3 +75,4 @@ This file lists To-Does for JTT project.
 * `[% a[i] %]`
 * Support user's function
 * warnings listener
+* `[% loop.getCount() %]`

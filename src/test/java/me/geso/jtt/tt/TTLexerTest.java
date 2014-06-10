@@ -14,7 +14,7 @@ public class TTLexerTest {
 	TTLexerBuilder lexer = new TTLexerBuilder("[%", "%]");
 
 	private String lex(String src) {
-		return s(lexer.build(src).lex());
+		return s(lexer.build("-", src).lex());
 	}
 
 	@Test
@@ -224,7 +224,7 @@ public class TTLexerTest {
 	public void testError() {
 		JSlateLexerError e = null;
 		try {
-			lexer.build("[%").lex();
+			lexer.build("-", "[%").lex();
 		} catch (JSlateLexerError err) {
 			e = err;
 		}

@@ -41,7 +41,7 @@ public class TemplateLoader {
 			throws IOException, ParserError, JSlateException {
 		try (InputStream is = Files.newInputStream(fullpath)) {
 			String str = IOUtils.toString(is, "UTF-8");
-			return compiler.compile(str);
+			return compiler.compile(fullpath.toString(), str);
 		}
 	}
 }

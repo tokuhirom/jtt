@@ -13,8 +13,8 @@ public class TTSyntax {
 		this.lexerBuilder = new TTLexerBuilder(openTag, closeTag);
 	}
 
-	public List<Token> tokenize(String src) {
-		TTLexer lexer = lexerBuilder.build(src);
+	public List<Token> tokenize(String fileName, String src) {
+		TTLexer lexer = lexerBuilder.build(fileName, src);
 		return lexer.lex();
 	}
 	

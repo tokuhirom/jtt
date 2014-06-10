@@ -394,10 +394,10 @@ public class Compiler {
 		return visitor.getResult();
 	}
 
-	public Irep compile(String src) throws ParserError, JSlateException {
+	public Irep compile(String fileName, String src) throws ParserError, JSlateException {
 		// TODO remove this entry point.
 		TTSyntax syntax = new TTSyntax("[%", "%]");
-		List<Token> tokens = syntax.tokenize(src);
+		List<Token> tokens = syntax.tokenize(fileName, src);
 		Node ast = syntax.parse(src, tokens);
 		return this.compile(ast);
 	}

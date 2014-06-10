@@ -10,7 +10,7 @@ public class TTLexerBuilder {
 		this.closeTag = closeTag;
 	}
 	
-	public TTLexer build(String src) {
-		return new TTLexer(src, this.openTag, this.closeTag);
+	public TTLexer build(String fileName, String src) {
+		return new TTLexer(fileName, src, this.openTag, this.closeTag);
 	}
 }

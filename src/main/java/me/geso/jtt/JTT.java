@@ -31,7 +31,7 @@ public class JTT {
 		if (vars == null) {
 			vars = new HashMap<>();
 		}
-		Irep irep = compiler.compile(src);
+		Irep irep = compiler.compile("-", src);
 		String result = vm.run(irep, vars);
 		return result;
 	}

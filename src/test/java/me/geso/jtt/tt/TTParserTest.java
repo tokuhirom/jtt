@@ -482,7 +482,7 @@ public class TTParserTest {
 
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
-		List<Token> tokens = syntax.tokenize(source);
+		List<Token> tokens = syntax.tokenize("-", source);
 		Node node = syntax.parse(source, tokens);
 		return node;
 	}
