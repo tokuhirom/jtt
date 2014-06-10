@@ -54,9 +54,10 @@ We need ER Diagram.
 ## Caching
 
 You can cache the compilation result.
-I recommend to use JCS(Java Caching System).
 
 JTT's parser/compiler is slow. If you are using JTT in the web application, I recommend to use caching feature.
+
+You can use JCS for caching(I will provide jtt-jcs package after few months...(maybe)).
 
 ## FAQ
 

@@ -5,62 +5,57 @@ import java.util.List;
 
 public class Node {
 
-	private String text;
-	private NodeType type;
-	private List<Node> children;
+	private final String text;
+	private final NodeType type;
+	private final List<Node> children;
+
+	public Node(NodeType type) {
+		this.type = type;
+		this.text = null;
+		this.children = null;
+	}
 
 	public Node(NodeType type, String text) {
-		this.setType(type);
-		this.setText(text);
+		this.type = type;
+		this.text = text;
+		this.children = null;
 	}
 
 	public Node(NodeType type, Node child) {
-		this.setType(type);
+		this.type = type;
+		this.text = null;
 
 		List<Node> children = new ArrayList<>();
 		children.add(child);
-		this.setChildren(children);
+		this.children = children;
 	}
 
 	public Node(NodeType type, List<Node> children) {
-		this.setType(type);
-		this.setChildren(children);
-	}
-
-	public Node(NodeType type) {
-		this.setType(type);
+		this.type = type;
+		this.text = null;
+		this.children = children;
 	}
 
 	public Node(NodeType type, Node lhs, Node rhs) {
-		this.setType(type);
+		this.type = type;
+		this.text = null;
+
 		List<Node> children = new ArrayList<>();
 		children.add(lhs);
 		children.add(rhs);
-		this.setChildren(children);
+		this.children = children;
 	}
 
 	public String getText() {
 		return text;
 	}
 
-	public void setText(String text) {
-		this.text = text;
-	}
-
 	public List<Node> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<Node> children) {
-		this.children = children;
-	}
-
 	public NodeType getType() {
 		return type;
-	}
-
-	public void setType(NodeType type) {
-		this.type = type;
 	}
 
 	public String toString() {
