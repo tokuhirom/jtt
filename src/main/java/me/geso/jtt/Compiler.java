@@ -24,7 +24,7 @@ public class Compiler {
 			return lvarStack.lastElement().size() - 1;
 		}
 
-		private void visitAst(Node node) throws JSlateException {
+		private void visitAst(Node node) {
 			switch (node.getType()) {
 			case EXPRESSION:
 				for (Node n : node.getChildren()) {
@@ -324,13 +324,13 @@ public class Compiler {
 					}
 					if (func.getText().equals("lc")) {
 						if (node.getChildren().size() - 1 != 1) {
-							throw new JSlateException(
+							throw new JTTCompilerError(
 									"Invalid argument count for 'lc'");
 						}
 						builder.add(OP.LC, node.getChildren().size() - 1);
 					} else if (func.getText().equals("uc")) {
 						if (node.getChildren().size() - 1 != 1) {
-							throw new JSlateException(
+							throw new JTTCompilerError(
 									"Invalid argument count for 'uc'");
 						}
 						builder.add(OP.UC, node.getChildren().size() - 1);
@@ -339,7 +339,7 @@ public class Compiler {
 					} else if (func.getText().equals("uri")
 							|| func.getText().equals("url")) {
 						if (node.getChildren().size() - 1 != 1) {
-							throw new JSlateException(
+							throw new JTTCompilerError(
 									"Invalid argument count for 'ur[il]'");
 						}
 						builder.add(OP.URI_ESCAPE,
@@ -369,7 +369,7 @@ public class Compiler {
 			}
 		}
 
-		void compileBinOp(Node node, OP op) throws JSlateException {
+		void compileBinOp(Node node, OP op) throws JTTCompilerError {
 			assert node.getChildren().size() == 2;
 			for (int i = node.getChildren().size() - 1; i >= 0; --i) {
 				visitAst(node.getChildren().get(i));
@@ -382,13 +382,13 @@ public class Compiler {
 			return builder.build();
 		}
 
-		public void start(Node ast) throws JSlateException {
+		public void start(Node ast) throws JTTCompilerError {
 			lvarStack.push(new ArrayList<>());
 			this.visitAst(ast);
 		}
 	}
 
-	public Irep compile(Node ast) throws ParserError, JSlateException {
+	public Irep compile(Node ast) throws ParserError, JTTCompilerError {
 		if (ast == null) {
 			throw new RuntimeException("nullpo");
 		}
@@ -397,7 +397,7 @@ public class Compiler {
 		return visitor.getResult();
 	}
 
-	public Irep compile(String fileName, String src) throws ParserError, JSlateException {
+	public Irep compile(String fileName, String src) throws ParserError, JTTCompilerError {
 		// TODO remove this entry point.
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize(fileName, src);

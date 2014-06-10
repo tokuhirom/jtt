@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Map;
 
 import me.geso.jtt.Compiler;
+import me.geso.jtt.JTTError;
 import me.geso.jtt.TemplateLoader;
 import me.geso.jtt.TemplateLoadingError;
 import me.geso.jtt.parser.ParserError;
 import me.geso.jtt.vm.Irep;
 import me.geso.jtt.vm.IrepBuilder;
-import me.geso.jtt.vm.JSlateException;
 import me.geso.jtt.vm.OP;
 import me.geso.jtt.vm.VM;
 
@@ -28,7 +28,7 @@ public class VMTest {
 	VM vm = new VM(compiler, loader, null, null);
 
 	@Test
-	public void test() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void test() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		IrepBuilder builder = new IrepBuilder();
 		builder.addPool(OP.LOAD_CONST, "hoge");
 		builder.add(OP.APPEND);
@@ -39,7 +39,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testAdd() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void testAdd() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		IrepBuilder builder = new IrepBuilder();
 		builder.addPool(OP.LOAD_CONST, new Integer(3));
 		builder.addPool(OP.LOAD_CONST, new Integer(4));
@@ -52,7 +52,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testSubtract() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void testSubtract() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		IrepBuilder builder = new IrepBuilder();
 		builder.addPool(OP.LOAD_CONST, new Integer(3));
 		builder.addPool(OP.LOAD_CONST, new Integer(4));
@@ -65,7 +65,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testElemMap() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void testElemMap() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		Map<String, String> map = new HashMap<>();
 		map.put("hoge", "fuga");
 
@@ -81,7 +81,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testElemList() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void testElemList() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		List<String> list = new ArrayList<>();
 		list.add("HAH");
 		list.add("Huh");
@@ -98,7 +98,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testLoadVar() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void testLoadVar() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 		vars.put("foo", "bar");
 
@@ -112,7 +112,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testSetVar() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void testSetVar() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		IrepBuilder builder = new IrepBuilder();
 		builder.addPool(OP.LOAD_CONST, "foo");
 		builder.addPool(OP.SET_VAR, "v");
@@ -126,7 +126,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testForEach() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void testForEach() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 
 		IrepBuilder builder = new IrepBuilder();
@@ -143,7 +143,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testEquals() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void testEquals() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 
 		IrepBuilder builder = new IrepBuilder();
@@ -163,7 +163,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testGraterThan() throws JSlateException, IOException, ParserError, TemplateLoadingError {
+	public void testGraterThan() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 
 		IrepBuilder builder = new IrepBuilder();
@@ -200,7 +200,7 @@ public class VMTest {
 	}
 
 	@Test
-	public void testDoGE() throws JSlateException {
+	public void testDoGE() throws JTTError {
 		// 3 >= 4
 		assertFalse(vm.doGE(new Integer(3), new Integer(4)));
 		// 3 >= 3

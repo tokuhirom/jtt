@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import me.geso.jtt.Compiler;
+import me.geso.jtt.JTTError;
 import me.geso.jtt.JTTMessageListener;
 import me.geso.jtt.TemplateLoader;
 import me.geso.jtt.TemplateLoadingError;
@@ -48,7 +49,7 @@ public class VM {
 	}
 
 	public String run(Irep irep, Map<String, Object> vars)
-			throws JSlateException, ParserError,
+			throws JTTError, ParserError,
 			TemplateLoadingError, IOException {
 		if (vars == null) {
 			throw new NullPointerException();
@@ -430,16 +431,16 @@ public class VM {
 		}
 	}
 
-	private void doMakeRange(Stack<Object> stack) throws JSlateException {
+	private void doMakeRange(Stack<Object> stack) throws JTTError {
 		Object lhs = stack.pop();
 		Object rhs = stack.pop();
 		if (!(lhs instanceof Integer)) {
-			throw new JSlateException(
+			throw new JTTError(
 					"Left side of range construction operator should be Integer but : "
 							+ lhs.getClass());
 		}
 		if (!(rhs instanceof Integer)) {
-			throw new JSlateException(
+			throw new JTTError(
 					"Right side of range construction operator should be Integer but : "
 							+ rhs.getClass());
 		}
@@ -555,7 +556,7 @@ public class VM {
 
 	// TODO support arguments
 	private Object invokeMethod(Object methodName, Object self, int numargs)
-			throws JSlateException {
+			throws JTTError {
 		assert methodName instanceof String;
 
 		Lookup lookup = MethodHandles.lookup();

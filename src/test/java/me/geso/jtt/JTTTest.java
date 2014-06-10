@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.geso.jtt.parser.ParserError;
-import me.geso.jtt.vm.JSlateException;
 
 import org.junit.Test;
 
@@ -16,7 +15,7 @@ public class JTTTest {
 	List<List<Object>> registry = new ArrayList<>();
 
 	@Test
-	public void test() throws ParserError, JSlateException, IOException,
+	public void test() throws ParserError, JTTError, IOException,
 			TemplateLoadingError {
 		JTT jtt = new JTTBuilder().addFunction("twice", x -> {
 			return ((Integer) x[0]) * 2;
@@ -25,7 +24,7 @@ public class JTTTest {
 	}
 
 	@Test
-	public void testFuncallWith2Args() throws ParserError, JSlateException,
+	public void testFuncallWith2Args() throws ParserError, JTTError,
 			IOException, TemplateLoadingError {
 		JTT jtt = new JTTBuilder().addFunction("sub", x -> {
 			return ((Integer) x[0]) - ((Integer) x[1]);
@@ -34,7 +33,7 @@ public class JTTTest {
 	}
 
 	@Test
-	public void testFuncallArgumentOrder() throws ParserError, JSlateException,
+	public void testFuncallArgumentOrder() throws ParserError, JTTError,
 			IOException, TemplateLoadingError {
 		this.n = 0;
 
@@ -54,7 +53,7 @@ public class JTTTest {
 	}
 
 	@Test
-	public void testWarningsHandler() throws ParserError, JSlateException, TemplateLoadingError, IOException {
+	public void testWarningsHandler() throws ParserError, JTTError, TemplateLoadingError, IOException {
 		final List<String> messages = new ArrayList<>();
 		assertEquals(
 				"(null)",

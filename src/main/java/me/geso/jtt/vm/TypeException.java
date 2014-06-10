@@ -1,7 +1,9 @@
 package me.geso.jtt.vm;
 
+import me.geso.jtt.JTTError;
 
-class TypeException extends JSlateException {
+
+class TypeException extends JTTError {
 	public TypeException(String string) {
 		super(string);
 	}

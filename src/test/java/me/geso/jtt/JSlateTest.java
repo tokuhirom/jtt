@@ -10,7 +10,6 @@ import me.geso.jtt.JTT;
 import me.geso.jtt.JTTBuilder;
 import me.geso.jtt.TemplateLoadingError;
 import me.geso.jtt.parser.ParserError;
-import me.geso.jtt.vm.JSlateException;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -27,14 +26,14 @@ public class JSlateTest {
 	public void testRenderString() throws IOException, ClassNotFoundException,
 			NoSuchMethodException, SecurityException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException,
-			InstantiationException, ParserError, JSlateException, TemplateLoadingError {
+			InstantiationException, ParserError, JTTCompilerError, TemplateLoadingError {
 		JTTBuilder builder = new JTTBuilder();
 		JTT jslate = builder.build();
 		assertEquals("hoge", jslate.renderString("hoge", new HashMap<>()));
 	}
 
 	@Test
-	public void testRenderFile() throws IOException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, ParserError, JSlateException, TemplateLoadingError {
+	public void testRenderFile() throws IOException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, ParserError, JTTCompilerError, TemplateLoadingError {
 		URL resource = this.getClass().getResource("/");
 		File includePath = new File(resource.getFile());
 		List<Path> paths = new ArrayList<>();
@@ -44,11 +43,11 @@ public class JSlateTest {
 	}
 
 	@Test
-	public void testRenderFile2() throws IOException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, ParserError, JSlateException, TemplateLoadingError {
+	public void testRenderFile2() throws IOException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, ParserError, JTTCompilerError, TemplateLoadingError {
 		assertEquals("INC1_HEAD\nINC2\n\nINC1_FOOT\n", render("inc1.tt", new HashMap<>()));
 	}
 	
-	private String render(String fileName, Map<String, Object> vars) throws IOException, ParserError, JSlateException, TemplateLoadingError {
+	private String render(String fileName, Map<String, Object> vars) throws IOException, ParserError, JTTCompilerError, TemplateLoadingError {
 		URL resource = this.getClass().getResource("/");
 		File includePath = new File(resource.getFile());
 		List<Path> paths = new ArrayList<>();

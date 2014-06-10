@@ -10,7 +10,6 @@ import org.apache.commons.io.IOUtils;
 
 import me.geso.jtt.parser.ParserError;
 import me.geso.jtt.vm.Irep;
-import me.geso.jtt.vm.JSlateException;
 
 public class TemplateLoader {
 	final List<Path> includePaths;
@@ -26,7 +25,7 @@ public class TemplateLoader {
 	}
 
 	public Irep compile(Path fileName, Compiler compiler) throws IOException,
-			ParserError, TemplateLoadingError, JSlateException {
+			ParserError, TemplateLoadingError {
 		// TODO We should cache the compilation result.
 		for (Path path : includePaths) {
 			Path fullpath = path.resolve(fileName);
@@ -38,7 +37,7 @@ public class TemplateLoader {
 	}
 
 	private Irep compileFile(Path fullpath, Compiler compiler)
-			throws IOException, ParserError, JSlateException {
+			throws IOException, ParserError {
 		try (InputStream is = Files.newInputStream(fullpath)) {
 			String str = IOUtils.toString(is, "UTF-8");
 			return compiler.compile(fullpath.toString(), str);
