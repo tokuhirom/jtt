@@ -404,22 +404,10 @@ public class VM {
 
 		Object methodName = stack.pop();
 		Object object = stack.pop();
-		// Lookup lookup = MethodHandles.lookup();
-		// MethodHandle methodBody = lookup.findVirtual(object.getClass(),
-		// ident.toString(),
-		// MethodType.methodType(object.getClass(), parameterTypes));
-		// Object retval = methodBody.invokeWithArguments(params);
-		// Method method = object.getClass().getMethod(ident.toString(),
-		// parameterTypes);
-		// Object retval = method.invoke(object, params);
+
 		MethodAccess access = MethodAccess.get(object.getClass());
 		Object retval = access.invoke(object, methodName.toString(), params);
 		return retval;
-		/*
-		 * e.printStackTrace(); if (this.strictMode) { throw new
-		 * JTTRuntimeError("Oops... : " + e.getStackTrace()); } else {
-		 * warn("Can't call method: " + e.getStackTrace()); return null; }
-		 */
 	}
 
 	private Boolean convertToBoolean(Object o) {
