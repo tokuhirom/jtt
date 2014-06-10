@@ -1,6 +1,7 @@
 package me.geso.jtt.tt;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
@@ -201,12 +202,15 @@ public class TTLexerTest {
 	@Test
 	public void testFile() {
 		assertEquals("[FILE]", lex("[% __FILE__ %]"));
+		
+		// MUST NOT BE [FILE],[IDENT e]
+		assertEquals("[CONCAT],[CONCAT],[IDENT FILE__e]", lex("[% __FILE__e %]"));
 	}
 
 	@Test
 	public void testLine() {
 		assertEquals("[LINE]", lex("[% __LINE__ %]"));
-
+		assertNotEquals("[LIKE],[IDENT e]", lex("[% __FILE__e %]"));
 	}
 
 	@Test

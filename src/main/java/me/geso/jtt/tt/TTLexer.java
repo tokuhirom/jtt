@@ -25,9 +25,8 @@ public class TTLexer {
 	private static final Pattern identRe = Pattern
 			.compile("\\A(?:[a-zA-Z][_a-zA-Z0-9]*)");
 
-	// TODO negative forward lookup \W
 	private static final Pattern positionRe = Pattern
-			.compile("\\A__(FILE|LINE)__");
+			.compile("\\A__(FILE|LINE)__(?!\\w)");
 
 	private int pos;
 	private int lineNumber;
