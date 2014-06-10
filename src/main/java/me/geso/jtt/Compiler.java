@@ -1,10 +1,10 @@
 package me.geso.jtt;
 
 import me.geso.jtt.exception.JTTCompilerError;
+import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
 import me.geso.jtt.parser.NodeType;
-import me.geso.jtt.parser.ParserError;
 import me.geso.jtt.tt.TTSyntax;
 import me.geso.jtt.vm.*;
 

@@ -6,11 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-
+import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.TemplateLoadingError;
-import me.geso.jtt.parser.ParserError;
 import me.geso.jtt.vm.Irep;
+
+import org.apache.commons.io.IOUtils;
 
 public class TemplateLoader {
 	final List<Path> includePaths;
@@ -25,8 +25,7 @@ public class TemplateLoader {
 		this.cacheLevel = cacheLevel;
 	}
 
-	public Irep compile(Path fileName, Compiler compiler) throws IOException,
-			ParserError, TemplateLoadingError {
+	public Irep compile(Path fileName, Compiler compiler) throws JTTError {
 		// TODO We should cache the compilation result.
 		for (Path path : includePaths) {
 			Path fullpath = path.resolve(fileName);
@@ -38,10 +37,12 @@ public class TemplateLoader {
 	}
 
 	private Irep compileFile(Path fullpath, Compiler compiler)
-			throws IOException, ParserError {
+			throws JTTError {
 		try (InputStream is = Files.newInputStream(fullpath)) {
 			String str = IOUtils.toString(is, "UTF-8");
 			return compiler.compile(fullpath.toString(), str);
+		} catch (IOException e) {
+			throw new JTTError("Cannot load "+ fullpath + " : " + e.getMessage());
 		}
 	}
 }

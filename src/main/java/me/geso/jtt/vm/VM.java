@@ -23,9 +23,9 @@ import me.geso.jtt.escape.Escaper;
 import me.geso.jtt.escape.HTMLEscaper;
 import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.MethodInvokeError;
+import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.exception.TemplateLoadingError;
 import me.geso.jtt.exception.TypeError;
-import me.geso.jtt.parser.ParserError;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
 import com.google.common.net.UrlEscapers;

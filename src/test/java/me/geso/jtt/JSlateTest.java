@@ -9,8 +9,8 @@ import java.lang.reflect.InvocationTargetException;
 import me.geso.jtt.JTT;
 import me.geso.jtt.JTTBuilder;
 import me.geso.jtt.exception.JTTCompilerError;
+import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.exception.TemplateLoadingError;
-import me.geso.jtt.parser.ParserError;
 
 import java.net.URL;
 import java.nio.file.Path;

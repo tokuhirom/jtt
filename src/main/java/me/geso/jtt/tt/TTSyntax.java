@@ -2,9 +2,9 @@ package me.geso.jtt.tt;
 
 import java.util.List;
 
+import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
-import me.geso.jtt.parser.ParserError;
 
 public class TTSyntax {
 	private final String openTag;

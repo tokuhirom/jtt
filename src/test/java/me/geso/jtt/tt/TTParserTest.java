@@ -4,10 +4,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
 import me.geso.jtt.parser.NodeType;
-import me.geso.jtt.parser.ParserError;
 import me.geso.jtt.tt.TTSyntax;
 
 import org.junit.Test;

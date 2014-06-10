@@ -1,6 +1,8 @@
-package me.geso.jtt.parser;
+package me.geso.jtt.exception;
 
-public class ParserError extends Exception {
+import me.geso.jtt.parser.Parser;
+
+public class ParserError extends JTTError {
 	private static final long serialVersionUID = 1L;
 	private Parser parser;
 

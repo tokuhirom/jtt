@@ -6,12 +6,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.lexer.TokenType;
 import me.geso.jtt.parser.Node;
 import me.geso.jtt.parser.NodeType;
 import me.geso.jtt.parser.Parser;
-import me.geso.jtt.parser.ParserError;
 
 import com.google.common.collect.Lists;
 
