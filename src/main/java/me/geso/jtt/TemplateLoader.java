@@ -14,15 +14,11 @@ import org.apache.commons.io.IOUtils;
 
 public class TemplateLoader {
 	final List<Path> includePaths;
-	final CacheLevel cacheLevel;
+	final TemplateCache templateCache;
 
-	enum CacheLevel {
-		NO_CACHE, CACHE_WITH_UPDATE_CHECK, CACHE_BUT_DO_NOT_CHECK_UPDATES
-	}
-
-	public TemplateLoader(List<Path> includePaths, CacheLevel cacheLevel) {
+	public TemplateLoader(List<Path> includePaths, TemplateCache templateCache) {
 		this.includePaths = includePaths;
-		this.cacheLevel = cacheLevel;
+		this.templateCache = templateCache;
 	}
 
 	public Irep compile(Path fileName, Compiler compiler) throws JTTError {
@@ -30,19 +26,28 @@ public class TemplateLoader {
 		for (Path path : includePaths) {
 			Path fullpath = path.resolve(fileName);
 			if (fullpath.toFile().exists()) {
-				return this.compileFile(fullpath, compiler);
+				{
+					Irep irep = this.templateCache.get(fullpath);
+					if (irep != null) {
+						return irep;
+					}
+				}
+
+				Irep irep = this.compileFile(fullpath, compiler);
+				this.templateCache.set(fullpath, irep);
+				return irep;
 			}
 		}
 		throw new TemplateLoadingError(fileName, this.includePaths);
 	}
 
-	private Irep compileFile(Path fullpath, Compiler compiler)
-			throws JTTError {
+	private Irep compileFile(Path fullpath, Compiler compiler) throws JTTError {
 		try (InputStream is = Files.newInputStream(fullpath)) {
 			String str = IOUtils.toString(is, "UTF-8");
 			return compiler.compile(fullpath.toString(), str);
 		} catch (IOException e) {
-			throw new JTTError("Cannot load "+ fullpath + " : " + e.getMessage());
+			throw new JTTError("Cannot load " + fullpath + " : "
+					+ e.getMessage());
 		}
 	}
 }

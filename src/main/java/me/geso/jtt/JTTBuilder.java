@@ -15,10 +15,10 @@ import me.geso.jtt.vm.VM;
  *
  */
 public class JTTBuilder {
-	private TemplateLoader.CacheLevel cacheLevel;
 	private List<Path> includePaths;
 	private JTTMessageListener warningListener;
 	private final Map<String, Function> functions = new HashMap<String,Function>();
+	private TemplateCache templateCache = new NullTemplateCache();
 	
 	public JTTBuilder() {
 	}
@@ -29,19 +29,11 @@ public class JTTBuilder {
 	 * @return Created instance.
 	 */
 	public JTT build() {
-		TemplateLoader loader = new TemplateLoader(getIncludePaths(), cacheLevel);
+		TemplateLoader loader = new TemplateLoader(getIncludePaths(), this.templateCache);
 		Compiler compiler = new Compiler();
 		VM vm = new VM(compiler, loader, functions, warningListener);
 		JTT jtt = new JTT(vm, loader, compiler);
 		return jtt;
-	}
-
-	public TemplateLoader.CacheLevel getCacheLevel() {
-		return cacheLevel;
-	}
-
-	public void setCacheLevel(TemplateLoader.CacheLevel cacheLevel) {
-		this.cacheLevel = cacheLevel;
 	}
 
 	public List<Path> getIncludePaths() {
@@ -61,5 +53,9 @@ public class JTTBuilder {
 	public JTTBuilder addFunction(String name, Function function) {
 		this.functions.put(name, function);
 		return this;
+	}
+
+	public void setTemplateCache(TemplateCache templateCache) {
+		this.templateCache = templateCache;
 	}
 }
