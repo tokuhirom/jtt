@@ -480,6 +480,13 @@ public class TTParserTest {
                 parse("[% loop.getCount() %]").toString());
     }
 
+    @Test
+    public void testFile() throws ParserError {
+        assertEquals(
+                "(template (expression (string -)))",
+                parse("[% __FILE__ %]").toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		TTSyntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize("-", source);

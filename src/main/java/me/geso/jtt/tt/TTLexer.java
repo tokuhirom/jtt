@@ -25,6 +25,9 @@ public class TTLexer {
 	private static final Pattern identRe = Pattern
 			.compile("\\A(?:[a-zA-Z][_a-zA-Z0-9]*)");
 
+	// TODO negative forward lookup \W
+	private static final Pattern fileRe = Pattern.compile("\\A__FILE__");
+
 	private int pos;
 	private int lineNumber;
 	private final String source;
@@ -149,8 +152,7 @@ public class TTLexer {
 					}
 					break;
 				case '_':
-					tokens.add(this.createToken(TokenType.CONCAT));
-					++pos;
+					tokens.add(this.lexUnderScore());
 					break;
 				case '%':
 					tokens.add(this.createToken(TokenType.MODULO));
@@ -311,6 +313,17 @@ public class TTLexer {
 					break;
 				}
 			}
+		}
+	}
+
+	private Token lexUnderScore() {
+		Matcher matcher = fileRe.matcher(source.substring(pos));
+		if (matcher.find()) {
+			pos += matcher.group(0).length();
+			return this.createToken(TokenType.FILE);
+		} else {
+			++pos;
+			return this.createToken(TokenType.CONCAT);
 		}
 	}
 

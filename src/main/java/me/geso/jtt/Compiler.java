@@ -101,12 +101,15 @@ public class Compiler {
 				builder.add(OP.LOOP);
 				break;
 			case TRUE:
+				// TODO pool is not required.
 				builder.addPool(OP.LOAD_TRUE, node.getText());
 				break;
 			case FALSE:
+				// TODO pool is not required.
 				builder.addPool(OP.LOAD_FALSE, node.getText());
 				break;
 			case NULL:
+				// TODO pool is not required.
 				builder.addPool(OP.LOAD_NULL, node.getText());
 				break;
 			case SET: {

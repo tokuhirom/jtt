@@ -556,6 +556,19 @@ public class CompilerTest {
 				eval("[% FOR x IN [5,9] %][% loop.hasNext() %][% END %]"));
 	}
 
+	@Test
+	public void testFile() throws JSlateException, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals("-",
+				eval("[% __FILE__ %]"));
+	}
+
+	// ---------------------------------------------------------------------
+	//
+	// UTILITY FUNCTIONS...
+	//
+	// ---------------------------------------------------------------------
+
 	private String eval(String src) throws ParserError, JSlateException,
 			IOException, TemplateLoadingError {
 		return eval(src, new HashMap<String, Object>());

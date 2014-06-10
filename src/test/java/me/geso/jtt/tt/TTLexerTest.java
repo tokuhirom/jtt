@@ -220,6 +220,13 @@ public class TTLexerTest {
                 lex("[% list[idx] %]"));
     }
 
+    @Test
+    public void testFile() {
+        assertEquals(
+                "[FILE]",
+                lex("[% __FILE__ %]"));
+    }
+
 	@Test
 	public void testError() {
 		JSlateLexerError e = null;

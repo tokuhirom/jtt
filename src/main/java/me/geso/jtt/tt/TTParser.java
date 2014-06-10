@@ -771,8 +771,7 @@ public class TTParser implements Parser {
 		return new Node(type, lhs, rhs);
 	}
 
-	// atom: double | int | ident | paren;
-	// TODO Support double literal
+	// atom: double | int | ident | paren | ...;
 	public Node parseAtom() throws ParserError {
 		switch (CURRENT_TYPE()) {
 		case DOUBLE:
@@ -799,7 +798,19 @@ public class TTParser implements Parser {
 			return parseDollarVar();
 		case LOOP:
 			return parseLoop();
+		case FILE:
+			return parseFile();
 		default:
+			return null;
+		}
+	}
+
+	private Node parseFile() {
+		if (CURRENT_TYPE() == TokenType.FILE) {
+			String fileName = CURRENT_FILENAME();
+			++pos;
+			return new Node(NodeType.STRING, fileName);
+		} else {
 			return null;
 		}
 	}
@@ -1002,6 +1013,14 @@ public class TTParser implements Parser {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	private String CURRENT_FILENAME() {
+		if (pos < tokens.size()) {
+			return tokens.get(pos).getFileName();
+		} else {
+			return null;
 		}
 	}
 
