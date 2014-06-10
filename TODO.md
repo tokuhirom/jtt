@@ -7,7 +7,6 @@ This file lists To-Does for JTT project.
 
 ## TODO
 
-* Deprecate TTLexBuilder.
 * `[% INCLUDE "hoge" WITH foo=bar %]`
  * caching
  * Should we implement "Casting operator"?
@@ -77,3 +76,4 @@ This file lists To-Does for JTT project.
 * `[% loop.getCount() %]`
 * `[% __FILE__ %]`
 * `[% __LINE__ %]`
+* Deprecate TTLexBuilder.
