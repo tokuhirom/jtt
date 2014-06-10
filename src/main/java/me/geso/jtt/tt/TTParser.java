@@ -55,12 +55,12 @@ public class TTParser implements Parser {
 
 			break;
 		}
-		return new Node(NodeType.TEMPLATE, children);
+		return new Node(NodeType.TEMPLATE, children, PREV_LINE_NUMBER());
 	}
 
 	Node parseRawString() {
 		if (CURRENT_TYPE() == TokenType.RAW) {
-			Node node = new Node(NodeType.RAW_STRING, CURRENT_STRING());
+			Node node = new Node(NodeType.RAW_STRING, CURRENT_STRING(), PREV_LINE_NUMBER());
 			++pos;
 			return node;
 		} else {
@@ -105,17 +105,17 @@ public class TTParser implements Parser {
 			children.add(iterNode);
 			children.add(expr);
 			children.add(body);
-			return new Node(NodeType.FOREACH, children);
+			return new Node(NodeType.FOREACH, children, PREV_LINE_NUMBER());
 		}
 		case WHILE:
 			return parseWhile();
 		case LAST: {
-			Node node = new Node(NodeType.LAST);
+			Node node = new Node(NodeType.LAST, CURRENT_LINE_NUMBER());
 			++pos;
 			return node;
 		}
 		case NEXT: {
-			Node node = new Node(NodeType.NEXT);
+			Node node = new Node(NodeType.NEXT, CURRENT_LINE_NUMBER());
 			++pos;
 			return node;
 		}
@@ -136,7 +136,7 @@ public class TTParser implements Parser {
 		default: {
 			Node exprNode = parseExpr();
 			if (exprNode != null) {
-				return new Node(NodeType.EXPRESSION, exprNode);
+				return new Node(NodeType.EXPRESSION, exprNode, PREV_LINE_NUMBER());
 			} else {
 				throw new ParserError("No expression", this);
 			}
@@ -171,7 +171,7 @@ public class TTParser implements Parser {
 			throw new ParserError("Missing END tag after SWITCH", this);
 		}
 
-		return new Node(NodeType.SWITCH, list);
+		return new Node(NodeType.SWITCH, list, PREV_LINE_NUMBER());
 	}
 
 	// [% CASE expr %]
@@ -190,7 +190,7 @@ public class TTParser implements Parser {
 			}
 
 			saver.commit();
-			return new Node(NodeType.CASE, Lists.newArrayList(expr, body));
+			return new Node(NodeType.CASE, Lists.newArrayList(expr, body), PREV_LINE_NUMBER());
 		}
 	}
 
@@ -207,7 +207,7 @@ public class TTParser implements Parser {
 			throw new ParserError("WITH is not implemented yet.", this);
 		}
 
-		return new Node(NodeType.INCLUDE, Lists.newArrayList(path));
+		return new Node(NodeType.INCLUDE, Lists.newArrayList(path), PREV_LINE_NUMBER());
 	}
 
 	private Node parseWhile() throws ParserError {
@@ -226,7 +226,7 @@ public class TTParser implements Parser {
 			throw new ParserError("No END tag after 'IF'", this);
 		}
 
-		return new Node(NodeType.WHILE, Lists.newArrayList(expr, body));
+		return new Node(NodeType.WHILE, Lists.newArrayList(expr, body), PREV_LINE_NUMBER());
 	}
 
 	private Node parseSet() throws ParserError {
@@ -240,7 +240,7 @@ public class TTParser implements Parser {
 		}
 		final Node expr = parseExpr();
 
-		return new Node(NodeType.SET, Lists.newArrayList(ident, expr));
+		return new Node(NodeType.SET, Lists.newArrayList(ident, expr), PREV_LINE_NUMBER());
 	}
 
 	private Node parseIf() throws ParserError {
@@ -272,7 +272,7 @@ public class TTParser implements Parser {
 		children.add(body);
 		children.add(elseBody);
 
-		return new Node(NodeType.IF, children);
+		return new Node(NodeType.IF, children, PREV_LINE_NUMBER());
 	}
 
 	private Node parseElsIf() throws ParserError {
@@ -295,7 +295,7 @@ public class TTParser implements Parser {
 		}
 
 		List<Node> list = Arrays.asList(elsifCond, elsifBody, elseClause);
-		return new Node(NodeType.IF, list);
+		return new Node(NodeType.IF, list, PREV_LINE_NUMBER());
 	}
 
 	private Node parseElse() throws ParserError {
@@ -359,7 +359,7 @@ public class TTParser implements Parser {
 				throw new ParserError("Missing expression after '|'", this);
 			}
 			if (lhs.getType() == NodeType.IDENT) {
-				n = new Node(NodeType.FUNCALL, lhs, n);
+				n = new Node(NodeType.FUNCALL, lhs, n, PREV_LINE_NUMBER());
 			} else {
 				throw new ParserError("left side of pipe must be ident", this);
 			}
@@ -378,7 +378,7 @@ public class TTParser implements Parser {
 								"Missing expression after 'OR' : "
 										+ CURRENT_TYPE(), this);
 					}
-					n = new Node(NodeType.OROR, n, rhs);
+					n = new Node(NodeType.OROR, n, rhs, PREV_LINE_NUMBER());
 				} else {
 					break;
 				}
@@ -399,7 +399,7 @@ public class TTParser implements Parser {
 								"Missing expression after 'AND' : "
 										+ CURRENT_TYPE(), this);
 					}
-					n = new Node(NodeType.ANDAND, n, rhs);
+					n = new Node(NodeType.ANDAND, n, rhs, PREV_LINE_NUMBER());
 				} else {
 					break;
 				}
@@ -421,7 +421,7 @@ public class TTParser implements Parser {
 				List<Node> children = new ArrayList<>();
 				children.add(n);
 				children.add(lhs);
-				n = new Node(NodeType.SET, children);
+				n = new Node(NodeType.SET, children, PREV_LINE_NUMBER());
 			}
 			return n;
 		} else {
@@ -453,7 +453,7 @@ public class TTParser implements Parser {
 				children.add(n);
 				children.add(c);
 				children.add(l);
-				n = new Node(NodeType.IF, children);
+				n = new Node(NodeType.IF, children, PREV_LINE_NUMBER());
 			}
 		}
 		return n;
@@ -472,7 +472,7 @@ public class TTParser implements Parser {
 				List<Node> children = new ArrayList<>();
 				children.add(l);
 				children.add(n);
-				n = new Node(NodeType.RANGE, children);
+				n = new Node(NodeType.RANGE, children, PREV_LINE_NUMBER());
 			}
 		}
 		return n;
@@ -488,7 +488,7 @@ public class TTParser implements Parser {
 						throw new ParserError("Missing expression after '||': "
 								+ CURRENT_TYPE(), this);
 					}
-					n = new Node(NodeType.OROR, n, rhs);
+					n = new Node(NodeType.OROR, n, rhs, PREV_LINE_NUMBER());
 				} else {
 					break;
 				}
@@ -507,7 +507,7 @@ public class TTParser implements Parser {
 						throw new ParserError("Missing expression after '&&': "
 								+ CURRENT_TYPE(), this);
 					}
-					n = new Node(NodeType.ANDAND, n, rhs);
+					n = new Node(NodeType.ANDAND, n, rhs, PREV_LINE_NUMBER());
 				} else {
 					break;
 				}
@@ -531,14 +531,14 @@ public class TTParser implements Parser {
 					List<Node> children = new ArrayList<>();
 					children.add(n);
 					children.add(rhs);
-					n = new Node(NodeType.EQUALS, children);
+					n = new Node(NodeType.EQUALS, children, PREV_LINE_NUMBER());
 				} else if (EAT(TokenType.NE)) {
 					Node rhs = parseComparationExpr();
 					if (rhs == null) {
 						throw new ParserError(
 								"Missing additive expression after '!='", this);
 					}
-					n = new Node(NodeType.NE, n, rhs);
+					n = new Node(NodeType.NE, n, rhs, PREV_LINE_NUMBER());
 				}
 				break;
 			}
@@ -566,7 +566,7 @@ public class TTParser implements Parser {
 				List<Node> children = new ArrayList<>();
 				children.add(n);
 				children.add(rhs);
-				n = new Node(NodeType.GE, children);
+				n = new Node(NodeType.GE, children, PREV_LINE_NUMBER());
 			} else if (EAT(TokenType.GT)) {
 				Node rhs = parseAdditive();
 				if (rhs == null) {
@@ -577,7 +577,7 @@ public class TTParser implements Parser {
 				List<Node> children = new ArrayList<>();
 				children.add(n);
 				children.add(rhs);
-				n = new Node(NodeType.GT, children);
+				n = new Node(NodeType.GT, children, PREV_LINE_NUMBER());
 			} else if (EAT(TokenType.LE)) {
 				Node rhs = parseAdditive();
 				if (rhs == null) {
@@ -588,7 +588,7 @@ public class TTParser implements Parser {
 				List<Node> children = new ArrayList<>();
 				children.add(n);
 				children.add(rhs);
-				n = new Node(NodeType.LE, children);
+				n = new Node(NodeType.LE, children, PREV_LINE_NUMBER());
 			} else if (EAT(TokenType.LT)) {
 				Node rhs = parseAdditive();
 				if (rhs == null) {
@@ -599,7 +599,7 @@ public class TTParser implements Parser {
 				List<Node> children = new ArrayList<>();
 				children.add(n);
 				children.add(rhs);
-				n = new Node(NodeType.LT, children);
+				n = new Node(NodeType.LT, children, PREV_LINE_NUMBER());
 			} else {
 				break;
 			}
@@ -622,14 +622,14 @@ public class TTParser implements Parser {
 				}
 				children.add(n);
 				children.add(rhs);
-				n = new Node(NodeType.ADD, children);
+				n = new Node(NodeType.ADD, children, PREV_LINE_NUMBER());
 			} else if (EAT(TokenType.MINUS)) {
 				List<Node> children = new ArrayList<>();
 				Node rhs = parseMultitive();
 				// TODO check rhs
 				children.add(n);
 				children.add(rhs);
-				n = new Node(NodeType.SUBTRACT, children);
+				n = new Node(NodeType.SUBTRACT, children, PREV_LINE_NUMBER());
 			} else if (EAT(TokenType.CONCAT)) {
 				// '_' is the sring concatenation operator.
 				List<Node> children = new ArrayList<>();
@@ -637,7 +637,7 @@ public class TTParser implements Parser {
 				// TODO check rhs
 				children.add(n);
 				children.add(rhs);
-				n = new Node(NodeType.CONCAT, children);
+				n = new Node(NodeType.CONCAT, children, PREV_LINE_NUMBER());
 			} else {
 				break;
 			}
@@ -673,7 +673,7 @@ public class TTParser implements Parser {
 			args.addFirst(n);
 
 			if (EAT(TokenType.RPAREN)) {
-				n = new Node(NodeType.FUNCALL, args);
+				n = new Node(NodeType.FUNCALL, args, PREV_LINE_NUMBER());
 			} else {
 				throw new ParserError("Missing closing paren after arguments",
 						this);
@@ -712,7 +712,7 @@ public class TTParser implements Parser {
 			if (n == null) {
 				throw new ParserError("Missing expression after '!'", this);
 			}
-			return new Node(NodeType.NOT, n);
+			return new Node(NodeType.NOT, n, PREV_LINE_NUMBER());
 		} else {
 			return parseAttr();
 		}
@@ -727,18 +727,18 @@ public class TTParser implements Parser {
 					if (rhs == null) {
 						throw new ParserError("SHOULD NOT REACH HERE", this);
 					}
-					Node key = new Node(NodeType.STRING, rhs.getText()); // Convert
+					Node key = new Node(NodeType.STRING, rhs.getText(), PREV_LINE_NUMBER()); // Convert
 																			// to
 																			// STRING
 																			// from
 																			// IDENT.
-					n = new Node(NodeType.ATTRIBUTE, n, key);
+					n = new Node(NodeType.ATTRIBUTE, n, key, PREV_LINE_NUMBER());
 				} else if (CURRENT_TYPE() == TokenType.DOLLARVAR) {
 					Node rhs = parseDollarVar();
 					if (rhs == null) {
 						throw new ParserError("SHOULD NOT REACH HERE", this);
 					}
-					n = new Node(NodeType.ATTRIBUTE, n, rhs);
+					n = new Node(NodeType.ATTRIBUTE, n, rhs, PREV_LINE_NUMBER());
 				} else {
 					throw new ParserError(
 							"Missing (identifier|variable) after '.'.", this);
@@ -754,7 +754,7 @@ public class TTParser implements Parser {
 							this);
 				}
 
-				n = new Node(NodeType.ATTRIBUTE, n, key);
+				n = new Node(NodeType.ATTRIBUTE, n, key, PREV_LINE_NUMBER());
 			} else {
 				break;
 			}
@@ -768,7 +768,7 @@ public class TTParser implements Parser {
 		if (rhs == null) {
 			throw new ParserError("Missing " + method + ".", this);
 		}
-		return new Node(type, lhs, rhs);
+		return new Node(type, lhs, rhs, PREV_LINE_NUMBER());
 	}
 
 	// atom: double | int | ident | paren | ...;
@@ -811,7 +811,7 @@ public class TTParser implements Parser {
 		if (CURRENT_TYPE() == TokenType.FILE) {
 			String fileName = CURRENT_FILENAME();
 			++pos;
-			return new Node(NodeType.STRING, fileName);
+			return new Node(NodeType.STRING, fileName, PREV_LINE_NUMBER());
 		} else {
 			return null;
 		}
@@ -821,7 +821,7 @@ public class TTParser implements Parser {
 		if (CURRENT_TYPE() == TokenType.LINE) {
 			int lineNumber = CURRENT_LINE_NUMBER();
 			++pos;
-			return new Node(NodeType.INTEGER, "" + lineNumber);
+			return new Node(NodeType.INTEGER, "" + lineNumber, PREV_LINE_NUMBER());
 		} else {
 			return null;
 		}
@@ -829,7 +829,7 @@ public class TTParser implements Parser {
 
 	private Node parseLoop() {
 		if (EAT(TokenType.LOOP)) {
-			return new Node(NodeType.LOOP);
+			return new Node(NodeType.LOOP, PREV_LINE_NUMBER());
 		} else {
 			return null;
 		}
@@ -839,7 +839,7 @@ public class TTParser implements Parser {
 		if (CURRENT_TYPE() == TokenType.DOLLARVAR) {
 			String name = CURRENT_STRING();
 			++pos;
-			return new Node(NodeType.DOLLARVAR, name);
+			return new Node(NodeType.DOLLARVAR, name, PREV_LINE_NUMBER());
 		} else {
 			return null;
 		}
@@ -847,17 +847,17 @@ public class TTParser implements Parser {
 
 	private Node parseNull() {
 		++pos;
-		return new Node(NodeType.NULL);
+		return new Node(NodeType.NULL, PREV_LINE_NUMBER());
 	}
 
 	private Node parseTrue() {
 		++pos;
-		return new Node(NodeType.TRUE);
+		return new Node(NodeType.TRUE, PREV_LINE_NUMBER());
 	}
 
 	private Node parseFalse() {
 		++pos;
-		return new Node(NodeType.FALSE);
+		return new Node(NodeType.FALSE, PREV_LINE_NUMBER());
 	}
 
 	// map := '{' ( key '=>' value ',' )* '}'
@@ -895,7 +895,7 @@ public class TTParser implements Parser {
 			throw new ParserError("Missing '}' after map.", this);
 		}
 
-		return new Node(NodeType.MAP, list);
+		return new Node(NodeType.MAP, list, PREV_LINE_NUMBER());
 	}
 
 	private Node parseMapKey() throws ParserError {
@@ -929,7 +929,7 @@ public class TTParser implements Parser {
 
 	private Node parseString() throws ParserError {
 		if (CURRENT_TYPE() == TokenType.STRING) {
-			Node node = new Node(NodeType.STRING, CURRENT_STRING());
+			Node node = new Node(NodeType.STRING, CURRENT_STRING(), PREV_LINE_NUMBER());
 			++pos;
 			return node;
 		} else {
@@ -956,7 +956,7 @@ public class TTParser implements Parser {
 						.createError("Missing closing bracket after array ltieral");
 			}
 
-			return new Node(NodeType.ARRAY, children);
+			return new Node(NodeType.ARRAY, children, PREV_LINE_NUMBER());
 		} else {
 			return null;
 		}
@@ -987,7 +987,7 @@ public class TTParser implements Parser {
 
 	public Node parseInt() {
 		if (CURRENT_TYPE() == TokenType.INTEGER) {
-			Node node = new Node(NodeType.INTEGER, CURRENT_STRING());
+			Node node = new Node(NodeType.INTEGER, CURRENT_STRING(), PREV_LINE_NUMBER());
 			pos++;
 			return node;
 		} else {
@@ -997,7 +997,7 @@ public class TTParser implements Parser {
 
 	public Node parseDouble() {
 		if (CURRENT_TYPE() == TokenType.DOUBLE) {
-			Node node = new Node(NodeType.DOUBLE, CURRENT_STRING());
+			Node node = new Node(NodeType.DOUBLE, CURRENT_STRING(), PREV_LINE_NUMBER());
 			pos++;
 			return node;
 		} else {
@@ -1056,9 +1056,17 @@ public class TTParser implements Parser {
 		}
 	}
 
+	private int PREV_LINE_NUMBER() {
+		if (pos == 0) {
+			return tokens.get(0).getLineNumber();
+		}
+		return tokens.get(pos-1).getLineNumber();
+	}
+
+
 	public Node parseIdent() {
 		if (CURRENT_TYPE() == TokenType.IDENT) {
-			Node node = new Node(NodeType.IDENT, CURRENT_STRING());
+			Node node = new Node(NodeType.IDENT, CURRENT_STRING(), PREV_LINE_NUMBER());
 			pos++;
 			return node;
 		} else {

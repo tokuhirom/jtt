@@ -8,35 +8,40 @@ public class Node {
 	private final String text;
 	private final NodeType type;
 	private final List<Node> children;
+	private final int lineNumber;
 
-	public Node(NodeType type) {
+	public Node(NodeType type, int lineNumber) {
 		this.type = type;
 		this.text = null;
 		this.children = null;
+		this.lineNumber = lineNumber;
 	}
 
-	public Node(NodeType type, String text) {
+	public Node(NodeType type, String text, int lineNumber) {
 		this.type = type;
 		this.text = text;
 		this.children = null;
+		this.lineNumber = lineNumber;
 	}
 
-	public Node(NodeType type, Node child) {
+	public Node(NodeType type, Node child, int lineNumber) {
 		this.type = type;
 		this.text = null;
 
 		List<Node> children = new ArrayList<>();
 		children.add(child);
 		this.children = children;
+		this.lineNumber = lineNumber;
 	}
 
-	public Node(NodeType type, List<Node> children) {
+	public Node(NodeType type, List<Node> children, int lineNumber) {
 		this.type = type;
 		this.text = null;
 		this.children = children;
+		this.lineNumber = lineNumber;
 	}
 
-	public Node(NodeType type, Node lhs, Node rhs) {
+	public Node(NodeType type, Node lhs, Node rhs, int lineNumber) {
 		this.type = type;
 		this.text = null;
 
@@ -44,6 +49,7 @@ public class Node {
 		children.add(lhs);
 		children.add(rhs);
 		this.children = children;
+		this.lineNumber = lineNumber;
 	}
 
 	public String getText() {
@@ -56,6 +62,10 @@ public class Node {
 
 	public NodeType getType() {
 		return type;
+	}
+
+	public int getLineNumber() {
+		return lineNumber;
 	}
 
 	public String toString() {
@@ -78,4 +88,5 @@ public class Node {
 		builder.append(')');
 		return builder.toString();
 	}
+
 }
