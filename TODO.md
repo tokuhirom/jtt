@@ -10,9 +10,6 @@ This file lists To-Does for JTT project.
 * `[% INCLUDE "hoge" WITH foo=bar %]`
  * Should we implement "Casting operator"?
    * How do I parse casting operator?
-* Make pool values unique.
-  * Do not add same object twice in the constant pool.
-  * It should be shared.
 
 ## DONE
 
@@ -77,3 +74,6 @@ This file lists To-Does for JTT project.
 * `[% __LINE__ %]`
 * Deprecate TTLexBuilder.
 * caching
+* Make pool values unique.
+  * Do not add same object twice in the constant pool.
+  * It should be shared.
