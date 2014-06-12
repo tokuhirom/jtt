@@ -46,9 +46,6 @@ We need ER Diagram.
   * Because you don't need to wrap by brackets.
   * I can't understand why TT2 needs brackets.
   * In JTT, you need to write this code as `[% FOR x IN 1..10 %]`.
- * [% a AND b %] style `AND`, `OR` operator was not supported.
-   * You can use `&&` and `||` operators instead.
- * Some methods are not supported.
  * VMethod is not supported. Because Java objects have own built-in methods.
 
 ## Caching
