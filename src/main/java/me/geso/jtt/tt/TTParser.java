@@ -202,12 +202,37 @@ class TTParser implements Parser {
 		}
 
 		Node path = parseString();
+		
+		ArrayList<Node> args = new ArrayList<>();
+		args.add(path);
 
 		if (EAT(TokenType.WITH)) {
-			throw new ParserError("WITH is not implemented yet.", this);
+			while (true) {
+				Node ident = parseIdent();
+				if (ident == null) {
+					throw new ParserError("Missing ident after WITH", this);
+				}
+				args.add(ident);
+				
+				if (!EAT(TokenType.ASSIGN)) {
+					throw new ParserError("Missing '=' after WITH", this);
+				}
+				
+				Node expr = parseExpr();
+				if (expr == null) {
+					throw new ParserError("Missing expr after WITH: " + CURRENT_TYPE(), this);
+				}
+				args.add(expr);
+				
+				if (EAT(TokenType.COMMA)) {
+					continue;
+				} else {
+					break;
+				}
+			}
 		}
 
-		return new Node(NodeType.INCLUDE, Lists.newArrayList(path), PREV_LINE_NUMBER());
+		return new Node(NodeType.INCLUDE, args, PREV_LINE_NUMBER());
 	}
 
 	private Node parseWhile() throws ParserError {

@@ -495,6 +495,13 @@ public class TTParserTest {
                 parse("[% __LINE__ %]\n[% __LINE__ %]").toString());
     }
 
+    @Test
+    public void testInclude2() throws ParserError {
+        assertEquals(
+                "(template (include (string hoge.tt) (ident foo) (ident bar)))",
+                parse("[% INCLUDE \"hoge.tt\" WITH foo=bar %]").toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		Syntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize("-", source);

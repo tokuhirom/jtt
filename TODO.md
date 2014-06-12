@@ -7,9 +7,11 @@ This file lists To-Does for JTT project.
 
 ## TODO
 
-* `[% INCLUDE "hoge" WITH foo=bar %]`
- * Should we implement "Casting operator"?
-   * How do I parse casting operator?
+* run `[% INCLUDE "hoge" WITH foo=bar %]`
+* compile `[% INCLUDE "hoge" WITH foo=bar %]`
+* benchmarking
+* lex `[% WRAPPER %]`
+* parse `[% WRAPPER %]`
 
 ## DONE
 
@@ -77,3 +79,4 @@ This file lists To-Does for JTT project.
 * Make pool values unique.
   * Do not add same object twice in the constant pool.
   * It should be shared.
+* parse `[% INCLUDE "hoge" WITH foo=bar %]`

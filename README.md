@@ -61,3 +61,7 @@ You can use JCS for caching(I will provide jtt-jcs package after few months...(m
 ### Why  JTT doesn't support MACRO?
 
 You can do it with INCLUDE or JavaScript.
+
+## Is there an "Casting operator"?
+
+How do I parse casting operator?
