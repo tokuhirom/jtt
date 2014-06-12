@@ -12,6 +12,7 @@ This file lists To-Does for JTT project.
 * benchmarking
 * lex `[% WRAPPER %]`
 * parse `[% WRAPPER %]`
+* run `[% WRAPPER %]`
 
 ## DONE
 

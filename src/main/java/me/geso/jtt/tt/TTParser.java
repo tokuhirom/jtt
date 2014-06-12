@@ -127,6 +127,8 @@ class TTParser implements Parser {
 			return parseSet();
 		case SWITCH:
 			return parseSwitch();
+		case WRAPPER:
+			return parseWrapper();
 		case END:
 		case ELSE:
 		case ELSIF:
@@ -142,6 +144,24 @@ class TTParser implements Parser {
 			}
 		}
 		}
+	}
+
+	// [% WRAPPER "foo.tt" %]body[% END %]
+	private Node parseWrapper() {
+		if (!EAT(TokenType.WRAPPER)) {
+			return null;
+		}
+
+		int lineNumber = CURRENT_LINE_NUMBER();
+
+		Node fileName = parseExpr();
+		if (fileName == null) {
+			throw new ParserError("Missing file name after WRAPPER keyword.", this);
+		}
+		
+		Node body = parseTemplateBody();
+
+		return new Node(NodeType.WRAPPER, Lists.newArrayList(fileName, body), lineNumber);
 	}
 
 	private Node parseSwitch() throws ParserError {

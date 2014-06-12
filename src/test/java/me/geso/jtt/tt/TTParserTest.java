@@ -502,6 +502,13 @@ public class TTParserTest {
                 parse("[% INCLUDE \"hoge.tt\" WITH foo=bar %]").toString());
     }
 
+    @Test
+    public void testWrapper() throws ParserError {
+        assertEquals(
+                "(template (wrapper (string foo.tt) (template (raw_string ohoho))))",
+                parse("[% WRAPPER \"foo.tt\" %]ohoho[% END %]").toString());
+    }
+
 	private Node parse(String source) throws ParserError {
 		Syntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize("-", source);

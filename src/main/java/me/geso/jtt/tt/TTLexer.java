@@ -54,6 +54,7 @@ class TTLexer {
 			new TokenPair("NEXT", TokenType.NEXT), //
 			new TokenPair("AND", TokenType.LOOSE_AND), //
 			new TokenPair("OR", TokenType.LOOSE_OR), //
+			new TokenPair("WRAPPER", TokenType.WRAPPER), //
 			new TokenPair("loop", TokenType.LOOP), //
 			new TokenPair("true", TokenType.TRUE), //
 			new TokenPair("false", TokenType.FALSE), //
