@@ -84,6 +84,15 @@ public class JTTTest {
 		assertEquals("INC1_HEAD\nINC2\n\nINC1_FOOT\n",
 				render("inc1.tt", new HashMap<>()));
 	}
+	
+	@Test
+	public void testRenderFile3() throws IOException, JTTError {
+		assertEquals("<body>\nfoo\n</body>\n",
+				render("wrap.tt", new HashMap<>()));
+	}
+	
+	// ---------------------------------------------------------------
+	// utils.
 
 	private String render(String fileName, Map<String, Object> vars)
 			throws JTTError, TemplateLoadingError, IOException {

@@ -362,6 +362,18 @@ public class Compiler {
 				}
 				break;
 			}
+			case WRAPPER: {
+				// (template (wrapper (string foo.tt) (template (raw_string ohoho))))
+				String fileName = node.getChildren().get(0).getText();
+				Node body = node.getChildren().get(1);
+
+				visitAst(body);
+
+				builder.addPool(OP.LOAD_CONST, fileName);
+				builder.add(OP.WRAP);
+
+				break;
+			}
 			default:
 				throw new RuntimeException("Should not reach here: "
 						+ node.getType());

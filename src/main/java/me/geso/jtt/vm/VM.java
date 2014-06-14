@@ -314,6 +314,17 @@ public class VM {
 				++pc;
 				break;
 			}
+			case WRAP: {
+				String path = (String) stack.pop();
+				Irep compiledIrep = loader.compile(Paths.get(path), syntax);
+				HashMap<String, Object> newvars = new HashMap<>(vars);
+				newvars.put("content", buffer.toString());
+				buffer.delete(0, buffer.length());
+				String result = this.run(compiledIrep, newvars);
+				buffer.append(result);
+				++pc;
+				break;
+			}
 			case ATTRIBUTE: { // PUSH(POP()[POP()])
 				// container[index]
 				Object index = stack.pop();

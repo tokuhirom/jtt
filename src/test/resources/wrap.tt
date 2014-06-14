@@ -1,0 +1,3 @@
+[% WRAPPER "layout.tt" %]
+foo
+[% END %]
