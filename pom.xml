@@ -25,13 +25,6 @@
 			<artifactId>guava</artifactId>
 			<version>17.0</version>
 		</dependency>
-
-		<dependency>
-			<groupId>com.cedarsoft.commons</groupId>
-			<artifactId>io</artifactId>
-			<version>6.0.1</version>
-		</dependency>
-
 		<dependency>
 			<groupId>com.esotericsoftware.reflectasm</groupId>
 			<artifactId>reflectasm</artifactId>

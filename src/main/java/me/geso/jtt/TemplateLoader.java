@@ -1,7 +1,7 @@
 package me.geso.jtt;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -11,8 +11,6 @@ import me.geso.jtt.exception.TemplateLoadingError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
 import me.geso.jtt.vm.Irep;
-
-import org.apache.commons.io.IOUtils;
 
 public class TemplateLoader {
 	final List<Path> includePaths;
@@ -45,8 +43,9 @@ public class TemplateLoader {
 	}
 
 	private Irep compileFile(Path fullpath, Syntax syntax) throws JTTError {
-		try (InputStream is = Files.newInputStream(fullpath)) {
-			String src = IOUtils.toString(is, "UTF-8");
+		try {
+			byte[] bytes = Files.readAllBytes(fullpath);
+			String src = new String(bytes, StandardCharsets.UTF_8);
 			List<Token> tokens = syntax.tokenize(fullpath.toString(), src);
 			Node ast = syntax.parse(src, tokens);
 			return syntax.compile(ast);

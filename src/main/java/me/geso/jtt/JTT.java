@@ -1,15 +1,11 @@
 package me.geso.jtt;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.geso.jtt.exception.JTTCompilerError;
 import me.geso.jtt.exception.JTTError;
-import me.geso.jtt.exception.ParserError;
-import me.geso.jtt.exception.TemplateLoadingError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
 import me.geso.jtt.tt.TTSyntax;
@@ -20,7 +16,7 @@ public class JTT {
 	private final VM vm;
 	private final TemplateLoader loader;
 	private final Syntax syntax;
-	
+
 	public JTT(VM vm, TemplateLoader loader, Syntax syntax) {
 		assert syntax != null;
 
@@ -29,17 +25,18 @@ public class JTT {
 		this.syntax = syntax;
 	}
 
-	public String render(String file, Map<String,Object> vars) throws IOException, JTTError {
+	public String render(String file, Map<String, Object> vars) throws JTTError {
 		return this.render(new File(file), vars);
 	}
-	
-	public String render(File file, Map<String,Object> vars) throws IOException, JTTError {
+
+	public String render(File file, Map<String, Object> vars) throws JTTError {
 		Irep irep = loader.compile(file.toPath(), this.syntax);
 		String result = vm.run(irep, vars);
 		return result;
 	}
 
-	public String renderString(String src, Map<String, Object> vars) throws ParserError, JTTCompilerError, TemplateLoadingError, IOException {
+	public String renderString(String src, Map<String, Object> vars)
+			throws JTTError {
 		if (vars == null) {
 			vars = new HashMap<>();
 		}

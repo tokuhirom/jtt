@@ -1,6 +1,5 @@
 package me.geso.jtt.vm;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
@@ -23,8 +22,6 @@ import me.geso.jtt.escape.Escaper;
 import me.geso.jtt.escape.HTMLEscaper;
 import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.MethodInvokeError;
-import me.geso.jtt.exception.ParserError;
-import me.geso.jtt.exception.TemplateLoadingError;
 import me.geso.jtt.exception.TypeError;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
@@ -52,8 +49,7 @@ public class VM {
 	}
 
 	public String run(Irep irep, Map<String, Object> vars)
-			throws JTTError, ParserError,
-			TemplateLoadingError, IOException {
+			throws JTTError {
 		if (vars == null) {
 			throw new NullPointerException();
 		}
