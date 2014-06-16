@@ -35,7 +35,14 @@ class TTParser implements Parser {
 	}
 
 	public Node parseTemplate() throws ParserError {
-		return parseTemplateBody();
+		Node n = parseTemplateBody();
+		if (n == null) {
+			throw new ParserError("Can't parse template", this);
+		}
+		if (this.pos != tokens.size()) {
+			throw new ParserError("Can't parse template", this);
+		}
+		return n;
 	}
 
 	public Node parseTemplateBody() throws ParserError {
@@ -71,54 +78,24 @@ class TTParser implements Parser {
 
 	// tag : '[%' expr '%]';
 	public Node parseTag() throws ParserError {
-		switch (tokens.get(pos).getType()) {
+		if (CURRENT_TYPE() != TokenType.OPEN) {
+			return null;
+		}
+		if (!HAS_NEXT_TOKEN()) {
+			throw new ParserError("Missing token after opening tag", this);
+		}
+		switch (NEXT_TYPE()) {
+		// switch (tokens.get(pos).getType()) {
 		case FOREACH: {
-			++pos;
-
-			Node iterNode = parseIdent();
-			if (iterNode == null) {
-				throw new ParserError("No variable name after (FOR|FOREACH)",
-						this);
-			}
-
-			if (!EAT(TokenType.IN)) {
-				throw new ParserError("No 'IN' keyword after (FOR|FOREACH)",
-						this);
-			}
-
-			Node expr = parseExpr();
-			if (expr == null) {
-				throw new ParserError("No expression after (FOR|FOREACH)", this);
-			}
-
-			Node body = parseTemplateBody();
-			if (body == null) {
-				throw new ParserError("No template body after (FOR|FOREACH)",
-						this);
-			}
-
-			if (!parseEnd()) {
-				throw new ParserError("No `[% END %]` after (FOR|FOREACH)",
-						this);
-			}
-
-			List<Node> children = new ArrayList<>();
-			children.add(iterNode);
-			children.add(expr);
-			children.add(body);
-			return new Node(NodeType.FOREACH, children, PREV_LINE_NUMBER());
+			return parseForEach();
 		}
 		case WHILE:
 			return parseWhile();
 		case LAST: {
-			Node node = new Node(NodeType.LAST, CURRENT_LINE_NUMBER());
-			++pos;
-			return node;
+			return parseLast();
 		}
 		case NEXT: {
-			Node node = new Node(NodeType.NEXT, CURRENT_LINE_NUMBER());
-			++pos;
-			return node;
+			return parseNext();
 		}
 		case IF:
 			return parseIf();
@@ -137,19 +114,112 @@ class TTParser implements Parser {
 			// Unexpected [% END %] etc... Backtracking is required.
 			return null;
 		default: {
-			Node exprNode = parseExpr();
-			if (exprNode != null) {
-				return new Node(NodeType.EXPRESSION, exprNode,
-						PREV_LINE_NUMBER());
-			} else {
-				throw new ParserError("No expression", this);
-			}
+			return this.parseTagExpr();
 		}
 		}
 	}
 
+	private Node parseForEach() {
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
+
+		if (!EAT(TokenType.FOREACH)) {
+			return null;
+		}
+
+		Node iterNode = parseIdent();
+		if (iterNode == null) {
+			throw new ParserError("No variable name after (FOR|FOREACH)", this);
+		}
+
+		if (!EAT(TokenType.IN)) {
+			throw new ParserError("No 'IN' keyword after (FOR|FOREACH)", this);
+		}
+
+		Node expr = parseExpr();
+		if (expr == null) {
+			throw new ParserError("No expression after (FOR|FOREACH)", this);
+		}
+
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after (FOR|FOREACH)",
+					this);
+		}
+
+		Node body = parseTemplateBody();
+		if (body == null) {
+			throw new ParserError("No template body after (FOR|FOREACH)", this);
+		}
+
+		if (!parseEnd()) {
+			throw new ParserError("No `[% END %]` after (FOR|FOREACH)", this);
+		}
+
+		List<Node> children = new ArrayList<>();
+		children.add(iterNode);
+		children.add(expr);
+		children.add(body);
+		return new Node(NodeType.FOREACH, children, PREV_LINE_NUMBER());
+	}
+
+	private Node parseLast() {
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
+
+		if (!EAT(TokenType.LAST)) {
+			return null;
+		}
+
+		Node node = new Node(NodeType.LAST, PREV_LINE_NUMBER());
+
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after LAST", this);
+		}
+
+		return node;
+	}
+
+	private Node parseNext() {
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
+
+		if (!EAT(TokenType.NEXT)) {
+			return null;
+		}
+
+		Node node = new Node(NodeType.NEXT, PREV_LINE_NUMBER());
+
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after NEXT", this);
+		}
+
+		return node;
+	}
+
+	private Node parseTagExpr() {
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
+		Node exprNode = parseExpr();
+		if (exprNode == null) {
+			throw new ParserError("No expression", this);
+		}
+
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after expression", this);
+		}
+
+		return new Node(NodeType.EXPRESSION, exprNode, PREV_LINE_NUMBER());
+	}
+
 	// [% WRAPPER "foo.tt" %]body[% END %]
 	private Node parseWrapper() {
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
 		if (!EAT(TokenType.WRAPPER)) {
 			return null;
 		}
@@ -162,13 +232,25 @@ class TTParser implements Parser {
 					this);
 		}
 
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after WRAPPER keyword.",
+					this);
+		}
+
 		Node body = parseTemplateBody();
+
+		if (!parseEnd()) {
+			throw new ParserError("Missing END after WRAPPER keyword.", this);
+		}
 
 		return new Node(NodeType.WRAPPER, Lists.newArrayList(fileName, body),
 				lineNumber);
 	}
 
 	private Node parseSwitch() throws ParserError {
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
 		if (!EAT(TokenType.SWITCH)) {
 			return null;
 		}
@@ -180,6 +262,10 @@ class TTParser implements Parser {
 			throw new ParserError("Missing expression after SWITCH", this);
 		}
 		list.add(expr);
+
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after SWITCH", this);
+		}
 
 		while (true) {
 			Node caseNode = parseCase();
@@ -201,12 +287,19 @@ class TTParser implements Parser {
 	// [% CASE expr %]
 	private Node parseCase() throws ParserError {
 		try (PositionSaver saver = new PositionSaver(this)) {
+			if (!EAT(TokenType.OPEN)) {
+				return null;
+			}
 			if (!EAT(TokenType.CASE)) {
 				return null;
 			}
 
 			// expr maybe null. `[% CASE %]` is valid.
 			Node expr = parseExpr();
+
+			if (!EAT(TokenType.CLOSE)) {
+				throw new ParserError("Missing closing tag after CASE", this);
+			}
 
 			Node body = parseTemplateBody();
 			if (body == null) {
@@ -222,6 +315,10 @@ class TTParser implements Parser {
 	// [% INCLUDE "hello.tt" %]
 	// [% INCLUDE "hello.tt" WITH foo %]
 	private Node parseInclude() throws ParserError {
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
+
 		if (!EAT(TokenType.INCLUDE)) {
 			throw new ParserError("No 'INCLUDE'", this);
 		}
@@ -232,7 +329,7 @@ class TTParser implements Parser {
 		args.add(path);
 
 		if (EAT(TokenType.WITH)) {
-			while (true) {
+			while (CURRENT_TYPE() != TokenType.CLOSE) {
 				Node ident = parseIdent();
 				if (ident == null) {
 					throw new ParserError("Missing ident after WITH", this);
@@ -258,10 +355,18 @@ class TTParser implements Parser {
 			}
 		}
 
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after 'INCLUDE'", this);
+		}
+
 		return new Node(NodeType.INCLUDE, args, PREV_LINE_NUMBER());
 	}
 
 	private Node parseWhile() throws ParserError {
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
+
 		if (!EAT(TokenType.WHILE)) {
 			throw new ParserError("No 'WHILE'", this);
 		}
@@ -269,6 +374,10 @@ class TTParser implements Parser {
 		final Node expr = parseExpr();
 		if (expr == null) {
 			throw new ParserError("No expression after 'WHILE'", this);
+		}
+
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after 'WHILE'", this);
 		}
 
 		final Node body = parseTemplateBody();
@@ -282,6 +391,10 @@ class TTParser implements Parser {
 	}
 
 	private Node parseSet() throws ParserError {
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
+
 		if (!EAT(TokenType.SET)) {
 			throw new ParserError("No 'SET'", this);
 		}
@@ -292,12 +405,20 @@ class TTParser implements Parser {
 		}
 		final Node expr = parseExpr();
 
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after 'SET'", this);
+		}
+
 		return new Node(NodeType.SET, Lists.newArrayList(ident, expr),
 				PREV_LINE_NUMBER());
 	}
 
 	private Node parseIf() throws ParserError {
 		// (if condition if-body else-body)
+		if (!EAT(TokenType.OPEN)) {
+			return null;
+		}
+
 		if (!EAT(TokenType.IF)) {
 			throw new ParserError("No 'IF'", this);
 		}
@@ -306,6 +427,11 @@ class TTParser implements Parser {
 		if (cond == null) {
 			throw new ParserError("No condition after 'IF'", this);
 		}
+
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag after 'IF'", this);
+		}
+
 		final Node body = parseTemplateBody();
 		if (body == null) {
 			throw new ParserError("No body after 'IF'", this);
@@ -329,14 +455,25 @@ class TTParser implements Parser {
 	}
 
 	private Node parseElsIf() throws ParserError {
-		if (!EAT(TokenType.ELSIF)) {
+		if (NEXT_TYPE() != TokenType.ELSIF) {
 			return null;
+		}
+
+		if (!EAT(TokenType.OPEN)) {
+			throw new ParserError("Missing open tag before 'ELSIF'", this);
+		}
+		if (!EAT(TokenType.ELSIF)) {
+			throw new ParserError("Should not reach here", this);
 		}
 
 		final Node elsifCond = parseExpr();
 		if (elsifCond == null) {
 			throw new ParserError("No condition after 'ELSIF'", this);
 		}
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("No closing tag after 'ELSIF'", this);
+		}
+
 		Node elsifBody = parseTemplateBody();
 		if (elsifBody == null) {
 			throw new ParserError("No body after 'ELSIF'", this);
@@ -352,8 +489,18 @@ class TTParser implements Parser {
 	}
 
 	private Node parseElse() throws ParserError {
-		if (!EAT(TokenType.ELSE)) {
+		if (NEXT_TYPE() != TokenType.ELSE) {
 			return null;
+		}
+
+		if (!EAT(TokenType.OPEN)) {
+			throw new ParserError("Unknown parser error around ELSE keyword", this);
+		}
+		if (!EAT(TokenType.ELSE)) {
+			throw new ParserError("Unknown parser error around ELSE keyword", this);
+		}
+		if (!EAT(TokenType.CLOSE)) {
+			throw new ParserError("Missing closing tag around ELSE keyword", this);
 		}
 
 		Node elseBody = parseTemplateBody();
@@ -385,11 +532,19 @@ class TTParser implements Parser {
 	}
 
 	private boolean parseEnd() {
+		if (!EAT(TokenType.OPEN)) {
+			return false;
+		}
+
 		if (!EAT(TokenType.END)) {
 			return false;
-		} else {
-			return true;
 		}
+
+		if (!EAT(TokenType.CLOSE)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	// expr = int;
@@ -1110,6 +1265,21 @@ class TTParser implements Parser {
 		} else {
 			return null;
 		}
+	}
+
+	private boolean HAS_NEXT_TOKEN() {
+		if (pos + 1 < tokens.size()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private TokenType NEXT_TYPE() {
+		if (!HAS_NEXT_TOKEN()) {
+			return null;
+		}
+		return tokens.get(pos + 1).getType();
 	}
 
 	private String CURRENT_STRING() {

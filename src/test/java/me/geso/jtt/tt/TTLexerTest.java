@@ -18,19 +18,19 @@ public class TTLexerTest {
 
 	@Test
 	public void testInteger() {
-		assertEquals("[INTEGER 3]", lex("[% 3 %]"));
-		assertEquals("[INTEGER 0]", lex("[% 0 %]"));
-		assertEquals("[INTEGER 30]", lex("[% 30 %]"));
+		assertEquals("[OPEN],[INTEGER 3],[CLOSE]", lex("[% 3 %]"));
+		assertEquals("[OPEN],[INTEGER 0],[CLOSE]", lex("[% 0 %]"));
+		assertEquals("[OPEN],[INTEGER 30],[CLOSE]", lex("[% 30 %]"));
 	}
 
 	@Test
 	public void testDouble() {
-		assertEquals("[DOUBLE 3.14]", lex("[% 3.14 %]"));
+		assertEquals("[OPEN],[DOUBLE 3.14],[CLOSE]", lex("[% 3.14 %]"));
 	}
 
 	@Test
 	public void testForIn() {
-		assertEquals("[FOREACH],[IDENT x],[IN],[IDENT y],[IDENT x],[END]",
+		assertEquals("[OPEN],[FOREACH],[IDENT x],[IN],[IDENT y],[CLOSE],[OPEN],[IDENT x],[CLOSE],[OPEN],[END],[CLOSE]",
 				lex("[% FOR x IN y %][% x %][% END %]"));
 	}
 
@@ -41,50 +41,50 @@ public class TTLexerTest {
 
 	@Test
 	public void testLexerIdent() {
-		assertEquals("[IDENT foo]", lex("[% foo %]"));
+		assertEquals("[OPEN],[IDENT foo],[CLOSE]", lex("[% foo %]"));
 	}
 
 	@Test
 	public void testIf() {
-		assertEquals("[IF],[IDENT foo],[RAW bar],[END]",
+		assertEquals("[OPEN],[IF],[IDENT foo],[CLOSE],[RAW bar],[OPEN],[END],[CLOSE]",
 				lex("[% IF foo %]bar[% END %]"));
 	}
 
 	@Test
 	public void testSwitch() {
-		assertEquals("[SWITCH],[IDENT foo],[CASE],[INTEGER 3],[RAW bar],[END]",
+		assertEquals("[OPEN],[SWITCH],[IDENT foo],[CLOSE],[OPEN],[CASE],[INTEGER 3],[CLOSE],[RAW bar],[OPEN],[END],[CLOSE]",
 				lex("[% SWITCH foo %][% CASE 3 %]bar[% END %]"));
 	}
 
 	@Test
 	public void testArray() {
 		assertEquals(
-				"[LBRACKET],[INTEGER 1],[COMMA],[INTEGER 2],[COMMA],[INTEGER 3],[RBRACKET]",
+				"[OPEN],[LBRACKET],[INTEGER 1],[COMMA],[INTEGER 2],[COMMA],[INTEGER 3],[RBRACKET],[CLOSE]",
 				lex("[% [1,2,3] %]"));
 	}
 
 	@Test
 	public void testEquals() {
-		assertEquals("[IDENT x],[EQUALS],[INTEGER 3]", lex("[% x==3 %]"));
+		assertEquals("[OPEN],[IDENT x],[EQUALS],[INTEGER 3],[CLOSE]", lex("[% x==3 %]"));
 	}
 
 	@Test
 	public void testAssign() {
-		assertEquals("[IDENT x],[ASSIGN],[INTEGER 3]", lex("[% x=3 %]"));
+		assertEquals("[OPEN],[IDENT x],[ASSIGN],[INTEGER 3],[CLOSE]", lex("[% x=3 %]"));
 	}
 
 	@Test
 	public void testOp() {
-		assertEquals("[IDENT x],[MODULO],[INTEGER 3]", lex("[% x%3 %]"));
-		assertEquals("[IDENT x],[LT],[INTEGER 3]", lex("[% x<3 %]"));
-		assertEquals("[IDENT x],[LE],[INTEGER 3]", lex("[% x<=3 %]"));
-		assertEquals("[IDENT x],[GT],[INTEGER 3]", lex("[% x>3 %]"));
-		assertEquals("[IDENT x],[GE],[INTEGER 3]", lex("[% x>=3 %]"));
+		assertEquals("[OPEN],[IDENT x],[MODULO],[INTEGER 3],[CLOSE]", lex("[% x%3 %]"));
+		assertEquals("[OPEN],[IDENT x],[LT],[INTEGER 3],[CLOSE]", lex("[% x<3 %]"));
+		assertEquals("[OPEN],[IDENT x],[LE],[INTEGER 3],[CLOSE]", lex("[% x<=3 %]"));
+		assertEquals("[OPEN],[IDENT x],[GT],[INTEGER 3],[CLOSE]", lex("[% x>3 %]"));
+		assertEquals("[OPEN],[IDENT x],[GE],[INTEGER 3],[CLOSE]", lex("[% x>=3 %]"));
 	}
 
 	@Test
 	public void testHash() {
-		assertEquals("[LBRACE],[IDENT a],[ARROW],[INTEGER 3],[RBRACE]",
+		assertEquals("[OPEN],[LBRACE],[IDENT a],[ARROW],[INTEGER 3],[RBRACE],[CLOSE]",
 				lex("[% {a=>3} %]"));
 	}
 
@@ -95,32 +95,32 @@ public class TTLexerTest {
 
 	@Test
 	public void testConcat() {
-		assertEquals("[STRING ho],[CONCAT],[STRING ge]",
+		assertEquals("[OPEN],[STRING ho],[CONCAT],[STRING ge],[CLOSE]",
 				lex("[% \"ho\" _ \"ge\" %]"));
 	}
 
 	@Test
 	public void testSqString() {
-		assertEquals("[STRING ho]", lex("[% 'ho' %]"));
+		assertEquals("[OPEN],[STRING ho],[CLOSE]", lex("[% 'ho' %]"));
 	}
 
 	@Test
 	public void testChomp() {
-		assertEquals("[RAW hoge],[STRING ho]", lex("hoge\n  [%- 'ho' %]"));
-		assertEquals("[STRING ho],[RAW   hoge]", lex("[% 'ho' -%]  \n  hoge"));
+		assertEquals("[RAW hoge],[OPEN],[STRING ho],[CLOSE]", lex("hoge\n  [%- 'ho' %]"));
+		assertEquals("[OPEN],[STRING ho],[CLOSE],[RAW   hoge]", lex("[% 'ho' -%]  \n  hoge"));
 	}
 
 	@Test
 	public void testParen() {
 		assertEquals(
-				"[LPAREN],[INTEGER 1],[PLUS],[INTEGER 2],[RPAREN],[MUL],[INTEGER 3]",
+				"[OPEN],[LPAREN],[INTEGER 1],[PLUS],[INTEGER 2],[RPAREN],[MUL],[INTEGER 3],[CLOSE]",
 				lex("[% (1+2)*3 %]"));
 	}
 
 	@Test
 	public void testLineComment() {
 		assertEquals(
-				"[IDENT theta],[ASSIGN],[INTEGER 20],[IDENT rho],[ASSIGN],[INTEGER 30]",
+				"[OPEN],[IDENT theta],[ASSIGN],[INTEGER 20],[IDENT rho],[ASSIGN],[INTEGER 30],[CLOSE]",
 				lex("[% # this is a comment\n"
 						+ "  theta = 20      # so is this\n"
 						+ "  rho   = 30      # <aol>me too!</aol>\n" + "%]"));
@@ -135,81 +135,81 @@ public class TTLexerTest {
 
 	@Test
 	public void testFuncall() {
-		assertEquals("[IDENT lc],[LPAREN],[STRING HOGE],[RPAREN]",
+		assertEquals("[OPEN],[IDENT lc],[LPAREN],[STRING HOGE],[RPAREN],[CLOSE]",
 				lex("[% lc(\"HOGE\") %]"));
 	}
 
 	@Test
 	public void testConditionalOperator() {
-		assertEquals("[INTEGER 3],[QUESTION],[INTEGER 1],[KOLON],[INTEGER 0]",
+		assertEquals("[OPEN],[INTEGER 3],[QUESTION],[INTEGER 1],[KOLON],[INTEGER 0],[CLOSE]",
 				lex("[% 3 ? 1 : 0 %]"));
 	}
 
 	@Test
 	public void testRangeConstructionOperator() {
-		assertEquals("[INTEGER 1],[RANGE],[INTEGER 3]", lex("[% 1..3 %]"));
+		assertEquals("[OPEN],[INTEGER 1],[RANGE],[INTEGER 3],[CLOSE]", lex("[% 1..3 %]"));
 	}
 
 	@Test
 	public void testUnaryNot() {
-		assertEquals("[NOT],[TRUE]", lex("[% !true %]"));
+		assertEquals("[OPEN],[NOT],[TRUE],[CLOSE]", lex("[% !true %]"));
 	}
 
 	@Test
 	public void testPipe() {
-		assertEquals("[INTEGER 3],[PIPE],[IDENT uri]", lex("[% 3 | uri %]"));
+		assertEquals("[OPEN],[INTEGER 3],[PIPE],[IDENT uri],[CLOSE]", lex("[% 3 | uri %]"));
 	}
 
 	@Test
 	public void testAnd() {
-		assertEquals("[INTEGER 3],[ANDAND],[INTEGER 4]", lex("[% 3 && 4 %]"));
+		assertEquals("[OPEN],[INTEGER 3],[ANDAND],[INTEGER 4],[CLOSE]", lex("[% 3 && 4 %]"));
 	}
 
 	@Test
 	public void testNE() {
-		assertEquals("[INTEGER 3],[NE],[INTEGER 4]", lex("[% 3 != 4 %]"));
+		assertEquals("[OPEN],[INTEGER 3],[NE],[INTEGER 4],[CLOSE]", lex("[% 3 != 4 %]"));
 	}
 
 	@Test
 	public void testOrOr() {
-		assertEquals("[INTEGER 3],[OROR],[INTEGER 4]", lex("[% 3 || 4 %]"));
+		assertEquals("[OPEN],[INTEGER 3],[OROR],[INTEGER 4],[CLOSE]", lex("[% 3 || 4 %]"));
 	}
 
 	@Test
 	public void testLooseAnd() {
-		assertEquals("[INTEGER 3],[LOOSE_AND],[INTEGER 4]",
+		assertEquals("[OPEN],[INTEGER 3],[LOOSE_AND],[INTEGER 4],[CLOSE]",
 				lex("[% 3 AND 4 %]"));
 	}
 
 	@Test
 	public void testLooseOr() {
-		assertEquals("[INTEGER 3],[LOOSE_OR],[INTEGER 4]", lex("[% 3 OR 4 %]"));
+		assertEquals("[OPEN],[INTEGER 3],[LOOSE_OR],[INTEGER 4],[CLOSE]", lex("[% 3 OR 4 %]"));
 	}
 
 	@Test
 	public void testDollarVar() {
-		assertEquals("[IDENT list],[DOT],[DOLLARVAR key]",
+		assertEquals("[OPEN],[IDENT list],[DOT],[DOLLARVAR key],[CLOSE]",
 				lex("[% list.$key %]"));
 	}
 
 	@Test
 	public void testArrayIndex() {
-		assertEquals("[IDENT list],[LBRACKET],[IDENT idx],[RBRACKET]",
+		assertEquals("[OPEN],[IDENT list],[LBRACKET],[IDENT idx],[RBRACKET],[CLOSE]",
 				lex("[% list[idx] %]"));
 	}
 
 	@Test
 	public void testFile() {
-		assertEquals("[FILE]", lex("[% __FILE__ %]"));
+		assertEquals("[OPEN],[FILE],[CLOSE]", lex("[% __FILE__ %]"));
 		
 		// MUST NOT BE [FILE],[IDENT e]
-		assertEquals("[CONCAT],[CONCAT],[IDENT FILE__e]", lex("[% __FILE__e %]"));
+		assertEquals("[OPEN],[CONCAT],[CONCAT],[IDENT FILE__e],[CLOSE]", lex("[% __FILE__e %]"));
 	}
 
 	@Test
 	public void testLine() {
-		assertEquals("[LINE]", lex("[% __LINE__ %]"));
-		assertNotEquals("[LIKE],[IDENT e]", lex("[% __FILE__e %]"));
+		assertEquals("[OPEN],[LINE],[CLOSE]", lex("[% __LINE__ %]"));
+		assertNotEquals("[OPEN],[LIKE],[IDENT e],[CLOSE]", lex("[% __FILE__e %]"));
 	}
 
 	@Test

@@ -79,12 +79,9 @@ class TTLexer {
 
 		while (pos < source.length()) {
 			if (mode == LexerMode.IN_RAW) {
-				String raw = lexRaw(source);
-				if (raw.length() > 0) {
-					tokens.add(this.createToken(TokenType.RAW, raw));
-				}
+				this.lexRaw(source);
 			} else if (mode == LexerMode.IN_TAG) {
-				lexTagBody(source, tokens);
+				this.lexTagBody(source, tokens);
 			} else {
 				throw new RuntimeException("SHOULD NOT REACH HERE");
 			}
@@ -108,6 +105,7 @@ class TTLexer {
 			if (matcher.find()) {
 				pos += matcher.group(0).length();
 				mode = LexerMode.IN_RAW;
+				tokens.add(this.createToken(TokenType.CLOSE));
 				return;
 			} else {
 				switch (string.charAt(pos)) {
@@ -320,7 +318,9 @@ class TTLexer {
 		Matcher matcher = positionRe.matcher(source.substring(pos));
 		if (matcher.find()) {
 			pos += matcher.group(0).length();
-			return this.createToken(matcher.group(1).equals("FILE") ? TokenType.FILE : TokenType.LINE);
+			return this
+					.createToken(matcher.group(1).equals("FILE") ? TokenType.FILE
+							: TokenType.LINE);
 		} else {
 			++pos;
 			return this.createToken(TokenType.CONCAT);
@@ -470,7 +470,7 @@ class TTLexer {
 		return new TTLexerError(message, this);
 	}
 
-	private String lexRaw(String string) {
+	private void lexRaw(String string) {
 		StringBuilder builder = new StringBuilder();
 		while (pos < string.length()) {
 			// [%-
@@ -479,12 +479,18 @@ class TTLexer {
 				mode = LexerMode.IN_TAG;
 				pos += matcher.group(0).length();
 
+				if (builder.toString().length() > 0) {
+					tokens.add(this.createToken(TokenType.RAW,
+							builder.toString()));
+				}
+
 				// [%# comments %]
 				if (pos < string.length() && string.charAt(pos) == '#') {
 					this.lexTagComment();
+				} else {
+					tokens.add(this.createToken(TokenType.OPEN));
 				}
-
-				return builder.toString();
+				return;
 			} else {
 				char c = string.charAt(pos);
 				if (c == '\n') {
@@ -494,7 +500,9 @@ class TTLexer {
 				++pos;
 			}
 		}
-		return builder.toString();
+		if (builder.toString().length() > 0) {
+			tokens.add(this.createToken(TokenType.RAW, builder.toString()));
+		}
 	}
 
 	private void lexTagComment() {
@@ -505,8 +513,8 @@ class TTLexer {
 			this.pos += commentMatcher.group(0).length();
 			this.mode = LexerMode.IN_RAW;
 		} else {
-			throw new TTLexerError(
-					"Missing closing tag after tag comments.", this);
+			throw new TTLexerError("Missing closing tag after tag comments.",
+					this);
 		}
 
 	}

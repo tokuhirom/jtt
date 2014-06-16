@@ -86,11 +86,10 @@ public class JTTTest {
 
 	@Test
 	public void testRenderFile3() throws IOException, JTTError {
-		assertEquals("<body>\nfoo\n</body>\n",
+		assertEquals("<body>\nfoo\n</body>\n\n",
 				render("wrap.tt", new HashMap<>()));
 	}
 
-	/*
 	@Test
 	public void testRenderString1() throws IOException, JTTError {
 		List<String> items = new ArrayList<>();
@@ -102,7 +101,7 @@ public class JTTTest {
 		params.put("items", items);
 
 		assertEquals(
-				"12",
+				"evenoddeven",
 				renderString(
 						"[% FOR item IN items %][% ['odd','even'][loop.getCount()%2] %][% END %]",
 						params));
@@ -115,24 +114,6 @@ public class JTTTest {
 		assertEquals("even", renderString("[% ['odd','even'][1%2] %]", params));
 		assertEquals("odd", renderString("[% ['odd','even'][2%2] %]", params));
 	}
-
-	@Test
-	public void testRenderString3() throws IOException, JTTError {
-		List<String> items = new ArrayList<>();
-		items.add("hoge");
-		items.add("fuga");
-		items.add("hige");
-
-		HashMap<String, Object> params = new HashMap<>();
-		params.put("items", items);
-
-		assertEquals(
-				"12",
-				renderString(
-						"[% FOR item IN items %][% [1,2,3] %][% END %]",
-						params));
-	}
-	*/
 
 	// ---------------------------------------------------------------
 	// utils.
