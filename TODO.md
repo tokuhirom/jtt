@@ -4,15 +4,14 @@ This file lists To-Does for JTT project.
 
 ## DOING
 
+* Fix the test case for in memory template cache.
+* Benchmarking with Velocity.
 
 ## TODO
 
 * run `[% INCLUDE "hoge" WITH foo=bar %]`
 * compile `[% INCLUDE "hoge" WITH foo=bar %]`
 * benchmarking
-* lex `[% WRAPPER %]`
-* parse `[% WRAPPER %]`
-* run `[% WRAPPER %]`
 
 ## DONE
 
@@ -81,3 +80,6 @@ This file lists To-Does for JTT project.
   * Do not add same object twice in the constant pool.
   * It should be shared.
 * parse `[% INCLUDE "hoge" WITH foo=bar %]`
+* lex `[% WRAPPER %]`
+* parse `[% WRAPPER %]`
+* run `[% WRAPPER %]`

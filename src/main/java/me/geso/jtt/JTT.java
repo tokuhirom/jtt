@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import me.geso.jtt.exception.JTTCompilerError;
+import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.exception.TemplateLoadingError;
 import me.geso.jtt.lexer.Token;
@@ -27,8 +28,12 @@ public class JTT {
 		this.loader = loader;
 		this.syntax = syntax;
 	}
+
+	public String render(String file, Map<String,Object> vars) throws IOException, JTTError {
+		return this.render(new File(file), vars);
+	}
 	
-	public String render(File file, Map<String,Object> vars) throws IOException, ParserError, JTTCompilerError, TemplateLoadingError {
+	public String render(File file, Map<String,Object> vars) throws IOException, JTTError {
 		Irep irep = loader.compile(file.toPath(), this.syntax);
 		String result = vm.run(irep, vars);
 		return result;

@@ -1,6 +1,7 @@
 package me.geso.jtt;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,14 @@ public class JTTBuilder {
 		return includePaths;
 	}
 
+	public JTTBuilder addIncludePath(Path path) {
+		if (this.includePaths == null) {
+			this.includePaths = new ArrayList<>();
+		}
+		this.includePaths.add(path);
+		return this;
+	}
+
 	public JTTBuilder setIncludePaths(List<Path> includePaths) {
 		this.includePaths = includePaths;
 		return this;
@@ -56,8 +65,9 @@ public class JTTBuilder {
 		return this;
 	}
 
-	public void setTemplateCache(TemplateCache templateCache) {
+	public JTTBuilder setTemplateCache(TemplateCache templateCache) {
 		this.templateCache = templateCache;
+		return this;
 	}
 
 	public JTTBuilder setSyntax(Syntax syntax) {

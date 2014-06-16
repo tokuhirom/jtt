@@ -8,6 +8,10 @@ This is a port of Perl5's popular template engine named Template-Toolkit 2.
 
 In development.
 
+But most of features are implemented.
+
+API may change without notice.
+
 ## Architecture
 
   * VM has TemplateLoader
