@@ -1,8 +1,7 @@
 package me.geso.jtt;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,8 +10,6 @@ import java.util.HashMap;
 import me.geso.jtt.exception.JTTError;
 
 import org.junit.Test;
-
-import com.google.common.collect.Lists;
 
 /**
  * This class tests in memotry template cache class.
