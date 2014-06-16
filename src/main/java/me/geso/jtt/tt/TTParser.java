@@ -60,7 +60,8 @@ class TTParser implements Parser {
 
 	Node parseRawString() {
 		if (CURRENT_TYPE() == TokenType.RAW) {
-			Node node = new Node(NodeType.RAW_STRING, CURRENT_STRING(), PREV_LINE_NUMBER());
+			Node node = new Node(NodeType.RAW_STRING, CURRENT_STRING(),
+					PREV_LINE_NUMBER());
 			++pos;
 			return node;
 		} else {
@@ -138,7 +139,8 @@ class TTParser implements Parser {
 		default: {
 			Node exprNode = parseExpr();
 			if (exprNode != null) {
-				return new Node(NodeType.EXPRESSION, exprNode, PREV_LINE_NUMBER());
+				return new Node(NodeType.EXPRESSION, exprNode,
+						PREV_LINE_NUMBER());
 			} else {
 				throw new ParserError("No expression", this);
 			}
@@ -156,12 +158,14 @@ class TTParser implements Parser {
 
 		Node fileName = parseExpr();
 		if (fileName == null) {
-			throw new ParserError("Missing file name after WRAPPER keyword.", this);
+			throw new ParserError("Missing file name after WRAPPER keyword.",
+					this);
 		}
-		
+
 		Node body = parseTemplateBody();
 
-		return new Node(NodeType.WRAPPER, Lists.newArrayList(fileName, body), lineNumber);
+		return new Node(NodeType.WRAPPER, Lists.newArrayList(fileName, body),
+				lineNumber);
 	}
 
 	private Node parseSwitch() throws ParserError {
@@ -210,7 +214,8 @@ class TTParser implements Parser {
 			}
 
 			saver.commit();
-			return new Node(NodeType.CASE, Lists.newArrayList(expr, body), PREV_LINE_NUMBER());
+			return new Node(NodeType.CASE, Lists.newArrayList(expr, body),
+					PREV_LINE_NUMBER());
 		}
 	}
 
@@ -222,7 +227,7 @@ class TTParser implements Parser {
 		}
 
 		Node path = parseString();
-		
+
 		ArrayList<Node> args = new ArrayList<>();
 		args.add(path);
 
@@ -233,17 +238,18 @@ class TTParser implements Parser {
 					throw new ParserError("Missing ident after WITH", this);
 				}
 				args.add(ident);
-				
+
 				if (!EAT(TokenType.ASSIGN)) {
 					throw new ParserError("Missing '=' after WITH", this);
 				}
-				
+
 				Node expr = parseExpr();
 				if (expr == null) {
-					throw new ParserError("Missing expr after WITH: " + CURRENT_TYPE(), this);
+					throw new ParserError("Missing expr after WITH: "
+							+ CURRENT_TYPE(), this);
 				}
 				args.add(expr);
-				
+
 				if (EAT(TokenType.COMMA)) {
 					continue;
 				} else {
@@ -271,7 +277,8 @@ class TTParser implements Parser {
 			throw new ParserError("No END tag after 'IF'", this);
 		}
 
-		return new Node(NodeType.WHILE, Lists.newArrayList(expr, body), PREV_LINE_NUMBER());
+		return new Node(NodeType.WHILE, Lists.newArrayList(expr, body),
+				PREV_LINE_NUMBER());
 	}
 
 	private Node parseSet() throws ParserError {
@@ -285,7 +292,8 @@ class TTParser implements Parser {
 		}
 		final Node expr = parseExpr();
 
-		return new Node(NodeType.SET, Lists.newArrayList(ident, expr), PREV_LINE_NUMBER());
+		return new Node(NodeType.SET, Lists.newArrayList(ident, expr),
+				PREV_LINE_NUMBER());
 	}
 
 	private Node parseIf() throws ParserError {
@@ -765,43 +773,50 @@ class TTParser implements Parser {
 
 	private Node parseAttr() throws ParserError {
 		Node n = parseAtom();
-		while (true) {
-			if (EAT(TokenType.DOT)) {
-				if (CURRENT_TYPE() == TokenType.IDENT) {
-					Node rhs = parseIdent();
-					if (rhs == null) {
-						throw new ParserError("SHOULD NOT REACH HERE", this);
+		if (n != null) {
+			while (true) {
+				if (EAT(TokenType.DOT)) {
+					if (CURRENT_TYPE() == TokenType.IDENT) {
+						Node rhs = parseIdent();
+						if (rhs == null) {
+							throw new ParserError("SHOULD NOT REACH HERE", this);
+						}
+						Node key = new Node(NodeType.STRING, rhs.getText(),
+								PREV_LINE_NUMBER()); // Convert
+						// to
+						// STRING
+						// from
+						// IDENT.
+						n = new Node(NodeType.ATTRIBUTE, n, key,
+								PREV_LINE_NUMBER());
+					} else if (CURRENT_TYPE() == TokenType.DOLLARVAR) {
+						Node rhs = parseDollarVar();
+						if (rhs == null) {
+							throw new ParserError("SHOULD NOT REACH HERE", this);
+						}
+						n = new Node(NodeType.ATTRIBUTE, n, rhs,
+								PREV_LINE_NUMBER());
+					} else {
+						throw new ParserError(
+								"Missing (identifier|variable) after '.'.",
+								this);
 					}
-					Node key = new Node(NodeType.STRING, rhs.getText(), PREV_LINE_NUMBER()); // Convert
-																			// to
-																			// STRING
-																			// from
-																			// IDENT.
+				} else if (EAT(TokenType.LBRACKET)) { // ary[idx]
+					Node key = parseExpr();
+					if (key == null) {
+						throw new ParserError("Missing expression after '['",
+								this);
+					}
+
+					if (!EAT(TokenType.RBRACKET)) {
+						throw new ParserError(
+								"Missing closing bracket after '['.", this);
+					}
+
 					n = new Node(NodeType.ATTRIBUTE, n, key, PREV_LINE_NUMBER());
-				} else if (CURRENT_TYPE() == TokenType.DOLLARVAR) {
-					Node rhs = parseDollarVar();
-					if (rhs == null) {
-						throw new ParserError("SHOULD NOT REACH HERE", this);
-					}
-					n = new Node(NodeType.ATTRIBUTE, n, rhs, PREV_LINE_NUMBER());
 				} else {
-					throw new ParserError(
-							"Missing (identifier|variable) after '.'.", this);
+					break;
 				}
-			} else if (EAT(TokenType.LBRACKET)) { // ary[idx]
-				Node key = parseExpr();
-				if (key == null) {
-					throw new ParserError("Missing expression after '['", this);
-				}
-
-				if (!EAT(TokenType.RBRACKET)) {
-					throw new ParserError("Missing closing bracket after '['.",
-							this);
-				}
-
-				n = new Node(NodeType.ATTRIBUTE, n, key, PREV_LINE_NUMBER());
-			} else {
-				break;
 			}
 		}
 		return n;
@@ -866,7 +881,8 @@ class TTParser implements Parser {
 		if (CURRENT_TYPE() == TokenType.LINE) {
 			int lineNumber = CURRENT_LINE_NUMBER();
 			++pos;
-			return new Node(NodeType.INTEGER, "" + lineNumber, PREV_LINE_NUMBER());
+			return new Node(NodeType.INTEGER, "" + lineNumber,
+					PREV_LINE_NUMBER());
 		} else {
 			return null;
 		}
@@ -974,7 +990,8 @@ class TTParser implements Parser {
 
 	private Node parseString() throws ParserError {
 		if (CURRENT_TYPE() == TokenType.STRING) {
-			Node node = new Node(NodeType.STRING, CURRENT_STRING(), PREV_LINE_NUMBER());
+			Node node = new Node(NodeType.STRING, CURRENT_STRING(),
+					PREV_LINE_NUMBER());
 			++pos;
 			return node;
 		} else {
@@ -1032,7 +1049,8 @@ class TTParser implements Parser {
 
 	public Node parseInt() {
 		if (CURRENT_TYPE() == TokenType.INTEGER) {
-			Node node = new Node(NodeType.INTEGER, CURRENT_STRING(), PREV_LINE_NUMBER());
+			Node node = new Node(NodeType.INTEGER, CURRENT_STRING(),
+					PREV_LINE_NUMBER());
 			pos++;
 			return node;
 		} else {
@@ -1042,7 +1060,8 @@ class TTParser implements Parser {
 
 	public Node parseDouble() {
 		if (CURRENT_TYPE() == TokenType.DOUBLE) {
-			Node node = new Node(NodeType.DOUBLE, CURRENT_STRING(), PREV_LINE_NUMBER());
+			Node node = new Node(NodeType.DOUBLE, CURRENT_STRING(),
+					PREV_LINE_NUMBER());
 			pos++;
 			return node;
 		} else {
@@ -1105,13 +1124,13 @@ class TTParser implements Parser {
 		if (pos == 0) {
 			return tokens.get(0).getLineNumber();
 		}
-		return tokens.get(pos-1).getLineNumber();
+		return tokens.get(pos - 1).getLineNumber();
 	}
-
 
 	public Node parseIdent() {
 		if (CURRENT_TYPE() == TokenType.IDENT) {
-			Node node = new Node(NodeType.IDENT, CURRENT_STRING(), PREV_LINE_NUMBER());
+			Node node = new Node(NodeType.IDENT, CURRENT_STRING(),
+					PREV_LINE_NUMBER());
 			pos++;
 			return node;
 		} else {
