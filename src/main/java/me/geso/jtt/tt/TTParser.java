@@ -18,7 +18,6 @@ import com.google.common.collect.Lists;
 class TTParser implements Parser {
 	private int pos = 0;
 	private String source;
-	private int line = 1;
 	private List<Token> tokens;
 
 	public String getSource() {
@@ -1306,14 +1305,6 @@ class TTParser implements Parser {
 		} else {
 			return null;
 		}
-	}
-
-	public int getLine() {
-		return line;
-	}
-
-	public void setLine(int line) {
-		this.line = line;
 	}
 
 	@Override
