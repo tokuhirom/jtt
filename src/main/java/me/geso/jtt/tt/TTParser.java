@@ -510,11 +510,11 @@ class TTParser implements Parser {
 	}
 
 	class PositionSaver implements Closeable {
-		Parser parser;
+		TTParser parser;
 		int pos;
 		boolean committed = false;
 
-		public PositionSaver(Parser parser) {
+		public PositionSaver(TTParser parser) {
 			this.parser = parser;
 			this.pos = parser.getPos();
 		}
@@ -1307,8 +1307,7 @@ class TTParser implements Parser {
 		}
 	}
 
-	@Override
-	public void setPos(int pos) {
+	void setPos(int pos) {
 		this.pos = pos;
 	}
 }
