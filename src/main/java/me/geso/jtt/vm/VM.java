@@ -558,7 +558,7 @@ public class VM {
 	private void warn(String message) {
 		// TODO We should show line number.
 		if (warningListener != null) {
-			warningListener.sendMessage(message, -1, "-");
+			warningListener.sendMessage(message, this.pc, this.irep);
 		} else {
 			System.out.println(message);
 		}

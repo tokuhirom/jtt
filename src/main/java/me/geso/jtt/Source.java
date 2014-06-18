@@ -57,6 +57,16 @@ public class Source {
 			return list;
 		}
 	}
+	
+	public String getTargetLines(int line) throws IOException {
+		StringBuilder buf = new StringBuilder();
+		List<String> lines = this.getSourceLines();
+		for (int i=Math.max(0, line-3); i<Math.min(lines.size(), line+3); ++i) {
+			buf.append(i==line-1 ? "* " : "  ");
+			buf.append(lines.get(i) + "\n");
+		}
+		return new String(buf);
+	}
 
 	public String getFileName() {
 		if (this.type == SourceType.FROM_FILE) {

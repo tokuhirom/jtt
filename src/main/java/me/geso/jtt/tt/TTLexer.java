@@ -2,6 +2,7 @@ package me.geso.jtt.tt;
 
 import com.google.common.collect.Lists;
 
+import me.geso.jtt.Source;
 import me.geso.jtt.lexer.LexerMode;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.lexer.TokenPair;
@@ -29,12 +30,12 @@ class TTLexer {
 
 	private int pos;
 	private int lineNumber;
-	private final String source;
+	private final String sourceString;
 
 	private LexerMode mode;
 	private List<Token> tokens;
 	private final String closeTag;
-	private final String fileName;
+	private final Source source;
 
 	private static final List<TokenPair> keywords = Lists.newArrayList(
 			new TokenPair("END", TokenType.END),//
@@ -61,9 +62,9 @@ class TTLexer {
 			new TokenPair("null", TokenType.NULL) //
 			);
 
-	public TTLexer(String fileName, String src, String openTag, String closeTag) {
-		this.fileName = fileName;
-		this.source = src;
+	public TTLexer(Source source, String sourceString, String openTag, String closeTag) {
+		this.source = source;
+		this.sourceString = sourceString;
 		this.closeTag = closeTag;
 		this.openTagRe = Pattern.compile(String.format("\\A(?:\\n?[ ]*%s-|%s)",
 				Pattern.quote(openTag), Pattern.quote(openTag)));
@@ -77,11 +78,11 @@ class TTLexer {
 		this.pos = 0;
 		this.lineNumber = 1;
 
-		while (pos < source.length()) {
+		while (pos < sourceString.length()) {
 			if (mode == LexerMode.IN_RAW) {
-				this.lexRaw(source);
+				this.lexRaw(sourceString);
 			} else if (mode == LexerMode.IN_TAG) {
-				this.lexTagBody(source, tokens);
+				this.lexTagBody(sourceString, tokens);
 			} else {
 				throw new RuntimeException("SHOULD NOT REACH HERE");
 			}
@@ -265,10 +266,10 @@ class TTLexer {
 					break;
 				case '=':
 					if (pos + 1 < string.length()) {
-						if (source.substring(pos).startsWith("==")) {
+						if (sourceString.substring(pos).startsWith("==")) {
 							tokens.add(this.createToken(TokenType.EQUALS));
 							pos += 2;
-						} else if (source.substring(pos).startsWith("=>")) {
+						} else if (sourceString.substring(pos).startsWith("=>")) {
 							tokens.add(this.createToken(TokenType.ARROW));
 							pos += 2;
 						} else {
@@ -315,7 +316,7 @@ class TTLexer {
 	}
 
 	private Token lexUnderScore() {
-		Matcher matcher = positionRe.matcher(source.substring(pos));
+		Matcher matcher = positionRe.matcher(sourceString.substring(pos));
 		if (matcher.find()) {
 			pos += matcher.group(0).length();
 			return this
@@ -328,7 +329,7 @@ class TTLexer {
 	}
 
 	private Token lexDollarVar() {
-		Matcher matcher = identRe.matcher(source.substring(pos));
+		Matcher matcher = identRe.matcher(sourceString.substring(pos));
 		if (matcher.find()) {
 			String name = matcher.group(0);
 			pos += name.length();
@@ -339,8 +340,8 @@ class TTLexer {
 	}
 
 	private void lexLineComment() {
-		while (pos < source.length()) {
-			if (source.charAt(pos) == '\n') {
+		while (pos < sourceString.length()) {
+			if (sourceString.charAt(pos) == '\n') {
 				return;
 			}
 			++pos;
@@ -353,14 +354,14 @@ class TTLexer {
 
 		StringBuilder builder = new StringBuilder();
 		boolean finished = false;
-		while (pos < source.length() && !finished) {
-			switch (source.charAt(pos)) {
+		while (pos < sourceString.length() && !finished) {
+			switch (sourceString.charAt(pos)) {
 			case '\\':
-				if (pos + 1 < source.length()) {
-					switch (source.charAt(pos + 1)) {
+				if (pos + 1 < sourceString.length()) {
+					switch (sourceString.charAt(pos + 1)) {
 					default:
 						++pos;
-						builder.append(source.charAt(pos));
+						builder.append(sourceString.charAt(pos));
 						++pos;
 						break;
 					}
@@ -373,7 +374,7 @@ class TTLexer {
 				finished = true;
 				break;
 			default:
-				builder.append(source.charAt(pos));
+				builder.append(sourceString.charAt(pos));
 				++pos;
 			}
 		}
@@ -385,11 +386,11 @@ class TTLexer {
 
 		StringBuilder builder = new StringBuilder();
 		boolean finished = false;
-		while (pos < source.length() && !finished) {
-			switch (source.charAt(pos)) {
+		while (pos < sourceString.length() && !finished) {
+			switch (sourceString.charAt(pos)) {
 			case '\\':
-				if (pos + 1 < source.length()) {
-					switch (source.charAt(pos + 1)) {
+				if (pos + 1 < sourceString.length()) {
+					switch (sourceString.charAt(pos + 1)) {
 					case 't':
 						builder.append("\t");
 						pos += 2;
@@ -400,7 +401,7 @@ class TTLexer {
 						break;
 					default:
 						++pos;
-						builder.append(source.charAt(pos));
+						builder.append(sourceString.charAt(pos));
 						++pos;
 						break;
 					}
@@ -413,7 +414,7 @@ class TTLexer {
 				finished = true;
 				break;
 			default:
-				builder.append(source.charAt(pos));
+				builder.append(sourceString.charAt(pos));
 				++pos;
 			}
 		}
@@ -423,7 +424,7 @@ class TTLexer {
 	private Token lexOthers() {
 		// keywords
 		for (TokenPair keyword : keywords) {
-			if (source.substring(pos).startsWith(keyword.pattern)) {
+			if (sourceString.substring(pos).startsWith(keyword.pattern)) {
 				pos += keyword.pattern.length();
 				return this.createToken(keyword.type);
 			}
@@ -431,7 +432,7 @@ class TTLexer {
 
 		// ident.
 		{
-			Matcher matcher = identRe.matcher(this.source.substring(pos));
+			Matcher matcher = identRe.matcher(this.sourceString.substring(pos));
 			if (matcher.find()) {
 				String s = matcher.group(0);
 				pos += s.length();
@@ -445,7 +446,7 @@ class TTLexer {
 	private Token lexNumber(String string) {
 		// double
 		{
-			Matcher matcher = doubleRe.matcher(this.source.substring(pos));
+			Matcher matcher = doubleRe.matcher(this.sourceString.substring(pos));
 			if (matcher.find()) {
 				String s = matcher.group(0);
 				pos += s.length();
@@ -455,7 +456,7 @@ class TTLexer {
 
 		// lex int
 		{
-			Matcher matcher = intRe.matcher(this.source.substring(pos));
+			Matcher matcher = intRe.matcher(this.sourceString.substring(pos));
 			if (matcher.find()) {
 				String s = matcher.group(0);
 				pos += s.length();
@@ -508,7 +509,7 @@ class TTLexer {
 	private void lexTagComment() {
 		Matcher commentMatcher = Pattern.compile(
 				"\\A.*?" + Pattern.quote(closeTag), Pattern.DOTALL).matcher(
-				source.substring(pos));
+				sourceString.substring(pos));
 		if (commentMatcher.find()) {
 			this.pos += commentMatcher.group(0).length();
 			this.mode = LexerMode.IN_RAW;
@@ -524,7 +525,7 @@ class TTLexer {
 	}
 
 	public String getSource() {
-		return source;
+		return sourceString;
 	}
 
 	/**
@@ -538,7 +539,7 @@ class TTLexer {
 	}
 
 	private Token createToken(TokenType type, String string) {
-		return new Token(type, string, lineNumber, fileName);
+		return new Token(type, string, lineNumber, source.getFileName());
 	}
 
 }

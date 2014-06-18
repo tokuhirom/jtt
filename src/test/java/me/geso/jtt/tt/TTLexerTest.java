@@ -6,13 +6,14 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import me.geso.jtt.Source;
 import me.geso.jtt.lexer.Token;
 
 import org.junit.Test;
 
 public class TTLexerTest {
 	private String lex(String src) {
-		TTLexer lexer = new TTLexer("-", src, "[%", "%]");
+		TTLexer lexer = new TTLexer(Source.fromString(src), src, "[%", "%]");
 		return s(lexer.lex());
 	}
 
@@ -219,7 +220,7 @@ public class TTLexerTest {
 	public void testError() {
 		TTLexerError e = null;
 		try {
-			new TTLexer("-", "[%", "[%", "%]").lex();
+			new TTLexer(Source.fromString("[%"), "[%", "[%", "%]").lex();
 		} catch (TTLexerError err) {
 			e = err;
 		}

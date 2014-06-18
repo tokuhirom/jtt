@@ -1,5 +1,7 @@
 package me.geso.jtt.exception;
 
+import java.io.IOException;
+import me.geso.jtt.Source;
 import me.geso.jtt.parser.Parser;
 
 public class ParserError extends JTTError {
@@ -13,18 +15,21 @@ public class ParserError extends JTTError {
 
 	public String toString() {
 		int line = parser.getLine();
-		String src = parser.getSource();
-		String[] lines = src.split("\r?\n");
-		
-		StringBuilder buf = new StringBuilder();
-		buf.append(this.getMessage() + " at " + parser.getFileName() + " line " + line);
-		buf.append("\n==============================================\n");
-		for (int i=Math.max(0, line-3); i<Math.min(lines.length-1, line+3); ++i) {
-			buf.append(i==line-1 ? "* " : "  ");
-			buf.append(lines[i] + "\n");
+		Source src = parser.getSource();
+		String lines;
+		try {
+			lines = src.getTargetLines(line);
+		} catch (IOException e) {
+			lines = "(IOException)";
 		}
+
+		StringBuilder buf = new StringBuilder();
+		buf.append(this.getMessage() + " at " + parser.getFileName() + " line "
+				+ line);
+		buf.append("\n==============================================\n");
+		buf.append(lines);
 		buf.append("\n==============================================");
-		
+
 		return buf.toString();
 	}
 }

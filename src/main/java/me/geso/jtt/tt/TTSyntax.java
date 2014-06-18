@@ -28,8 +28,8 @@ public class TTSyntax implements Syntax {
 	 * @see me.geso.jtt.tt.Syntax#tokenize(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public List<Token> tokenize(String fileName, String src) {
-		TTLexer lexer = new TTLexer(fileName, src, openTag, closeTag);
+	public List<Token> tokenize(Source source, String src) {
+		TTLexer lexer = new TTLexer(source, src, openTag, closeTag);
 		return lexer.lex();
 	}
 	
@@ -37,7 +37,7 @@ public class TTSyntax implements Syntax {
 	 * @see me.geso.jtt.tt.Syntax#parse(java.lang.String, java.util.List)
 	 */
 	@Override
-	public Node parse(String source, List<Token> tokens) throws ParserError {
+	public Node parse(Source source, List<Token> tokens) throws ParserError {
 		return new TTParser(source, tokens).parseTemplate();
 	}
 

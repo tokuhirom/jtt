@@ -44,10 +44,11 @@ public class JTT {
 		if (vars == null) {
 			vars = new HashMap<>();
 		}
+		Source source = Source.fromString(src);
 		Syntax syntax = new TTSyntax("[%", "%]");
-		List<Token> tokens = syntax.tokenize("-", src);
-		Node ast = syntax.parse(src, tokens);
-		Irep irep = syntax.compile(Source.fromString(src), ast);
+		List<Token> tokens = syntax.tokenize(source, src);
+		Node ast = syntax.parse(source, tokens);
+		Irep irep = syntax.compile(source, ast);
 		String result = this.newVM(irep, vars).run();
 		return result;
 	}

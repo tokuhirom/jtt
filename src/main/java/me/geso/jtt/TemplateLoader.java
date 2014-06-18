@@ -46,9 +46,10 @@ public class TemplateLoader {
 		try {
 			byte[] bytes = Files.readAllBytes(fullpath);
 			String src = new String(bytes, StandardCharsets.UTF_8);
-			List<Token> tokens = syntax.tokenize(fullpath.toString(), src);
-			Node ast = syntax.parse(src, tokens);
-			return syntax.compile(Source.fromFile(fullpath.toString()), ast);
+			Source source = Source.fromFile(fullpath.toString());
+			List<Token> tokens = syntax.tokenize(source, src);
+			Node ast = syntax.parse(source, tokens);
+			return syntax.compile(source, ast);
 		} catch (IOException e) {
 			throw new JTTError("Cannot load " + fullpath + " : "
 					+ e.getMessage());

@@ -1,5 +1,7 @@
 package me.geso.jtt;
 
+import me.geso.jtt.vm.Irep;
+
 /**
  * Warning/Error message listener interface for JTT.
  * 
@@ -8,5 +10,5 @@ package me.geso.jtt;
  */
 @FunctionalInterface
 public interface JTTMessageListener {
-	public void sendMessage(String message, int lineno, String fileName);
+	public void sendMessage(String message, int pc, Irep irep);
 }

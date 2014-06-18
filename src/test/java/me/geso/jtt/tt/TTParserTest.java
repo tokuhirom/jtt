@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import me.geso.jtt.Source;
 import me.geso.jtt.Syntax;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.lexer.Token;
@@ -509,9 +510,10 @@ public class TTParserTest {
                 parse("[% WRAPPER \"foo.tt\" %]ohoho[% END %]").toString());
     }
 
-	private Node parse(String source) throws ParserError {
+	private Node parse(String sourceString) throws ParserError {
 		Syntax syntax = new TTSyntax("[%", "%]");
-		List<Token> tokens = syntax.tokenize("-", source);
+		Source source = Source.fromString(sourceString);
+		List<Token> tokens = syntax.tokenize(source, sourceString);
 		Node node = syntax.parse(source, tokens);
 		return node;
 	}

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import me.geso.jtt.Source;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.lexer.TokenType;
@@ -17,10 +18,11 @@ import com.google.common.collect.Lists;
 
 class TTParser implements Parser {
 	private int pos = 0;
-	private String source;
+	private Source source;
 	private List<Token> tokens;
 
-	public String getSource() {
+	@Override
+	public Source getSource() {
 		return this.source;
 	}
 
@@ -29,7 +31,7 @@ class TTParser implements Parser {
 		return this.tokens.get(pos).getLineNumber();
 	}
 
-	public TTParser(String source, List<Token> tokens) {
+	public TTParser(Source source, List<Token> tokens) {
 		this.source = source;
 		this.tokens = tokens;
 	}
@@ -1033,6 +1035,9 @@ class TTParser implements Parser {
 	private Node parseFile() {
 		if (CURRENT_TYPE() == TokenType.FILE) {
 			String fileName = CURRENT_FILENAME();
+			if (fileName == null) {
+				fileName = "-";
+			}
 			++pos;
 			return new Node(NodeType.STRING, fileName, PREV_LINE_NUMBER());
 		} else {
@@ -1092,7 +1097,7 @@ class TTParser implements Parser {
 
 		List<Node> list = new ArrayList<>();
 
-		while (pos < source.length()) {
+		while (pos < tokens.size()) {
 			Node key = parseMapKey();
 			if (key == null) {
 				break;

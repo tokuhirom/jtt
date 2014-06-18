@@ -568,13 +568,14 @@ public class CompilerTest {
 		return eval(src, new HashMap<String, Object>());
 	}
 
-	private String eval(String src, Map<String, Object> vars)
+	private String eval(String srcString, Map<String, Object> vars)
 			throws ParserError, JTTCompilerError, IOException,
 			TemplateLoadingError {
+		Source source = Source.fromString(srcString);
 		Syntax syntax = new TTSyntax("[%", "%]");
-		List<Token> tokens = syntax.tokenize("-", src);
-		Node ast = syntax.parse(src, tokens);
-		Irep irep = syntax.compile(Source.fromString(src), ast);
+		List<Token> tokens = syntax.tokenize(source, srcString);
+		Node ast = syntax.parse(source, tokens);
+		Irep irep = syntax.compile(source, ast);
 		return new VM(syntax, loader, null, null, irep, vars).run();
 	}
 }
