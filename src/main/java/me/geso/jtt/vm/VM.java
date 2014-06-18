@@ -705,8 +705,10 @@ public class VM {
 			@SuppressWarnings("unchecked")
 			int ret = ((Comparable<Object>) lhs).compareTo(rhs);
 			return ret > 0;
+		} else if (lhs == null) {
+			throw new TypeError("lhs is null for '>' operator");
 		} else {
-			throw new TypeError("lhs for '>' must implement Comparable");
+			throw new TypeError("lhs for '>' must implement Comparable. But " + lhs.getClass());
 		}
 	}
 
@@ -717,8 +719,10 @@ public class VM {
 			@SuppressWarnings("unchecked")
 			int ret = ((Comparable<Object>) lhs).compareTo(rhs);
 			return ret >= 0;
+		} else if (lhs == null) {
+			throw new TypeError("lhs is null for '>=' operator");
 		} else {
-			throw new TypeError("lhs for '>' must implement Comparable");
+			throw new TypeError("lhs for '>' must implement Comparable. But " + lhs.getClass());
 		}
 	}
 
@@ -728,8 +732,10 @@ public class VM {
 			@SuppressWarnings("unchecked")
 			int ret = ((Comparable<Object>) lhs).compareTo(rhs);
 			return ret < 0;
+		} else if (lhs == null) {
+			throw new TypeError("lhs is null for '<' operator");
 		} else {
-			throw new TypeError("lhs for '<' must implement Comparable");
+			throw new TypeError("lhs for '<' must implement Comparable. But " + lhs.getClass());
 		}
 	}
 
@@ -739,8 +745,10 @@ public class VM {
 			@SuppressWarnings("unchecked")
 			int ret = ((Comparable<Object>) lhs).compareTo(rhs);
 			return ret <= 0;
+		} else if (lhs == null) {
+			throw new TypeError("lhs is null for '<=' operator");
 		} else {
-			throw new TypeError("lhs for '<=' must implement Comparable");
+			throw new TypeError("lhs for '<=' must implement Comparable. But " + lhs.getClass());
 		}
 	}
 
