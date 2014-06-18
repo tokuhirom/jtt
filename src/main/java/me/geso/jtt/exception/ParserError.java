@@ -20,6 +20,7 @@ public class ParserError extends JTTError {
 		buf.append(this.getMessage() + " at " + parser.getFileName() + " line " + line);
 		buf.append("\n==============================================\n");
 		for (int i=Math.max(0, line-3); i<Math.min(lines.length-1, line+3); ++i) {
+			buf.append(i==line-1 ? "* " : "  ");
 			buf.append(lines[i] + "\n");
 		}
 		buf.append("\n==============================================");
