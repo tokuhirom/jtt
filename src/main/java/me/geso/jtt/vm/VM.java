@@ -24,6 +24,7 @@ import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.MethodInvokeError;
 import me.geso.jtt.exception.VMError;
 
+import com.esotericsoftware.reflectasm.FieldAccess;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import com.google.common.net.UrlEscapers;
 
@@ -426,9 +427,15 @@ public class VM {
 		Object methodName = stack.pop();
 		Object object = stack.pop();
 
-		MethodAccess access = MethodAccess.get(object.getClass());
-		Object retval = access.invoke(object, methodName.toString(), params);
-		return retval;
+		try {
+			MethodAccess access = MethodAccess.get(object.getClass());
+			Object retval = access
+					.invoke(object, methodName.toString(), params);
+			return retval;
+		} catch (IllegalArgumentException e) {
+			warn(e.toString());
+			return null;
+		}
 	}
 
 	private Boolean convertToBoolean(Object o) {
@@ -515,9 +522,17 @@ public class VM {
 			warn("container is null");
 			return null;
 		} else {
-			warn("Unsupported container: " + container.getClass());
-			// TODO: s
-			return null;
+			FieldAccess access = FieldAccess.get(container.getClass());
+			if (index instanceof String) {
+				Object result = access.get(container, (String) index);
+				return result;
+			} else if (index == null) {
+				warn("null index for accessor name");
+				return null;
+			} else {
+				warn("Index is not a string: " + index.getClass());
+				return null;
+			}
 		}
 	}
 
@@ -560,8 +575,8 @@ public class VM {
 	}
 
 	private void opGetElem() throws VMError {
-				Object key = stack.pop();
-				Object container = stack.pop();
+		Object key = stack.pop();
+		Object container = stack.pop();
 		if (container instanceof Map) {
 			Object elem = ((Map<?, ?>) container).get(key);
 			stack.push(elem);

@@ -130,6 +130,21 @@ public class JTTTest {
 		}
 		assertTrue(errorSeen);
 	}
+	
+	@Test
+	public void testAttribute() throws IOException, JTTError {
+		Foo foo = new Foo();
+		foo.n = 5963;
+
+		HashMap<String, Object> params = new HashMap<>();
+		params.put("foo", foo);
+		assertEquals("5963", renderString("[% foo.n %]", params));
+		assertEquals("(null)", renderString("[% foo.n() %]", params));
+	}
+	
+	class Foo {
+		public int n;
+	}
 
 	// ---------------------------------------------------------------
 	// utils.
