@@ -19,9 +19,36 @@ public class IrepBuilder {
 	private final Map<Object, Integer> poolSeen = new HashMap<Object, Integer>();
 	private final String fileName;
 	private final List<Integer> lineNumbers = new ArrayList<>();
+	private final boolean fromFile;
+	/**
+	 * source is null if fromFile is true.
+	 */
+	private final String source;
 
-	public IrepBuilder(String fileName) {
+	private IrepBuilder(boolean fromFile, String fileName, String source) {
+		this.fromFile = fromFile;
 		this.fileName = fileName;
+		this.source = source;
+	}
+	
+	/**
+	 * Create new instance from file.
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	public static IrepBuilder fromFile(String fileName) {
+		return new IrepBuilder(true, fileName, null);
+	}
+
+	/**
+	 * Create new instance from string.
+	 * 
+	 * @param source
+	 * @return
+	 */
+	public static IrepBuilder fromString(String source) {
+		return new IrepBuilder(false, null, source);
 	}
 
 	public int getLineNumber(int pc) {
@@ -35,7 +62,7 @@ public class IrepBuilder {
 	public void addReturn() {
 		iseq.add(new Code(OP.RETURN));
 		if (lineNumbers.size() > 0) {
-			lineNumbers.add(lineNumbers.get(lineNumbers.size()-1));
+			lineNumbers.add(lineNumbers.get(lineNumbers.size() - 1));
 		} else {
 			lineNumbers.add(1);
 		}
@@ -81,8 +108,7 @@ public class IrepBuilder {
 	}
 
 	public Irep build() {
-		return new Irep(iseq.toArray(new Code[iseq.size()]),
-				pool.toArray(new Object[pool.size()]));
+		return new Irep(iseq, pool, this.fileName, this.lineNumbers, this.fromFile, this.source);
 	}
 
 	public String toString() {

@@ -6,9 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.geso.jtt.Function;
 import me.geso.jtt.tt.TTSyntax;
-import me.geso.jtt.vm.VM;
 
 /**
  * This is a builder class for the JTT class.
@@ -17,7 +15,7 @@ import me.geso.jtt.vm.VM;
  *
  */
 public class JTTBuilder {
-	private List<Path> includePaths;
+	private List<Path> includePaths = new ArrayList<>();
 	private JTTMessageListener warningListener;
 	private final Map<String, Function> functions = new HashMap<String,Function>();
 	private TemplateCache templateCache = new NullTemplateCache();
@@ -33,8 +31,7 @@ public class JTTBuilder {
 	 */
 	public JTT build() {
 		TemplateLoader loader = new TemplateLoader(getIncludePaths(), this.templateCache);
-		VM vm = new VM(this.syntax, loader, functions, warningListener);
-		JTT jtt = new JTT(vm, loader, this.syntax);
+		JTT jtt = new JTT(loader, this.syntax, functions, warningListener);
 		return jtt;
 	}
 
@@ -71,6 +68,9 @@ public class JTTBuilder {
 	}
 
 	public JTTBuilder setSyntax(Syntax syntax) {
+		if (syntax == null) {
+			throw new Error("Syntax must not be null");
+		}
 		this.syntax = syntax;
 		return this;
 	}

@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 public class CompilerTest {
 	Syntax syntax = new TTSyntax();
 	TemplateLoader loader = new TemplateLoader(null, null);
-	VM vm = new VM(syntax, loader, null, null);
 
 	@Test
 	public void test() throws JTTCompilerError, ParserError, IOException,
@@ -575,7 +574,7 @@ public class CompilerTest {
 		Syntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize("-", src);
 		Node ast = syntax.parse(src, tokens);
-		Irep irep = syntax.compile(ast);
-		return vm.run(irep, vars);
+		Irep irep = syntax.compileString(src, ast);
+		return new VM(syntax, loader, null, null, irep, vars).run();
 	}
 }

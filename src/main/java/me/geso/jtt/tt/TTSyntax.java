@@ -44,7 +44,12 @@ public class TTSyntax implements Syntax {
 	 * @see me.geso.jtt.tt.Syntax#compile(me.geso.jtt.parser.Node)
 	 */
 	@Override
-	public Irep compile(Node ast) throws ParserError {
-		return new Compiler().compile("-", ast);
+	public Irep compileFile(String fileName, Node ast) throws ParserError {
+		return new Compiler().compileFile(fileName, ast);
+	}
+
+	@Override
+	public Irep compileString(String source, Node ast) throws ParserError {
+		return new Compiler().compileString(source, ast);
 	}
 }

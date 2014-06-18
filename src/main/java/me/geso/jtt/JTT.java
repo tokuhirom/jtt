@@ -13,16 +13,20 @@ import me.geso.jtt.vm.Irep;
 import me.geso.jtt.vm.VM;
 
 public class JTT {
-	private final VM vm;
 	private final TemplateLoader loader;
 	private final Syntax syntax;
+	private Map<String, Function> functions;
+	private JTTMessageListener warningListener;
 
-	public JTT(VM vm, TemplateLoader loader, Syntax syntax) {
-		assert syntax != null;
-
-		this.vm = vm;
+	public JTT(TemplateLoader loader, Syntax syntax,
+			Map<String, Function> functions, JTTMessageListener warningListener) {
+		if (syntax == null) {
+			throw new IllegalArgumentException("syntax");
+		}
 		this.loader = loader;
 		this.syntax = syntax;
+		this.functions = functions;
+		this.warningListener = warningListener;
 	}
 
 	public String render(String file, Map<String, Object> vars) throws JTTError {
@@ -31,7 +35,7 @@ public class JTT {
 
 	public String render(File file, Map<String, Object> vars) throws JTTError {
 		Irep irep = loader.compile(file.toPath(), this.syntax);
-		String result = vm.run(irep, vars);
+		String result = this.newVM(irep, vars).run();
 		return result;
 	}
 
@@ -43,8 +47,12 @@ public class JTT {
 		Syntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize("-", src);
 		Node ast = syntax.parse(src, tokens);
-		Irep irep = syntax.compile(ast);
-		String result = vm.run(irep, vars);
+		Irep irep = syntax.compileString(src, ast);
+		String result = this.newVM(irep, vars).run();
 		return result;
+	}
+
+	private VM newVM(Irep irep, Map<String, Object> vars) {
+		return new VM(syntax, loader, functions, warningListener, irep, vars);
 	}
 }

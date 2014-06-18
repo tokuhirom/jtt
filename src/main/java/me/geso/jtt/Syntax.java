@@ -14,6 +14,7 @@ public interface Syntax {
 	public abstract Node parse(String source, List<Token> tokens)
 			throws ParserError;
 
-	public abstract Irep compile(Node ast) throws ParserError;
+	public abstract Irep compileFile(String fileName, Node ast) throws ParserError;
+	public abstract Irep compileString(String source, Node ast) throws ParserError;
 
 }

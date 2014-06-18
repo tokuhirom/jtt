@@ -26,96 +26,106 @@ import com.google.common.collect.Lists;
 public class VMTest {
 	TemplateLoader loader = new TemplateLoader(null, null);
 	Syntax syntax = new TTSyntax();
-	VM vm = new VM(syntax, loader, null, null);
 	Node nop = new Node(NodeType.NULL, 1);
 
+	private String run(Irep irep, Map<String, Object>vars) {
+		return new VM(syntax, loader, null, null, irep, vars).run();
+	}
+
 	@Test
-	public void test() throws JTTError, IOException, ParserError, TemplateLoadingError {
-		IrepBuilder builder = new IrepBuilder("-");
+	public void test() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
+		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, "hoge", nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
-		String got = vm.run(irep, new HashMap<>());
+		String got = run(irep, new HashMap<>());
 		assertEquals("hoge", got);
 	}
 
 	@Test
-	public void testAdd() throws JTTError, IOException, ParserError, TemplateLoadingError {
-		IrepBuilder builder = new IrepBuilder("-");
+	public void testAdd() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
+		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, new Integer(3), nop);
 		builder.addPool(OP.LOAD_CONST, new Integer(4), nop);
 		builder.add(OP.ADD, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
-		String got = vm.run(irep, new HashMap<>());
+		String got = run(irep, new HashMap<>());
 		assertEquals("7", got);
 	}
 
 	@Test
-	public void testSubtract() throws JTTError, IOException, ParserError, TemplateLoadingError {
-		IrepBuilder builder = new IrepBuilder("-");
+	public void testSubtract() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
+		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, new Integer(3), nop);
 		builder.addPool(OP.LOAD_CONST, new Integer(4), nop);
 		builder.add(OP.SUBTRACT, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
-		String got = vm.run(irep, new HashMap<>());
+		String got = run(irep, new HashMap<>());
 		assertEquals("1", got);
 	}
 
 	@Test
-	public void testElemMap() throws JTTError, IOException, ParserError, TemplateLoadingError {
+	public void testElemMap() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
 		Map<String, String> map = new HashMap<>();
 		map.put("hoge", "fuga");
 
-		IrepBuilder builder = new IrepBuilder("-");
+		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, map, nop);
 		builder.addPool(OP.LOAD_CONST, "hoge", nop);
 		builder.add(OP.ELEM, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
-		String got = vm.run(irep, new HashMap<>());
+		String got = run(irep, new HashMap<>());
 		assertEquals("fuga", got);
 	}
 
 	@Test
-	public void testElemList() throws JTTError, IOException, ParserError, TemplateLoadingError {
+	public void testElemList() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
 		List<String> list = new ArrayList<>();
 		list.add("HAH");
 		list.add("Huh");
 
-		IrepBuilder builder = new IrepBuilder("-");
+		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, list, nop);
 		builder.addPool(OP.LOAD_CONST, new Integer(1), nop);
 		builder.add(OP.ELEM, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
-		String got = vm.run(irep, new HashMap<>());
+		String got = run(irep, new HashMap<>());
 		assertEquals("Huh", got);
 	}
 
 	@Test
-	public void testLoadVar() throws JTTError, IOException, ParserError, TemplateLoadingError {
+	public void testLoadVar() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 		vars.put("foo", "bar");
 
-		IrepBuilder builder = new IrepBuilder("-");
+		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_VAR, "foo", nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
-		String got = vm.run(irep, vars);
+		String got = run(irep, vars);
 		assertEquals("bar", got);
 	}
 
 	@Test
-	public void testSetVar() throws JTTError, IOException, ParserError, TemplateLoadingError {
-		IrepBuilder builder = new IrepBuilder("-");
+	public void testSetVar() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
+		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, "foo", nop);
 		builder.addPool(OP.SET_VAR, "v", nop);
 		builder.addPool(OP.LOAD_VAR, "v", nop);
@@ -123,15 +133,16 @@ public class VMTest {
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
 
-		String got = vm.run(irep, new HashMap<String, Object>());
+		String got = run(irep, new HashMap<String, Object>());
 		assertEquals("foo", got);
 	}
 
 	@Test
-	public void testForEach() throws JTTError, IOException, ParserError, TemplateLoadingError {
+	public void testForEach() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 
-		IrepBuilder builder = new IrepBuilder("-");
+		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, Lists.newArrayList("foo", "bar"), nop);
 		builder.add(OP.ITER_START, nop);
 		builder.addPool(OP.SET_VAR, "v", nop);
@@ -140,15 +151,16 @@ public class VMTest {
 		builder.add(OP.FOR_ITER, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
-		String got = vm.run(irep, vars);
+		String got = run(irep, vars);
 		assertEquals("foobar", got);
 	}
 
 	@Test
-	public void testEquals() throws JTTError, IOException, ParserError, TemplateLoadingError {
+	public void testEquals() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 
-		IrepBuilder builder = new IrepBuilder("-");
+		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, "foo", nop);
 		builder.addPool(OP.LOAD_CONST, "foo", nop);
 		builder.add(OP.EQUALS, nop);
@@ -160,15 +172,16 @@ public class VMTest {
 		builder.add(OP.RETURN, nop);
 
 		Irep irep = builder.build();
-		String got = vm.run(irep, vars);
+		String got = run(irep, vars);
 		assertEquals("truefalse", got);
 	}
 
 	@Test
-	public void testGraterThan() throws JTTError, IOException, ParserError, TemplateLoadingError {
+	public void testGraterThan() throws JTTError, IOException, ParserError,
+			TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 
-		IrepBuilder builder = new IrepBuilder("-");
+		IrepBuilder builder = IrepBuilder.fromString("-");
 
 		// 3<9
 		builder.addPool(OP.LOAD_CONST, 3, nop);
@@ -197,12 +210,16 @@ public class VMTest {
 		builder.add(OP.RETURN, nop);
 
 		Irep irep = builder.build();
-		String got = vm.run(irep, vars);
+		String got = run(irep, vars);
 		assertEquals("truefalsefalsetrue", got);
 	}
 
 	@Test
 	public void testDoGE() throws JTTError {
+		IrepBuilder builder = IrepBuilder.fromString("-");
+		Irep irep = builder.build();
+		VM vm = new VM(syntax, loader, null, null, irep, new HashMap<>());
+
 		// 3 >= 4
 		assertFalse(vm.doGE(new Integer(3), new Integer(4)));
 		// 3 >= 3

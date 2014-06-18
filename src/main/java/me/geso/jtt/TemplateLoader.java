@@ -48,7 +48,7 @@ public class TemplateLoader {
 			String src = new String(bytes, StandardCharsets.UTF_8);
 			List<Token> tokens = syntax.tokenize(fullpath.toString(), src);
 			Node ast = syntax.parse(src, tokens);
-			return syntax.compile(ast);
+			return syntax.compileString(src, ast);
 		} catch (IOException e) {
 			throw new JTTError("Cannot load " + fullpath + " : "
 					+ e.getMessage());
