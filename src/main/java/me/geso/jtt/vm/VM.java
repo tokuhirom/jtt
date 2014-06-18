@@ -39,6 +39,7 @@ public class VM {
 	private final Irep irep;
 
 	private static final Map<Class<?>, FieldAccess> fieldAccessCache = new ConcurrentHashMap<>();
+	private static final Map<Class<?>, MethodAccess> methodAccessCache = new ConcurrentHashMap<>();
 
 	/**
 	 * VM innerr status.
@@ -419,7 +420,12 @@ public class VM {
 		Object object = stack.pop();
 
 		try {
-			MethodAccess access = MethodAccess.get(object.getClass());
+			MethodAccess access = methodAccessCache.get(object.getClass());
+			if (access == null) {
+				access = MethodAccess.get(object.getClass());
+				methodAccessCache.put(object.getClass(), access);
+			}
+
 			Object retval = access
 					.invoke(object, methodName.toString(), params);
 			return retval;
