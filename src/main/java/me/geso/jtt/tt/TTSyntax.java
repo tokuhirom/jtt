@@ -45,6 +45,6 @@ public class TTSyntax implements Syntax {
 	 */
 	@Override
 	public Irep compile(Node ast) throws ParserError {
-		return new Compiler().compile(ast);
+		return new Compiler().compile("-", ast);
 	}
 }

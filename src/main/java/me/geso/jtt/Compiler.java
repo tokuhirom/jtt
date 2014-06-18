@@ -16,10 +16,14 @@ import me.geso.jtt.vm.OP;
 public class Compiler {
 
 	class Visitor {
-		private IrepBuilder builder = new IrepBuilder();
-		private Stack<List<Code>> lastStack = new Stack<>();
-		private Stack<List<String>> lvarStack = new Stack<>();
-		private Stack<List<Code>> nextStack = new Stack<>();
+		private final IrepBuilder builder;
+		private final Stack<List<Code>> lastStack = new Stack<>();
+		private final Stack<List<String>> lvarStack = new Stack<>();
+		private final Stack<List<Code>> nextStack = new Stack<>();
+		
+		public Visitor(String fileName) {
+			this.builder = new IrepBuilder(fileName);
+		}
 
 		public int reserveLocalVariable(String name) {
 			lvarStack.lastElement().add(name);
@@ -33,7 +37,7 @@ public class Compiler {
 					visitAst(n);
 				}
 				if (node.getChildren().get(0).getType() != NodeType.SET) {
-					builder.add(OP.APPEND);
+					builder.add(OP.APPEND, node);
 				}
 				break;
 			case TEMPLATE:
@@ -45,7 +49,7 @@ public class Compiler {
 				for (Node n : node.getChildren()) {
 					visitAst(n);
 				}
-				builder.add(OP.MAKE_ARRAY, node.getChildren().size());
+				builder.add(OP.MAKE_ARRAY, node.getChildren().size(), node);
 				break;
 			case ADD:
 				compileBinOp(node, OP.ADD);
@@ -90,33 +94,33 @@ public class Compiler {
 				compileBinOp(node, OP.OROR);
 				break;
 			case RAW_STRING:
-				builder.addPool(OP.LOAD_CONST, new JTTRawString(node.getText()));
-				builder.add(OP.APPEND);
+				builder.addPool(OP.LOAD_CONST, new JTTRawString(node.getText()), node);
+				builder.add(OP.APPEND, node);
 				break;
 			case INTEGER:
-				builder.addPool(OP.LOAD_CONST, Integer.valueOf(node.getText()));
+				builder.addPool(OP.LOAD_CONST, Integer.valueOf(node.getText()), node);
 				break;
 			case DOUBLE:
-				builder.addPool(OP.LOAD_CONST, Double.valueOf(node.getText()));
+				builder.addPool(OP.LOAD_CONST, Double.valueOf(node.getText()), node);
 				break;
 			case LOOP:
-				builder.add(OP.LOOP);
+				builder.add(OP.LOOP, node);
 				break;
 			case TRUE:
-				builder.add(OP.LOAD_TRUE);
+				builder.add(OP.LOAD_TRUE, node);
 				break;
 			case FALSE:
-				builder.add(OP.LOAD_FALSE);
+				builder.add(OP.LOAD_FALSE, node);
 				break;
 			case NULL:
-				builder.add(OP.LOAD_NULL);
+				builder.add(OP.LOAD_NULL, node);
 				break;
 			case SET: {
 				// (set ident expr)
 				Node ident = node.getChildren().get(0);
 				Node expr = node.getChildren().get(1);
 				visitAst(expr);
-				builder.addPool(OP.SET_VAR, ident.getText());
+				builder.addPool(OP.SET_VAR, ident.getText(), node);
 				break;
 			}
 			case IF: {
@@ -127,11 +131,11 @@ public class Compiler {
 				Node elseClause = children.get(2);
 
 				visitAst(condClause);
-				Code condJump = builder.addLazy(OP.JUMP_IF_FALSE);
+				Code condJump = builder.addLazy(OP.JUMP_IF_FALSE, condClause);
 				int pos = builder.getSize();
 				visitAst(bodyClause);
 				if (elseClause != null) {
-					Code code = builder.addLazy(OP.JUMP);
+					Code code = builder.addLazy(OP.JUMP, elseClause);
 
 					condJump.arg1 = builder.getSize() - pos + 1;
 					int elseStart = builder.getSize();
@@ -151,7 +155,7 @@ public class Compiler {
 				// first argument for switch stmt.
 				visitAst(node.getChildren().get(0));
 				int lvar = reserveLocalVariable(null);
-				builder.add(OP.SET_LVAR, lvar);
+				builder.add(OP.SET_LVAR, lvar, node);
 
 				for (int i = 1; i < node.getChildren().size(); ++i) {
 					Node n = node.getChildren().get(i);
@@ -159,18 +163,18 @@ public class Compiler {
 					if (n.getType() == NodeType.CASE) {
 						if (n.getChildren().get(0) != null) {
 							// condition
-							builder.add(OP.LOAD_LVAR, lvar);
+							builder.add(OP.LOAD_LVAR, lvar, n);
 							visitAst(n.getChildren().get(0));
-							builder.add(OP.MATCH);
-							Code jmp = builder.addLazy(OP.JUMP_IF_FALSE);
+							builder.add(OP.MATCH, n);
+							Code jmp = builder.addLazy(OP.JUMP_IF_FALSE, n);
 							int pos = builder.getSize();
 							// body
 							visitAst(n.getChildren().get(1));
-							gotoLast.add(builder.addLazy(OP.JUMP_ABS));
+							gotoLast.add(builder.addLazy(OP.JUMP_ABS, n));
 							jmp.arg1 = builder.getSize() - pos + 1;
 						} else {
 							visitAst(n.getChildren().get(1));
-							gotoLast.add(builder.addLazy(OP.JUMP_ABS));
+							gotoLast.add(builder.addLazy(OP.JUMP_ABS, n));
 						}
 					} else {
 						throw new RuntimeException("SHOULD NOT REACH HERE");
@@ -187,19 +191,19 @@ public class Compiler {
 				Node rhs = node.getChildren().get(1);
 				visitAst(lhs);
 				visitAst(rhs);
-				builder.add(OP.MAKE_RANGE);
+				builder.add(OP.MAKE_RANGE, node);
 				break;
 			}
 			case NOT: {
 				visitAst(node.getChildren().get(0));
-				builder.add(OP.NOT);
+				builder.add(OP.NOT, node);
 				break;
 			}
 			case IDENT:
-				builder.addPool(OP.LOAD_VAR, node.getText());
+				builder.addPool(OP.LOAD_VAR, node.getText(), node);
 				break;
 			case STRING:
-				builder.addPool(OP.LOAD_CONST, node.getText());
+				builder.addPool(OP.LOAD_CONST, node.getText(), node);
 				break;
 			case FOREACH: {
 				assert node.getChildren().size() == 3;
@@ -209,9 +213,9 @@ public class Compiler {
 				Node body = node.getChildren().get(2);
 
 				visitAst(container);
-				builder.add(OP.ITER_START);
+				builder.add(OP.ITER_START, node);
 
-				builder.addPool(OP.SET_VAR, var.getText());
+				builder.addPool(OP.SET_VAR, var.getText(), node);
 
 				nextStack.add(new ArrayList<Code>());
 				lastStack.add(new ArrayList<Code>());
@@ -219,7 +223,7 @@ public class Compiler {
 				visitAst(body);
 
 				int nextPos = builder.getSize();
-				builder.add(OP.FOR_ITER);
+				builder.add(OP.FOR_ITER, node);
 				int lastPos = builder.getSize();
 
 				for (Code code : lastStack.lastElement()) {
@@ -245,7 +249,7 @@ public class Compiler {
 
 				visitAst(expr);
 
-				Code jumpAfterCond = builder.addLazy(OP.JUMP_IF_FALSE);
+				Code jumpAfterCond = builder.addLazy(OP.JUMP_IF_FALSE, expr);
 				int afterExprPos = builder.getSize();
 
 				nextStack.add(new ArrayList<Code>());
@@ -253,7 +257,7 @@ public class Compiler {
 
 				visitAst(body);
 
-				builder.add(OP.JUMP, pos - builder.getSize());
+				builder.add(OP.JUMP, pos - builder.getSize(), node);
 				jumpAfterCond.arg1 = builder.getSize() - afterExprPos + 1;
 
 				for (Code code : lastStack.lastElement()) {
@@ -269,19 +273,19 @@ public class Compiler {
 				break;
 			}
 			case NEXT: {
-				Code code = builder.addLazy(OP.JUMP_ABS);
+				Code code = builder.addLazy(OP.JUMP_ABS, node);
 				nextStack.lastElement().add(code);
 				break;
 			}
 			case LAST: {
-				Code code = builder.addLazy(OP.JUMP_ABS);
+				Code code = builder.addLazy(OP.JUMP_ABS, node);
 				lastStack.lastElement().add(code);
 				break;
 			}
 			case INCLUDE: {
 				visitAst(node.getChildren().get(0));
-				builder.add(OP.INCLUDE);
-				builder.add(OP.APPEND);
+				builder.add(OP.INCLUDE, node);
+				builder.add(OP.APPEND, node);
 				break;
 			}
 			case ATTRIBUTE: {
@@ -291,7 +295,7 @@ public class Compiler {
 				visitAst(key);
 				visitAst(val);
 
-				builder.add(OP.ATTRIBUTE);
+				builder.add(OP.ATTRIBUTE, node);
 				break;
 			}
 			case MAP: {
@@ -300,18 +304,18 @@ public class Compiler {
 					Node key = children.get(i);
 					Node value = children.get(i + 1);
 					if (key.getType() == NodeType.IDENT) {
-						builder.addPool(OP.LOAD_CONST, key.getText());
+						builder.addPool(OP.LOAD_CONST, key.getText(), node);
 					} else {
 						visitAst(key);
 					}
 					visitAst(value);
 				}
 
-				builder.add(OP.MAKE_MAP, children.size() / 2);
+				builder.add(OP.MAKE_MAP, children.size() / 2, node);
 				break;
 			}
 			case DOLLARVAR: {
-				builder.addPool(OP.LOAD_VAR, node.getText());
+				builder.addPool(OP.LOAD_VAR, node.getText(), node);
 				break;
 			}
 			case FUNCALL: {
@@ -326,15 +330,15 @@ public class Compiler {
 							throw new JTTCompilerError(
 									"Invalid argument count for 'lc'");
 						}
-						builder.add(OP.LC, node.getChildren().size() - 1);
+						builder.add(OP.LC, node.getChildren().size() - 1, func);
 					} else if (func.getText().equals("uc")) {
 						if (node.getChildren().size() - 1 != 1) {
 							throw new JTTCompilerError(
 									"Invalid argument count for 'uc'");
 						}
-						builder.add(OP.UC, node.getChildren().size() - 1);
+						builder.add(OP.UC, node.getChildren().size() - 1, node);
 					} else if (func.getText().equals("sprintf")) {
-						builder.add(OP.SPRINTF, node.getChildren().size() - 1);
+						builder.add(OP.SPRINTF, node.getChildren().size() - 1, node);
 					} else if (func.getText().equals("uri")
 							|| func.getText().equals("url")) {
 						if (node.getChildren().size() - 1 != 1) {
@@ -342,19 +346,19 @@ public class Compiler {
 									"Invalid argument count for 'ur[il]'");
 						}
 						builder.add(OP.URI_ESCAPE,
-								node.getChildren().size() - 1);
+								node.getChildren().size() - 1, node);
 					} else {
-						builder.addPool(OP.LOAD_CONST, func.getText());
-						builder.add(OP.FUNCALL, node.getChildren().size() - 1);
+						builder.addPool(OP.LOAD_CONST, func.getText(), node);
+						builder.add(OP.FUNCALL, node.getChildren().size() - 1, node);
 					}
 				} else if (func.getType() == NodeType.ATTRIBUTE) {
 					visitAst(func.getChildren().get(0)); // object
 					builder.addPool(OP.LOAD_CONST, func.getChildren().get(1)
-							.getText()); // method name
+							.getText(), node); // method name
 					for (int i = 1; i < node.getChildren().size(); ++i) {
 						visitAst(node.getChildren().get(i));
 					}
-					builder.add(OP.METHOD_CALL, node.getChildren().size() - 1);
+					builder.add(OP.METHOD_CALL, node.getChildren().size() - 1, node);
 				} else {
 					throw new RuntimeException("Invalid funcall : "
 							+ func.getType());
@@ -369,8 +373,8 @@ public class Compiler {
 
 				visitAst(body);
 
-				builder.addPool(OP.LOAD_CONST, fileName);
-				builder.add(OP.WRAP);
+				builder.addPool(OP.LOAD_CONST, fileName, node);
+				builder.add(OP.WRAP, node);
 
 				break;
 			}
@@ -385,11 +389,11 @@ public class Compiler {
 			for (int i = node.getChildren().size() - 1; i >= 0; --i) {
 				visitAst(node.getChildren().get(i));
 			}
-			builder.add(op);
+			builder.add(op, node);
 		}
 
 		public Irep getResult() {
-			builder.add(OP.RETURN);
+			builder.addReturn();
 			return builder.build();
 		}
 
@@ -399,11 +403,11 @@ public class Compiler {
 		}
 	}
 
-	public Irep compile(Node ast) throws ParserError, JTTCompilerError {
+	public Irep compile(String fileName, Node ast) throws ParserError, JTTCompilerError {
 		if (ast == null) {
 			throw new RuntimeException("nullpo");
 		}
-		Visitor visitor = new Visitor();
+		Visitor visitor = new Visitor(fileName);
 		visitor.start(ast);
 		return visitor.getResult();
 	}

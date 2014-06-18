@@ -15,6 +15,8 @@ import me.geso.jtt.TemplateLoader;
 import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.exception.TemplateLoadingError;
+import me.geso.jtt.parser.Node;
+import me.geso.jtt.parser.NodeType;
 import me.geso.jtt.tt.TTSyntax;
 
 import org.junit.Test;
@@ -25,13 +27,14 @@ public class VMTest {
 	TemplateLoader loader = new TemplateLoader(null, null);
 	Syntax syntax = new TTSyntax();
 	VM vm = new VM(syntax, loader, null, null);
+	Node nop = new Node(NodeType.NULL, 1);
 
 	@Test
 	public void test() throws JTTError, IOException, ParserError, TemplateLoadingError {
-		IrepBuilder builder = new IrepBuilder();
-		builder.addPool(OP.LOAD_CONST, "hoge");
-		builder.add(OP.APPEND);
-		builder.add(OP.RETURN);
+		IrepBuilder builder = new IrepBuilder("-");
+		builder.addPool(OP.LOAD_CONST, "hoge", nop);
+		builder.add(OP.APPEND, nop);
+		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
 		String got = vm.run(irep, new HashMap<>());
 		assertEquals("hoge", got);
@@ -39,12 +42,12 @@ public class VMTest {
 
 	@Test
 	public void testAdd() throws JTTError, IOException, ParserError, TemplateLoadingError {
-		IrepBuilder builder = new IrepBuilder();
-		builder.addPool(OP.LOAD_CONST, new Integer(3));
-		builder.addPool(OP.LOAD_CONST, new Integer(4));
-		builder.add(OP.ADD);
-		builder.add(OP.APPEND);
-		builder.add(OP.RETURN);
+		IrepBuilder builder = new IrepBuilder("-");
+		builder.addPool(OP.LOAD_CONST, new Integer(3), nop);
+		builder.addPool(OP.LOAD_CONST, new Integer(4), nop);
+		builder.add(OP.ADD, nop);
+		builder.add(OP.APPEND, nop);
+		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
 		String got = vm.run(irep, new HashMap<>());
 		assertEquals("7", got);
@@ -52,12 +55,12 @@ public class VMTest {
 
 	@Test
 	public void testSubtract() throws JTTError, IOException, ParserError, TemplateLoadingError {
-		IrepBuilder builder = new IrepBuilder();
-		builder.addPool(OP.LOAD_CONST, new Integer(3));
-		builder.addPool(OP.LOAD_CONST, new Integer(4));
-		builder.add(OP.SUBTRACT);
-		builder.add(OP.APPEND);
-		builder.add(OP.RETURN);
+		IrepBuilder builder = new IrepBuilder("-");
+		builder.addPool(OP.LOAD_CONST, new Integer(3), nop);
+		builder.addPool(OP.LOAD_CONST, new Integer(4), nop);
+		builder.add(OP.SUBTRACT, nop);
+		builder.add(OP.APPEND, nop);
+		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
 		String got = vm.run(irep, new HashMap<>());
 		assertEquals("1", got);
@@ -68,12 +71,12 @@ public class VMTest {
 		Map<String, String> map = new HashMap<>();
 		map.put("hoge", "fuga");
 
-		IrepBuilder builder = new IrepBuilder();
-		builder.addPool(OP.LOAD_CONST, map);
-		builder.addPool(OP.LOAD_CONST, "hoge");
-		builder.add(OP.ELEM);
-		builder.add(OP.APPEND);
-		builder.add(OP.RETURN);
+		IrepBuilder builder = new IrepBuilder("-");
+		builder.addPool(OP.LOAD_CONST, map, nop);
+		builder.addPool(OP.LOAD_CONST, "hoge", nop);
+		builder.add(OP.ELEM, nop);
+		builder.add(OP.APPEND, nop);
+		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
 		String got = vm.run(irep, new HashMap<>());
 		assertEquals("fuga", got);
@@ -85,12 +88,12 @@ public class VMTest {
 		list.add("HAH");
 		list.add("Huh");
 
-		IrepBuilder builder = new IrepBuilder();
-		builder.addPool(OP.LOAD_CONST, list);
-		builder.addPool(OP.LOAD_CONST, new Integer(1));
-		builder.add(OP.ELEM);
-		builder.add(OP.APPEND);
-		builder.add(OP.RETURN);
+		IrepBuilder builder = new IrepBuilder("-");
+		builder.addPool(OP.LOAD_CONST, list, nop);
+		builder.addPool(OP.LOAD_CONST, new Integer(1), nop);
+		builder.add(OP.ELEM, nop);
+		builder.add(OP.APPEND, nop);
+		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
 		String got = vm.run(irep, new HashMap<>());
 		assertEquals("Huh", got);
@@ -101,10 +104,10 @@ public class VMTest {
 		Map<String, Object> vars = new HashMap<>();
 		vars.put("foo", "bar");
 
-		IrepBuilder builder = new IrepBuilder();
-		builder.addPool(OP.LOAD_VAR, "foo");
-		builder.add(OP.APPEND);
-		builder.add(OP.RETURN);
+		IrepBuilder builder = new IrepBuilder("-");
+		builder.addPool(OP.LOAD_VAR, "foo", nop);
+		builder.add(OP.APPEND, nop);
+		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
 		String got = vm.run(irep, vars);
 		assertEquals("bar", got);
@@ -112,12 +115,12 @@ public class VMTest {
 
 	@Test
 	public void testSetVar() throws JTTError, IOException, ParserError, TemplateLoadingError {
-		IrepBuilder builder = new IrepBuilder();
-		builder.addPool(OP.LOAD_CONST, "foo");
-		builder.addPool(OP.SET_VAR, "v");
-		builder.addPool(OP.LOAD_VAR, "v");
-		builder.add(OP.APPEND);
-		builder.add(OP.RETURN);
+		IrepBuilder builder = new IrepBuilder("-");
+		builder.addPool(OP.LOAD_CONST, "foo", nop);
+		builder.addPool(OP.SET_VAR, "v", nop);
+		builder.addPool(OP.LOAD_VAR, "v", nop);
+		builder.add(OP.APPEND, nop);
+		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
 
 		String got = vm.run(irep, new HashMap<String, Object>());
@@ -128,14 +131,14 @@ public class VMTest {
 	public void testForEach() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 
-		IrepBuilder builder = new IrepBuilder();
-		builder.addPool(OP.LOAD_CONST, Lists.newArrayList("foo", "bar"));
-		builder.add(OP.ITER_START);
-		builder.addPool(OP.SET_VAR, "v");
-		builder.addPool(OP.LOAD_VAR, "v");
-		builder.add(OP.APPEND);
-		builder.add(OP.FOR_ITER);
-		builder.add(OP.RETURN);
+		IrepBuilder builder = new IrepBuilder("-");
+		builder.addPool(OP.LOAD_CONST, Lists.newArrayList("foo", "bar"), nop);
+		builder.add(OP.ITER_START, nop);
+		builder.addPool(OP.SET_VAR, "v", nop);
+		builder.addPool(OP.LOAD_VAR, "v", nop);
+		builder.add(OP.APPEND, nop);
+		builder.add(OP.FOR_ITER, nop);
+		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
 		String got = vm.run(irep, vars);
 		assertEquals("foobar", got);
@@ -145,16 +148,16 @@ public class VMTest {
 	public void testEquals() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 
-		IrepBuilder builder = new IrepBuilder();
-		builder.addPool(OP.LOAD_CONST, "foo");
-		builder.addPool(OP.LOAD_CONST, "foo");
-		builder.add(OP.EQUALS);
-		builder.add(OP.APPEND);
-		builder.addPool(OP.LOAD_CONST, "foo");
-		builder.addPool(OP.LOAD_CONST, "bar");
-		builder.add(OP.EQUALS);
-		builder.add(OP.APPEND);
-		builder.add(OP.RETURN);
+		IrepBuilder builder = new IrepBuilder("-");
+		builder.addPool(OP.LOAD_CONST, "foo", nop);
+		builder.addPool(OP.LOAD_CONST, "foo", nop);
+		builder.add(OP.EQUALS, nop);
+		builder.add(OP.APPEND, nop);
+		builder.addPool(OP.LOAD_CONST, "foo", nop);
+		builder.addPool(OP.LOAD_CONST, "bar", nop);
+		builder.add(OP.EQUALS, nop);
+		builder.add(OP.APPEND, nop);
+		builder.add(OP.RETURN, nop);
 
 		Irep irep = builder.build();
 		String got = vm.run(irep, vars);
@@ -165,33 +168,33 @@ public class VMTest {
 	public void testGraterThan() throws JTTError, IOException, ParserError, TemplateLoadingError {
 		Map<String, Object> vars = new HashMap<>();
 
-		IrepBuilder builder = new IrepBuilder();
+		IrepBuilder builder = new IrepBuilder("-");
 
 		// 3<9
-		builder.addPool(OP.LOAD_CONST, 3);
-		builder.addPool(OP.LOAD_CONST, 9);
-		builder.add(OP.GT);
-		builder.add(OP.APPEND);
+		builder.addPool(OP.LOAD_CONST, 3, nop);
+		builder.addPool(OP.LOAD_CONST, 9, nop);
+		builder.add(OP.GT, nop);
+		builder.add(OP.APPEND, nop);
 
 		// 3<3
-		builder.addPool(OP.LOAD_CONST, 3);
-		builder.addPool(OP.LOAD_CONST, 3);
-		builder.add(OP.GT);
-		builder.add(OP.APPEND);
+		builder.addPool(OP.LOAD_CONST, 3, nop);
+		builder.addPool(OP.LOAD_CONST, 3, nop);
+		builder.add(OP.GT, nop);
+		builder.add(OP.APPEND, nop);
 
 		// 9<3
-		builder.addPool(OP.LOAD_CONST, 9);
-		builder.addPool(OP.LOAD_CONST, 3);
-		builder.add(OP.GT);
-		builder.add(OP.APPEND);
+		builder.addPool(OP.LOAD_CONST, 9, nop);
+		builder.addPool(OP.LOAD_CONST, 3, nop);
+		builder.add(OP.GT, nop);
+		builder.add(OP.APPEND, nop);
 
 		// 3.04<3.14
-		builder.addPool(OP.LOAD_CONST, 3.04);
-		builder.addPool(OP.LOAD_CONST, 3.14);
-		builder.add(OP.GT);
-		builder.add(OP.APPEND);
+		builder.addPool(OP.LOAD_CONST, 3.04, nop);
+		builder.addPool(OP.LOAD_CONST, 3.14, nop);
+		builder.add(OP.GT, nop);
+		builder.add(OP.APPEND, nop);
 
-		builder.add(OP.RETURN);
+		builder.add(OP.RETURN, nop);
 
 		Irep irep = builder.build();
 		String got = vm.run(irep, vars);
