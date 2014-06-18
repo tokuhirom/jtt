@@ -57,7 +57,8 @@ public class VM {
 
 	public VM(Syntax syntax, TemplateLoader loader,
 			Map<String, Function> functions,
-			JTTMessageListener warningListener, Irep irep, Map<String,Object> vars) {
+			JTTMessageListener warningListener, Irep irep,
+			Map<String, Object> vars) {
 		this.loader = loader;
 		this.syntax = syntax;
 		this.functions = functions;
@@ -87,7 +88,6 @@ public class VM {
 			Code code = codes[pc];
 
 			// System.out.println(String.format("%06d %s", pc, code.op));
-			// TODO INCLUDE
 
 			switch (code.op) {
 			case LOAD_CONST:
@@ -196,13 +196,10 @@ public class VM {
 				++pc;
 				break;
 			}
-			case CONCAT: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doConcat(lhs, rhs));
+			case CONCAT:
+				opConcat();
 				++pc;
 				break;
-			}
 			case LOAD_TRUE:
 				stack.push(Boolean.TRUE);
 				++pc;
@@ -234,10 +231,8 @@ public class VM {
 				++pc;
 				break;
 			}
-			case ELEM: { // a[0], a['hoge']
-				Object key = stack.pop();
-				Object container = stack.pop();
-				stack.push(this.elem(key, container));
+			case GET_ELEM: { // a[0], a['hoge']
+				this.opGetElem();
 				++pc;
 				break;
 			}
@@ -526,7 +521,10 @@ public class VM {
 		}
 	}
 
-	private String doConcat(Object lhs, Object rhs) {
+	private void opConcat() {
+		final Object lhs = stack.pop();
+		final Object rhs = stack.pop();
+
 		StringBuilder builder = new StringBuilder();
 		if (lhs == null) {
 			warn("null in string concatenation.");
@@ -538,7 +536,8 @@ public class VM {
 		} else {
 			builder.append(rhs.toString());
 		}
-		return builder.toString();
+
+		stack.push(builder.toString());
 	}
 
 	private void warn(String message) {
@@ -560,12 +559,15 @@ public class VM {
 		return true;
 	}
 
-	private Object elem(Object key, Object container)
-			throws VMError {
+	private void opGetElem() throws VMError {
+				Object key = stack.pop();
+				Object container = stack.pop();
 		if (container instanceof Map) {
-			return ((Map<?, ?>) container).get(key);
+			Object elem = ((Map<?, ?>) container).get(key);
+			stack.push(elem);
 		} else if (container instanceof List) {
-			return ((List<?>) container).get((Integer) key);
+			Object elem = ((List<?>) container).get((Integer) key);
+			stack.push(elem);
 		} else {
 			throw this.createError("Container must be List or Map: "
 					+ container.getClass());

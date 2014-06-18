@@ -81,7 +81,7 @@ public class VMTest {
 		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, map, nop);
 		builder.addPool(OP.LOAD_CONST, "hoge", nop);
-		builder.add(OP.ELEM, nop);
+		builder.add(OP.GET_ELEM, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
@@ -99,7 +99,7 @@ public class VMTest {
 		IrepBuilder builder = IrepBuilder.fromString("-");
 		builder.addPool(OP.LOAD_CONST, list, nop);
 		builder.addPool(OP.LOAD_CONST, new Integer(1), nop);
-		builder.add(OP.ELEM, nop);
+		builder.add(OP.GET_ELEM, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build();
