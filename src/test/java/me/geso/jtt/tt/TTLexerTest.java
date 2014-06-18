@@ -26,6 +26,9 @@ public class TTLexerTest {
 	@Test
 	public void testDouble() {
 		assertEquals("[OPEN],[DOUBLE 3.14],[CLOSE]", lex("[% 3.14 %]"));
+		assertEquals("[OPEN],[DOUBLE 3.0],[CLOSE]", lex("[% 3.0 %]"));
+		assertEquals("[OPEN],[DOUBLE 0.0],[CLOSE]", lex("[% 0.0 %]"));
+		assertEquals("[OPEN],[DOUBLE 0.1],[CLOSE]", lex("[% 0.1 %]"));
 	}
 
 	@Test

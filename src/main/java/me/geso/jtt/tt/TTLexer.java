@@ -19,7 +19,7 @@ class TTLexer {
 	private static final Pattern intRe = Pattern
 			.compile("\\A(?:[1-9][0-9]*|0)");
 	private static final Pattern doubleRe = Pattern
-			.compile("\\A(?:[1-9][0-9]*\\.[0-9]+)");
+			.compile("\\A(?:(?:[1-9][0-9]*|0)\\.[0-9]+)");
 
 	private static final Pattern identRe = Pattern
 			.compile("\\A(?:[a-zA-Z][_a-zA-Z0-9]*)");
