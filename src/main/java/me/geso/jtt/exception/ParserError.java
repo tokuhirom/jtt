@@ -12,11 +12,18 @@ public class ParserError extends JTTError {
 	}
 
 	public String toString() {
-		int pos = parser.getPos();
+		int line = parser.getLine();
 		String src = parser.getSource();
-		int show = Math.min(src.length() - pos, 10);
-
-		return this.getMessage() + " : '" + src.substring(pos, pos + show)
-				+ "'";
+		String[] lines = src.split("\r?\n");
+		
+		StringBuilder buf = new StringBuilder();
+		buf.append(this.getMessage() + " at " + parser.getFileName() + " line " + line);
+		buf.append("\n==============================================\n");
+		for (int i=Math.max(0, line-3); i<Math.min(lines.length-1, line+3); ++i) {
+			buf.append(lines[i] + "\n");
+		}
+		buf.append("\n==============================================");
+		
+		return buf.toString();
 	}
 }

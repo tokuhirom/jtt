@@ -1,6 +1,7 @@
 package me.geso.jtt;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,6 +114,21 @@ public class JTTTest {
 
 		assertEquals("even", renderString("[% ['odd','even'][1%2] %]", params));
 		assertEquals("odd", renderString("[% ['odd','even'][2%2] %]", params));
+	}
+
+	// Added test case for ParserError contains error position.
+	@Test
+	public void testError() throws IOException, JTTError {
+		HashMap<String, Object> params = new HashMap<>();
+
+		boolean errorSeen = false;
+		try {
+			render("error.tt", params);
+		} catch (ParserError e) {
+			errorSeen = true;
+			assertTrue(e.toString().contains("[% IF %]"));
+		}
+		assertTrue(errorSeen);
 	}
 
 	// ---------------------------------------------------------------

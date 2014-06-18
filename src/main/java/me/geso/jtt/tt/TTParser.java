@@ -24,8 +24,9 @@ class TTParser implements Parser {
 		return this.source;
 	}
 
-	public int getPos() {
-		return this.pos;
+	@Override
+	public int getLine() {
+		return this.tokens.get(pos).getLineNumber();
 	}
 
 	public TTParser(String source, List<Token> tokens) {
@@ -544,6 +545,14 @@ class TTParser implements Parser {
 		}
 
 		return true;
+	}
+
+	int getPos() {
+		return this.pos;
+	}
+	
+	public String getFileName() {
+		return CURRENT_FILENAME();
 	}
 
 	// expr = int;
