@@ -1,9 +1,5 @@
 package me.geso.jtt.vm;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.invoke.MethodType;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +18,6 @@ import me.geso.jtt.TemplateLoader;
 import me.geso.jtt.escape.Escaper;
 import me.geso.jtt.escape.HTMLEscaper;
 import me.geso.jtt.exception.JTTError;
-import me.geso.jtt.exception.MethodInvokeError;
 import me.geso.jtt.exception.VMError;
 
 import com.esotericsoftware.reflectasm.FieldAccess;
@@ -225,13 +220,6 @@ public class VM {
 			case LOAD_LVAR: {
 				Object o = localVarStack.lastElement().get(code.arg1);
 				stack.push(o);
-				++pc;
-				break;
-			}
-			case INVOKE: { // invoke method
-				Object methodName = stack.pop();
-				Object self = stack.pop();
-				stack.push(this.invokeMethod(methodName, self, code.arg1));
 				++pc;
 				break;
 			}
@@ -597,23 +585,6 @@ public class VM {
 		} else {
 			throw this.createError("Container must be List or Map: "
 					+ container.getClass());
-		}
-	}
-
-	// TODO support arguments
-	private Object invokeMethod(Object methodName, Object self, int numargs)
-			throws JTTError {
-		assert methodName instanceof String;
-
-		Lookup lookup = MethodHandles.lookup();
-		try {
-			MethodHandle meth;
-			meth = lookup.findVirtual(self.getClass(), (String) methodName,
-					MethodType.methodType(self.getClass()));
-			Object retval = meth.invokeWithArguments(self);
-			return retval;
-		} catch (Throwable e) {
-			throw new MethodInvokeError(e);
 		}
 	}
 
