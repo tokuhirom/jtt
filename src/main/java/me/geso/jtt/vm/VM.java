@@ -42,6 +42,8 @@ public class VM {
 	private final JTTMessageListener warningListener;
 	private final Irep irep;
 
+	private static final Map<Class<?>, FieldAccess> fieldAccessCache = new HashMap<>();
+
 	/**
 	 * VM innerr status.
 	 */
@@ -522,7 +524,17 @@ public class VM {
 			warn("container is null");
 			return null;
 		} else {
-			FieldAccess access = FieldAccess.get(container.getClass());
+			FieldAccess access;
+			Class<? extends Object> klass = container.getClass();
+			if (fieldAccessCache.containsKey(klass)) {
+				access = fieldAccessCache.get(klass);
+			} else {
+				synchronized (fieldAccessCache) {
+					access = FieldAccess.get(container.getClass());
+					fieldAccessCache.put(klass, access);
+				}
+			}
+
 			if (index instanceof String) {
 				Object result = access.get(container, (String) index);
 				return result;
