@@ -59,6 +59,10 @@ public class VM {
 			Map<String, Function> functions,
 			JTTMessageListener warningListener, Irep irep,
 			Map<String, Object> vars) {
+		if (vars == null) {
+			throw new IllegalArgumentException("vars must not be null");
+		}
+
 		this.loader = loader;
 		this.syntax = syntax;
 		this.functions = functions;
@@ -77,9 +81,6 @@ public class VM {
 	}
 
 	public String run() throws JTTError {
-		if (vars == null) {
-			throw new NullPointerException();
-		}
 
 		Code[] codes = irep.getIseq();
 		Object[] pool = irep.getPool();
