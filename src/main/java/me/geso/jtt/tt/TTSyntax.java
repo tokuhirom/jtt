@@ -7,6 +7,7 @@ import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
 import me.geso.jtt.vm.Irep;
 import me.geso.jtt.Compiler;
+import me.geso.jtt.Source;
 import me.geso.jtt.Syntax;
 
 public class TTSyntax implements Syntax {
@@ -44,12 +45,7 @@ public class TTSyntax implements Syntax {
 	 * @see me.geso.jtt.tt.Syntax#compile(me.geso.jtt.parser.Node)
 	 */
 	@Override
-	public Irep compileFile(String fileName, Node ast) throws ParserError {
-		return new Compiler().compileFile(fileName, ast);
-	}
-
-	@Override
-	public Irep compileString(String source, Node ast) throws ParserError {
-		return new Compiler().compileString(source, ast);
+	public Irep compile(Source source, Node ast) throws ParserError {
+		return new Compiler().compile(source, ast);
 	}
 }

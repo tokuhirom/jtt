@@ -47,7 +47,7 @@ public class JTT {
 		Syntax syntax = new TTSyntax("[%", "%]");
 		List<Token> tokens = syntax.tokenize("-", src);
 		Node ast = syntax.parse(src, tokens);
-		Irep irep = syntax.compileString(src, ast);
+		Irep irep = syntax.compile(Source.fromString(src), ast);
 		String result = this.newVM(irep, vars).run();
 		return result;
 	}

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import me.geso.jtt.Source;
 import me.geso.jtt.parser.Node;
 
 /**
@@ -17,46 +18,19 @@ public class IrepBuilder {
 	private final List<Code> iseq = new ArrayList<Code>();
 	private final List<Object> pool = new ArrayList<Object>();
 	private final Map<Object, Integer> poolSeen = new HashMap<Object, Integer>();
-	private final String fileName;
 	private final List<Integer> lineNumbers = new ArrayList<>();
-	private final boolean fromFile;
-	/**
-	 * source is null if fromFile is true.
-	 */
-	private final String source;
+	private final Source source;
 
-	private IrepBuilder(boolean fromFile, String fileName, String source) {
-		this.fromFile = fromFile;
-		this.fileName = fileName;
+	public IrepBuilder(Source source) {
 		this.source = source;
 	}
 	
-	/**
-	 * Create new instance from file.
-	 * 
-	 * @param fileName
-	 * @return
-	 */
-	public static IrepBuilder fromFile(String fileName) {
-		return new IrepBuilder(true, fileName, null);
-	}
-
-	/**
-	 * Create new instance from string.
-	 * 
-	 * @param source
-	 * @return
-	 */
-	public static IrepBuilder fromString(String source) {
-		return new IrepBuilder(false, null, source);
-	}
-
 	public int getLineNumber(int pc) {
 		return lineNumbers.get(pc);
 	}
 
 	public String getFileName() {
-		return this.fileName;
+		return this.source.getFileName();
 	}
 
 	public void addReturn() {
@@ -108,7 +82,7 @@ public class IrepBuilder {
 	}
 
 	public Irep build() {
-		return new Irep(iseq, pool, this.fileName, this.lineNumbers, this.fromFile, this.source);
+		return new Irep(iseq, pool, this.lineNumbers, this.source);
 	}
 
 	public String toString() {

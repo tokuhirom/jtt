@@ -19,16 +19,8 @@ class Visitor {
 	private final Stack<List<String>> lvarStack = new Stack<>();
 	private final Stack<List<Code>> nextStack = new Stack<>();
 
-	private Visitor(IrepBuilder builder) {
-		this.builder = builder;
-	}
-
-	public static Visitor fromFile(String fileName) {
-		return new Visitor(IrepBuilder.fromFile(fileName));
-	}
-
-	public static Visitor fromString(String source) {
-		return new Visitor(IrepBuilder.fromString(source));
+	public Visitor(Source source) {
+		this.builder = new IrepBuilder(source);
 	}
 
 	public int reserveLocalVariable(String name) {
@@ -414,22 +406,12 @@ class Visitor {
 
 public class Compiler {
 
-	public Irep compileFile(String fileName, Node ast) throws ParserError,
+	public Irep compile(Source source, Node ast) throws ParserError,
 			JTTCompilerError {
 		if (ast == null) {
 			throw new IllegalArgumentException("ast must not be null");
 		}
-		Visitor visitor = Visitor.fromFile(fileName);
-		visitor.start(ast);
-		return visitor.getResult();
-	}
-
-	public Irep compileString(String source, Node ast) throws ParserError,
-			JTTCompilerError {
-		if (ast == null) {
-			throw new IllegalArgumentException("ast must not be null");
-		}
-		Visitor visitor = Visitor.fromString(source);
+		Visitor visitor = new Visitor(source);
 		visitor.start(ast);
 		return visitor.getResult();
 	}
