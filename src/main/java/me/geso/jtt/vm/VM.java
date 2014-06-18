@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 import me.geso.jtt.Function;
 import me.geso.jtt.JTTMessageListener;
@@ -42,7 +43,7 @@ public class VM {
 	private final JTTMessageListener warningListener;
 	private final Irep irep;
 
-	private static final Map<Class<?>, FieldAccess> fieldAccessCache = new HashMap<>();
+	private static final Map<Class<?>, FieldAccess> fieldAccessCache = new ConcurrentHashMap<>();
 
 	/**
 	 * VM innerr status.
@@ -529,10 +530,8 @@ public class VM {
 			if (fieldAccessCache.containsKey(klass)) {
 				access = fieldAccessCache.get(klass);
 			} else {
-				synchronized (fieldAccessCache) {
-					access = FieldAccess.get(container.getClass());
-					fieldAccessCache.put(klass, access);
-				}
+				access = FieldAccess.get(container.getClass());
+				fieldAccessCache.put(klass, access);
 			}
 
 			if (index instanceof String) {
