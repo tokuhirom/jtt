@@ -417,7 +417,7 @@ public class Compiler {
 	public Irep compileFile(String fileName, Node ast) throws ParserError,
 			JTTCompilerError {
 		if (ast == null) {
-			throw new RuntimeException("nullpo");
+			throw new IllegalArgumentException("ast must not be null");
 		}
 		Visitor visitor = Visitor.fromFile(fileName);
 		visitor.start(ast);
@@ -427,7 +427,7 @@ public class Compiler {
 	public Irep compileString(String source, Node ast) throws ParserError,
 			JTTCompilerError {
 		if (ast == null) {
-			throw new RuntimeException("nullpo");
+			throw new IllegalArgumentException("ast must not be null");
 		}
 		Visitor visitor = Visitor.fromString(source);
 		visitor.start(ast);
