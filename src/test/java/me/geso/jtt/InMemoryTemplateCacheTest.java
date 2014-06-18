@@ -32,7 +32,7 @@ public class InMemoryTemplateCacheTest {
 				.addIncludePath(tmpdir).build();
 
 		{
-			String got = jtt.render("index.tt", new HashMap<>());
+			String got = jtt.renderFile("index.tt", new HashMap<>());
 			assertEquals(got, "hoge");
 			// no cache.
 			assertEquals(((InMemoryTemplateCache) templateCache).size(), 0);
@@ -43,7 +43,7 @@ public class InMemoryTemplateCacheTest {
 
 
 		{
-			String got = jtt.render("index.tt", new HashMap<>());
+			String got = jtt.renderFile("index.tt", new HashMap<>());
 			assertEquals(got, "fuga"); // modified.
 			assertEquals(((InMemoryTemplateCache) templateCache).size(), 0); // no
 																				// cache.
@@ -63,7 +63,7 @@ public class InMemoryTemplateCacheTest {
 				.addIncludePath(tmpdir).build();
 
 		{
-			String got = jtt.render("index.tt", new HashMap<>());
+			String got = jtt.renderFile("index.tt", new HashMap<>());
 			assertEquals(got, "hoge");
 			assertEquals(((InMemoryTemplateCache) templateCache).size(), 1);
 		}
@@ -72,7 +72,7 @@ public class InMemoryTemplateCacheTest {
 		Files.write(tmpdir.resolve("index.tt"), "fuga".getBytes());
 
 		{
-			String got = jtt.render("index.tt", new HashMap<>());
+			String got = jtt.renderFile("index.tt", new HashMap<>());
 			assertEquals("fuga", got); // modified.
 			assertEquals(((InMemoryTemplateCache) templateCache).size(), 1);
 		}
@@ -91,7 +91,7 @@ public class InMemoryTemplateCacheTest {
 				.addIncludePath(tmpdir).build();
 
 		{
-			String got = jtt.render("index.tt", new HashMap<>());
+			String got = jtt.renderFile("index.tt", new HashMap<>());
 			assertEquals(got, "hoge");
 			assertEquals(((InMemoryTemplateCache) templateCache).size(), 1);
 		}
@@ -100,7 +100,7 @@ public class InMemoryTemplateCacheTest {
 		Files.write(tmpdir.resolve("index.tt"), "fuga".getBytes());
 
 		{
-			String got = jtt.render("index.tt", new HashMap<>());
+			String got = jtt.renderFile("index.tt", new HashMap<>());
 			assertEquals(got, "hoge"); // not modified.
 			assertEquals(((InMemoryTemplateCache) templateCache).size(), 1);
 		}

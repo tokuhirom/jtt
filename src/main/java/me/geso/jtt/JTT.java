@@ -29,11 +29,11 @@ public class JTT {
 		this.warningListener = warningListener;
 	}
 
-	public String render(String file, Map<String, Object> vars) throws JTTError {
-		return this.render(new File(file), vars);
+	public String renderFile(String file, Map<String, Object> vars) throws JTTError {
+		return this.renderFile(new File(file), vars);
 	}
 
-	public String render(File file, Map<String, Object> vars) throws JTTError {
+	public String renderFile(File file, Map<String, Object> vars) throws JTTError {
 		Irep irep = loader.compile(file.toPath(), this.syntax);
 		String result = this.newVM(irep, vars).run();
 		return result;

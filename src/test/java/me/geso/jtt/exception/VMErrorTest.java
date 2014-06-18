@@ -20,7 +20,7 @@ public class VMErrorTest {
 		JTT jtt = new JTTBuilder().addIncludePath(
 				new File("src/test/resources/").toPath()).build();
 		try {
-			jtt.render("runtime-error.tt", new HashMap<>());
+			jtt.renderFile("runtime-error.tt", new HashMap<>());
 		} catch (VMError e) {
 			seenError = true;
 			assertThat(e.toString(), containsString("[% null < 3 %]"));
