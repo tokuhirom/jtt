@@ -2,22 +2,15 @@ package me.geso.jtt.escape;
 
 import me.geso.jtt.JTTRawString;
 
-import com.google.common.escape.CharEscaper;
-import com.google.common.escape.Escapers;
+import com.google.common.html.HtmlEscapers;
 
 public class HTMLEscaper extends Escaper {
-	private static final CharEscaper HTML_CONTENT_ESCAPER = (CharEscaper) Escapers
-			.builder().addEscape('"', "&quot;")
-			// Note: "&apos;" is not defined in HTML 4.01.
-			.addEscape('\'', "&#39;").addEscape('&', "&amp;")
-			.addEscape('<', "&lt;").addEscape('>', "&gt;").build();
-
 	@Override
 	public String escape(String str) {
 		if (str == null) {
 			return "(null)";
 		} else {
-			return HTML_CONTENT_ESCAPER.escape(str);
+			return HtmlEscapers.htmlEscaper().escape(str);
 		}
 	}
 	

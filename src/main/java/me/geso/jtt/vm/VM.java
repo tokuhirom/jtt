@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.BaseStream;
+import java.util.stream.IntStream;
 
 import me.geso.jtt.Function;
 import me.geso.jtt.JTTMessageListener;
@@ -270,6 +272,14 @@ public class VM {
 					stack.push(loop.next());
 
 					++pc;
+				} else if(container instanceof BaseStream) {
+					@SuppressWarnings({ "unchecked", "rawtypes" })
+					Iterator<Object> iterator = ((BaseStream) container).iterator();
+					Loop loop = new Loop(iterator, pc);
+					loopStack.push(loop);
+					stack.push(loop.next());
+
+					++pc;
 				} else {
 					throw new RuntimeException(
 							"Non container type detected in FOREACH.");
@@ -462,13 +472,9 @@ public class VM {
 							+ rhs.getClass());
 		}
 
-		int l = ((Integer) lhs).intValue();
-		int r = ((Integer) rhs).intValue();
-		ArrayList<Integer> list = new ArrayList<>();
-		for (int i = l; i <= r; ++i) {
-			list.add(i);
-		}
-		stack.push(list);
+		int startInclusive = ((Integer) lhs).intValue();
+		int endInclusive = ((Integer) rhs).intValue();
+		stack.push(IntStream.rangeClosed(startInclusive, endInclusive));
 	}
 
 	private void doFuncall(int arglen, Stack<Object> stack) {
