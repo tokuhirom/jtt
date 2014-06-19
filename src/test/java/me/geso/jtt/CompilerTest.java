@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import me.geso.jtt.escape.HTMLEscaper;
 import me.geso.jtt.exception.JTTCompilerError;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.exception.TemplateLoadingError;
@@ -576,6 +577,6 @@ public class CompilerTest {
 		List<Token> tokens = syntax.tokenize(source, srcString);
 		Node ast = syntax.parse(source, tokens);
 		Irep irep = syntax.compile(source, ast);
-		return new VM(syntax, loader, null, null, irep, vars).run();
+		return new VM(syntax, loader, null, null, new HTMLEscaper(), irep, vars).run();
 	}
 }

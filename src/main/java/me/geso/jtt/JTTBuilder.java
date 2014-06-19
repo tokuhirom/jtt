@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import me.geso.jtt.escape.Escaper;
+import me.geso.jtt.escape.HTMLEscaper;
 import me.geso.jtt.tt.TTSyntax;
 
 /**
@@ -20,6 +22,7 @@ public class JTTBuilder {
 	private final Map<String, Function> functions = new HashMap<String,Function>();
 	private TemplateCache templateCache = new NullTemplateCache();
 	private Syntax syntax = new TTSyntax();
+	private Escaper escaper = new HTMLEscaper();
 	
 	public JTTBuilder() {
 	}
@@ -31,7 +34,7 @@ public class JTTBuilder {
 	 */
 	public JTT build() {
 		TemplateLoader loader = new TemplateLoader(getIncludePaths(), this.templateCache);
-		JTT jtt = new JTT(loader, this.syntax, functions, warningListener);
+		JTT jtt = new JTT(loader, this.syntax, functions, warningListener, escaper);
 		return jtt;
 	}
 
@@ -64,6 +67,11 @@ public class JTTBuilder {
 
 	public JTTBuilder setTemplateCache(TemplateCache templateCache) {
 		this.templateCache = templateCache;
+		return this;
+	}
+	
+	public JTTBuilder setEscaper(Escaper escaper) {
+		this.escaper = escaper;
 		return this;
 	}
 

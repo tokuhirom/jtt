@@ -13,6 +13,7 @@ import java.util.Map;
 import me.geso.jtt.Source;
 import me.geso.jtt.Syntax;
 import me.geso.jtt.TemplateLoader;
+import me.geso.jtt.escape.HTMLEscaper;
 import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.exception.TemplateLoadingError;
@@ -30,7 +31,7 @@ public class VMTest {
 	Node nop = new Node(NodeType.NULL, 1);
 
 	private String run(Irep irep, Map<String, Object>vars) {
-		return new VM(syntax, loader, null, null, irep, vars).run();
+		return new VM(syntax, loader, null, null, new HTMLEscaper(), irep, vars).run();
 	}
 
 	@Test
@@ -219,7 +220,7 @@ public class VMTest {
 	public void testDoGE() throws JTTError {
 		IrepBuilder builder = newIrepBuilder();
 		Irep irep = builder.build();
-		VM vm = new VM(syntax, loader, null, null, irep, new HashMap<>());
+		VM vm = new VM(syntax, loader, null, null, new HTMLEscaper(), irep, new HashMap<>());
 
 		// 3 >= 4
 		assertFalse(vm.doGE(new Integer(3), new Integer(4)));

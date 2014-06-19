@@ -18,7 +18,6 @@ import me.geso.jtt.JTTMessageListener;
 import me.geso.jtt.Syntax;
 import me.geso.jtt.TemplateLoader;
 import me.geso.jtt.escape.Escaper;
-import me.geso.jtt.escape.HTMLEscaper;
 import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.VMError;
 
@@ -32,7 +31,7 @@ import com.google.common.net.UrlEscapers;
  * @author tokuhirom
  */
 public class VM {
-	private final Escaper escaper = new HTMLEscaper(); // TODO configurable
+	private final Escaper escaper;
 	private final TemplateLoader loader;
 	private final Syntax syntax;
 	private final Map<String, Function> functions;
@@ -54,12 +53,12 @@ public class VM {
 	private Map<String, Object> vars;
 
 	private VM newVM(Irep irep, Map<String, Object> vars) {
-		return new VM(syntax, loader, functions, warningListener, irep, vars);
+		return new VM(syntax, loader, functions, warningListener, escaper, irep, vars);
 	}
 
 	public VM(Syntax syntax, TemplateLoader loader,
 			Map<String, Function> functions,
-			JTTMessageListener warningListener, Irep irep,
+			JTTMessageListener warningListener, Escaper escaper, Irep irep,
 			Map<String, Object> vars) {
 		if (vars == null) {
 			throw new IllegalArgumentException("vars must not be null");
@@ -69,6 +68,7 @@ public class VM {
 		this.syntax = syntax;
 		this.functions = functions;
 		this.warningListener = warningListener;
+		this.escaper = escaper;
 
 		this.irep = irep;
 		this.vars = vars;

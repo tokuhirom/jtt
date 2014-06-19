@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import me.geso.jtt.escape.Escaper;
 import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.lexer.Token;
 import me.geso.jtt.parser.Node;
@@ -17,9 +18,10 @@ public class JTT {
 	private final Syntax syntax;
 	private Map<String, Function> functions;
 	private JTTMessageListener warningListener;
+	private final Escaper escaper;
 
 	public JTT(TemplateLoader loader, Syntax syntax,
-			Map<String, Function> functions, JTTMessageListener warningListener) {
+			Map<String, Function> functions, JTTMessageListener warningListener, Escaper escaper) {
 		if (syntax == null) {
 			throw new IllegalArgumentException("syntax");
 		}
@@ -27,6 +29,7 @@ public class JTT {
 		this.syntax = syntax;
 		this.functions = functions;
 		this.warningListener = warningListener;
+		this.escaper = escaper;
 	}
 
 	public String renderFile(String file, Map<String, Object> vars) throws JTTError {
@@ -54,6 +57,6 @@ public class JTT {
 	}
 
 	private VM newVM(Irep irep, Map<String, Object> vars) {
-		return new VM(syntax, loader, functions, warningListener, irep, vars);
+		return new VM(syntax, loader, functions, warningListener, escaper, irep, vars);
 	}
 }
