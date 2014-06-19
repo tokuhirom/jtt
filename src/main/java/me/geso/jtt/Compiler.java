@@ -92,9 +92,7 @@ class Visitor {
 			compileBinOp(node, OP.OROR);
 			break;
 		case RAW_STRING:
-			builder.addPool(OP.LOAD_CONST, new JTTRawString(node.getText()),
-					node);
-			builder.add(OP.APPEND, node);
+			builder.addPool(OP.APPEND_RAW, node.getText(), node);
 			break;
 		case INTEGER:
 			builder.addPool(OP.LOAD_CONST, Integer.valueOf(node.getText()),

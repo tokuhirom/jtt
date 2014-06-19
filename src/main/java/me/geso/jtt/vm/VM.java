@@ -97,12 +97,19 @@ public class VM {
 				stack.push(pool[code.arg1]);
 				++pc;
 				break;
+			case APPEND_RAW: {
+				buffer.append(pool[code.arg1]);
+				++pc;
+				break;
+			}
 			case APPEND: {
 				Object obj = stack.pop();
 				if (obj == null) {
 					warn("Appending null");
+					buffer.append("(null)");
+				} else {
+					buffer.append(escaper.escape(obj));
 				}
-				buffer.append(escaper.escape(obj));
 				++pc;
 				break;
 			}
