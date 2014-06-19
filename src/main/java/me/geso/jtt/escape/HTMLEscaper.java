@@ -20,6 +20,9 @@ public class HTMLEscaper extends Escaper {
 			return "(null)";
 		} else if (str instanceof JTTRawString) {
 			return this.escape((JTTRawString)str);
+		} else if (str instanceof Integer) {
+			// Integer doesn't need HTML escape.
+			return str.toString();
 		} else {
 			return this.escape(str.toString());
 		}
