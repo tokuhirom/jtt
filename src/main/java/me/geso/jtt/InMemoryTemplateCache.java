@@ -1,7 +1,8 @@
 package me.geso.jtt;
 
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import me.geso.jtt.vm.Irep;
 
@@ -17,7 +18,7 @@ class CacheEntry {
 
 public class InMemoryTemplateCache implements TemplateCache {
 
-	HashMap<String, CacheEntry> cache = new HashMap<>();
+	Map<String, CacheEntry> cache = new ConcurrentHashMap<>();
 
 	public enum CacheMode {
 		NO_CACHE, CACHE_WITH_UPDATE_CHECK, CACHE_BUT_DO_NOT_CHECK_UPDATES,
