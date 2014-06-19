@@ -24,18 +24,18 @@ public class TemplateLoader {
 	public Irep compile(Path fileName, Syntax syntax) throws JTTError {
 		assert syntax != null;
 
+		{
+			Irep irep = this.templateCache.get(fileName);
+			if (irep != null) {
+				return irep;
+			}
+		}
+
 		for (Path path : includePaths) {
 			Path fullpath = path.resolve(fileName);
 			if (fullpath.toFile().exists()) {
-				{
-					Irep irep = this.templateCache.get(fullpath);
-					if (irep != null) {
-						return irep;
-					}
-				}
-
 				Irep irep = this.compileFile(fullpath, syntax);
-				this.templateCache.set(fullpath, irep);
+				this.templateCache.set(fileName, irep);
 				return irep;
 			}
 		}
