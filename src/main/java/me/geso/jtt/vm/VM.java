@@ -260,30 +260,13 @@ public class VM {
 				// Get an iterator object from TOS.
 				// Put iterator object on the loop stack.
 
-				Object container = stack.pop();
+				Iterator<Object> iterator = this.getIterator();
+				Loop loop = new Loop(iterator, pc);
+				loopStack.push(loop);
+				stack.push(loop.next());
 
-				if (container instanceof Collection) {
-					// TODO better casting
-					@SuppressWarnings("unchecked")
-					Iterator<Object> iterator = ((Collection<Object>) container)
-							.iterator();
-					Loop loop = new Loop(iterator, pc);
-					loopStack.push(loop);
-					stack.push(loop.next());
+				++pc;
 
-					++pc;
-				} else if(container instanceof BaseStream) {
-					@SuppressWarnings({ "unchecked", "rawtypes" })
-					Iterator<Object> iterator = ((BaseStream) container).iterator();
-					Loop loop = new Loop(iterator, pc);
-					loopStack.push(loop);
-					stack.push(loop.next());
-
-					++pc;
-				} else {
-					throw new RuntimeException(
-							"Non container type detected in FOREACH.");
-				}
 				break;
 			}
 			case FOR_ITER: {
@@ -796,4 +779,22 @@ public class VM {
 		}
 	}
 
+	// Get iterator from top of stack.
+	private Iterator<Object> getIterator() {
+		Object container = stack.pop();
+
+		if (container instanceof Collection) {
+			// TODO better casting
+			@SuppressWarnings("unchecked")
+			Iterator<Object> iterator = ((Collection<Object>) container)
+					.iterator();
+			return iterator;
+		} else if (container instanceof BaseStream) {
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			Iterator<Object> iterator = ((BaseStream) container).iterator();
+			return iterator;
+		} else {
+			throw this.createError("Non container type detected in FOREACH.");
+		}
+	}
 }

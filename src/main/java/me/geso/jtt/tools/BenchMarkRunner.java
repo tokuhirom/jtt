@@ -14,7 +14,7 @@ public class BenchMarkRunner {
 				new File("src/test/resources").toPath()).build();
 		for (int i = 0; i < 10000; ++i) {
 			Map<String, Object> vars = new HashMap<>();
-			vars.put("n", 1000000);
+			vars.put("n", 100000);
 			jtt.renderFile(new File("loop.tt"), vars);
 		}
 		System.out.println("done");
