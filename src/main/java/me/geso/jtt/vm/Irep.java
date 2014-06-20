@@ -18,7 +18,7 @@ public class Irep {
 	public Irep(List<Code> iseq, List<Object> pool,
 			List<Integer> lineNumbers, Source source) {
 		this.iseq = iseq.toArray(new Code[iseq.size()]);
-		this.pool = pool.toArray(new Object[iseq.size()]);
+		this.pool = pool.toArray(new Object[pool.size()]);
 		this.lineNumbers = lineNumbers.toArray(new Integer[lineNumbers.size()]);
 		this.source = source;
 	}
