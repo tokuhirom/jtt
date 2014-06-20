@@ -49,7 +49,7 @@ public class VM {
 	private final StringBuilder buffer;
 	private final Stack<Object> stack;
 	private final Stack<Loop> loopStack;
-	private final Stack<ArrayList<Object>> localVarStack;
+	private final ArrayList<Object> localVars;
 	private int pc;
 	private Map<String, Object> vars;
 
@@ -83,8 +83,7 @@ public class VM {
 		}
 		this.stack = new Stack<Object>();
 		this.loopStack = new Stack<Loop>();
-		this.localVarStack = new Stack<ArrayList<Object>>();
-		this.localVarStack.add(new ArrayList<Object>());
+		this.localVars = new ArrayList<Object>(irep.getLocalVariableCount());
 
 		this.pc = 0;
 	}
@@ -221,18 +220,12 @@ public class VM {
 				stack.push(null);
 				++pc;
 				break;
-			case SET_LVAR: {
-				Object o = stack.pop();
-				localVarStack.lastElement().add(code.arg1, o);
-				++pc;
+			case SET_LVAR:
+				opSetLvar(code);
 				break;
-			}
-			case LOAD_LVAR: {
-				Object o = localVarStack.lastElement().get(code.arg1);
-				stack.push(o);
-				++pc;
+			case LOAD_LVAR:
+				opLoadLvar(code);
 				break;
-			}
 			case GET_ELEM: { // a[0], a['hoge']
 				this.opGetElem();
 				++pc;
@@ -378,6 +371,18 @@ public class VM {
 				throw new RuntimeException("SHOULD NOT REACH HERE: " + code.op);
 			}
 		}
+	}
+
+	private void opLoadLvar(Code code) {
+		Object o = localVars.get(code.arg1);
+		stack.push(o);
+		++pc;
+	}
+
+	private void opSetLvar(Code code) {
+		Object o = stack.pop();
+		localVars.add(code.arg1, o);
+		++pc;
 	}
 
 	private void opAppend() {

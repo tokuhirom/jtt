@@ -81,12 +81,12 @@ public class IrepBuilder {
 		return iseq.size();
 	}
 
-	public Irep build() {
-		return new Irep(iseq, pool, this.lineNumbers, this.source);
+	public Irep build(int localVarsNum) {
+		return new Irep(iseq, pool, this.lineNumbers, this.source, localVarsNum);
 	}
 
 	public String toString() {
-		return new Disassembler().disasm(build());
+		return new Disassembler().disasm(build(0));
 	}
 
 }

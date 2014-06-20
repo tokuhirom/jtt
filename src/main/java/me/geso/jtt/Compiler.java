@@ -1,7 +1,10 @@
 package me.geso.jtt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import me.geso.jtt.exception.JTTCompilerError;
@@ -16,16 +19,33 @@ import me.geso.jtt.vm.OP;
 class Visitor {
 	private final IrepBuilder builder;
 	private final Stack<List<Code>> lastStack = new Stack<>();
-	private final Stack<List<String>> lvarStack = new Stack<>();
+	private final Stack<Map<String, Integer>> lvarStack = new Stack<>();
 	private final Stack<List<Code>> nextStack = new Stack<>();
+	private int lvarIndex = 0;
 
 	public Visitor(Source source) {
 		this.builder = new IrepBuilder(source);
 	}
 
-	public int reserveLocalVariable(String name) {
-		lvarStack.lastElement().add(name);
-		return lvarStack.lastElement().size() - 1;
+	public int declareLocalVariable(String name) {
+		Map<String, Integer> lastElement = lvarStack.lastElement();
+		int idx = lvarIndex++;
+		lastElement.put(name, idx);
+		return idx;
+	}
+
+	public Integer getLocalVariableIndex(String name) {
+		for (int i = 0; i < lvarStack.size(); ++i) {
+			Map<String, Integer> vars = lvarStack.get(i);
+			Iterator<String> iterator = vars.keySet().iterator();
+			while (iterator.hasNext()) {
+				String key = iterator.next();
+				if (key.equals(name)) {
+					return vars.get(key);
+				}
+			}
+		}
+		return null;
 	}
 
 	private void visitAst(Node node) {
@@ -152,7 +172,7 @@ class Visitor {
 
 			// first argument for switch stmt.
 			visitAst(node.getChildren().get(0));
-			int lvar = reserveLocalVariable(null);
+			int lvar = declareLocalVariable(null);
 			builder.add(OP.SET_LVAR, lvar, node);
 
 			for (int i = 1; i < node.getChildren().size(); ++i) {
@@ -197,13 +217,21 @@ class Visitor {
 			builder.add(OP.NOT, node);
 			break;
 		}
-		case IDENT:
-			builder.addPool(OP.LOAD_VAR, node.getText(), node);
+		case IDENT: {
+			Integer idx = this.getLocalVariableIndex(node.getText());
+			if (idx != null) {
+				// local variable
+				builder.add(OP.LOAD_LVAR, idx, node);
+			} else {
+				// global vars(maybe passed from external world)
+				builder.addPool(OP.LOAD_VAR, node.getText(), node);
+			}
 			break;
+		}
 		case STRING:
 			builder.addPool(OP.LOAD_CONST, node.getText(), node);
 			break;
-		case FOREACH: {
+		case FOREACH: { // [% FOR x IN y %]
 			assert node.getChildren().size() == 3;
 
 			Node var = node.getChildren().get(0);
@@ -213,7 +241,8 @@ class Visitor {
 			visitAst(container);
 			builder.add(OP.ITER_START, node);
 
-			builder.addPool(OP.SET_VAR, var.getText(), node);
+			int lvar = declareLocalVariable(var.getText());
+			builder.add(OP.SET_LVAR, lvar, node);
 
 			nextStack.add(new ArrayList<Code>());
 			lastStack.add(new ArrayList<Code>());
@@ -393,11 +422,11 @@ class Visitor {
 
 	public Irep getResult() {
 		builder.addReturn();
-		return builder.build();
+		return builder.build(this.lvarIndex+1);
 	}
 
 	public void start(Node ast) throws JTTCompilerError {
-		lvarStack.push(new ArrayList<>());
+		lvarStack.push(new HashMap<>());
 		this.visitAst(ast);
 	}
 }

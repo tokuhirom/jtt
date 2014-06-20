@@ -41,7 +41,7 @@ public class VMTest {
 		builder.addPool(OP.LOAD_CONST, "hoge", nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		String got = run(irep, new HashMap<>());
 		assertEquals("hoge", got);
 	}
@@ -55,7 +55,7 @@ public class VMTest {
 		builder.add(OP.ADD, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		String got = run(irep, new HashMap<>());
 		assertEquals("7", got);
 	}
@@ -69,7 +69,7 @@ public class VMTest {
 		builder.add(OP.SUBTRACT, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		String got = run(irep, new HashMap<>());
 		assertEquals("1", got);
 	}
@@ -86,7 +86,7 @@ public class VMTest {
 		builder.add(OP.GET_ELEM, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		String got = run(irep, new HashMap<>());
 		assertEquals("fuga", got);
 	}
@@ -104,7 +104,7 @@ public class VMTest {
 		builder.add(OP.GET_ELEM, nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		String got = run(irep, new HashMap<>());
 		assertEquals("Huh", got);
 	}
@@ -119,7 +119,7 @@ public class VMTest {
 		builder.addPool(OP.LOAD_VAR, "foo", nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		String got = run(irep, vars);
 		assertEquals("bar", got);
 	}
@@ -133,7 +133,7 @@ public class VMTest {
 		builder.addPool(OP.LOAD_VAR, "v", nop);
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 
 		String got = run(irep, new HashMap<String, Object>());
 		assertEquals("foo", got);
@@ -152,7 +152,7 @@ public class VMTest {
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.FOR_ITER, nop);
 		builder.add(OP.RETURN, nop);
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		String got = run(irep, vars);
 		assertEquals("foobar", got);
 	}
@@ -173,7 +173,7 @@ public class VMTest {
 		builder.add(OP.APPEND, nop);
 		builder.add(OP.RETURN, nop);
 
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		String got = run(irep, vars);
 		assertEquals("truefalse", got);
 	}
@@ -211,7 +211,7 @@ public class VMTest {
 
 		builder.add(OP.RETURN, nop);
 
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		String got = run(irep, vars);
 		assertEquals("truefalsefalsetrue", got);
 	}
@@ -219,7 +219,7 @@ public class VMTest {
 	@Test
 	public void testDoGE() throws JTTError {
 		IrepBuilder builder = newIrepBuilder();
-		Irep irep = builder.build();
+		Irep irep = builder.build(0);
 		VM vm = new VM(syntax, loader, null, null, new HTMLEscaper(), irep, new HashMap<>());
 
 		// 3 >= 4
