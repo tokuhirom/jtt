@@ -1,7 +1,6 @@
 package me.geso.jtt.escape;
 
 import static org.junit.Assert.*;
-import me.geso.jtt.JTTRawString;
 
 import org.junit.Test;
 
@@ -18,8 +17,6 @@ public class NullEscaperTest {
 	public void test() {
 		NullEscaper ne = new NullEscaper();
 		assertEquals(ne.escape("<>"), "<>");
-		assertEquals(ne.escape(new JTTRawString("<>")), "<>");
-		assertEquals(ne.escape(new Foo()), "<>");
 	}
 
 }

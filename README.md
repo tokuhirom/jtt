@@ -12,6 +12,10 @@ But most of features are implemented.
 
 API may change without notice.
 
+## Versioning
+
+This project respects semantic versioning.
+
 ## Architecture
 
   * VM has TemplateLoader

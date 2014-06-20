@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 
 import me.geso.jtt.Function;
 import me.geso.jtt.JTTMessageListener;
+import me.geso.jtt.JTTRawString;
 import me.geso.jtt.Syntax;
 import me.geso.jtt.TemplateLoader;
 import me.geso.jtt.escape.Escaper;
@@ -108,17 +109,9 @@ public class VM {
 				++pc;
 				break;
 			}
-			case APPEND: {
-				Object obj = stack.pop();
-				if (obj == null) {
-					warn("Appending null");
-					buffer.append("(null)");
-				} else {
-					buffer.append(escaper.escape(obj));
-				}
-				++pc;
+			case APPEND:
+				opAppend();
 				break;
-			}
 			case ADD: {
 				Object lhs = stack.pop();
 				Object rhs = stack.pop();
@@ -385,6 +378,19 @@ public class VM {
 				throw new RuntimeException("SHOULD NOT REACH HERE: " + code.op);
 			}
 		}
+	}
+
+	private void opAppend() {
+		Object obj = stack.pop();
+		if (obj == null) {
+			warn("Appending null");
+			buffer.append("(null)");
+		} else if (obj instanceof JTTRawString) {
+			buffer.append(((JTTRawString)obj).toString());
+		} else {
+			buffer.append(escaper.escape(obj.toString()));
+		}
+		++pc;
 	}
 
 	private void opSetVar(Object[] pool, Code code) {

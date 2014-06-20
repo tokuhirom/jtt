@@ -1,6 +1,6 @@
 package me.geso.jtt.escape;
 
-public class NullEscaper extends Escaper {
+public class NullEscaper implements Escaper {
 
 	@Override
 	public String escape(String string) {
