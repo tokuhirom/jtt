@@ -46,10 +46,11 @@ public class VM {
 	 * VM innerr status.
 	 */
 	private final StringBuilder buffer;
-	private final Stack<Object> stack;
+	private final Object[] stack;
 	private final Stack<Loop> loopStack;
 	private final Object[] localVars;
 	private int pc;
+	private int sp;
 	private Map<String, Object> vars;
 
 	private VM newVM(Irep irep, Map<String, Object> vars) {
@@ -65,6 +66,7 @@ public class VM {
 			throw new IllegalArgumentException("vars must not be null");
 		}
 
+		this.sp = 0;
 		this.loader = loader;
 		this.syntax = syntax;
 		this.functions = functions;
@@ -80,11 +82,25 @@ public class VM {
 		} else {
 			this.buffer = new StringBuilder();
 		}
-		this.stack = new Stack<Object>();
+		this.stack = new Object[irep.getIseq().length];
 		this.loopStack = new Stack<Loop>();
 		this.localVars = new Object[irep.getLocalVariableCount()];
 
 		this.pc = 0;
+	}
+	
+	/**
+	 * Push object to stack top.
+	 */
+	private void PUSH(Object object) {
+		this.stack[sp] = object;
+		++sp;
+	}
+
+	private Object POP() {
+		Object object = this.stack[sp-1];
+		--sp;
+		return object;
 	}
 
 	public String run() throws JTTError {
@@ -99,7 +115,7 @@ public class VM {
 
 			switch (code.op) {
 			case LOAD_CONST:
-				stack.push(pool[code.arg1]);
+				PUSH(pool[code.arg1]);
 				++pc;
 				break;
 			case APPEND_RAW: {
@@ -111,95 +127,95 @@ public class VM {
 				opAppend();
 				break;
 			case ADD: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doAdd(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doAdd(lhs, rhs));
 				++pc;
 				break;
 			}
 			case MODULO: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doModulo(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doModulo(lhs, rhs));
 				++pc;
 				break;
 			}
 			case SUBTRACT: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doSubtract(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doSubtract(lhs, rhs));
 				++pc;
 				break;
 			}
 			case MULTIPLY: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doMultiply(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doMultiply(lhs, rhs));
 				++pc;
 				break;
 			}
 			case DIVIDE: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doDivide(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doDivide(lhs, rhs));
 				++pc;
 				break;
 			}
 			case ANDAND: { // && operator
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(convertToBoolean(lhs) && convertToBoolean(rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(convertToBoolean(lhs) && convertToBoolean(rhs));
 				++pc;
 				break;
 			}
 			case OROR: { // && operator
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(convertToBoolean(lhs) || convertToBoolean(rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(convertToBoolean(lhs) || convertToBoolean(rhs));
 				++pc;
 				break;
 			}
 			case MATCH: // Smart match for SWITCH.
 			case EQUALS: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doEquals(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doEquals(lhs, rhs));
 				++pc;
 				break;
 			}
 			case NE: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doNotEquals(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doNotEquals(lhs, rhs));
 				++pc;
 				break;
 			}
 			case GT: {
-				assert stack.size() >= 2;
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doGT(lhs, rhs));
+				assert sp >= 2;
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doGT(lhs, rhs));
 				++pc;
 				break;
 			}
 			case GE: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doGE(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doGE(lhs, rhs));
 				++pc;
 				break;
 			}
 			case LT: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doLT(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doLT(lhs, rhs));
 				++pc;
 				break;
 			}
 			case LE: {
-				Object lhs = stack.pop();
-				Object rhs = stack.pop();
-				stack.push(doLE(lhs, rhs));
+				Object lhs = POP();
+				Object rhs = POP();
+				PUSH(doLE(lhs, rhs));
 				++pc;
 				break;
 			}
@@ -208,15 +224,15 @@ public class VM {
 				++pc;
 				break;
 			case LOAD_TRUE:
-				stack.push(Boolean.TRUE);
+				PUSH(Boolean.TRUE);
 				++pc;
 				break;
 			case LOAD_FALSE:
-				stack.push(Boolean.FALSE);
+				PUSH(Boolean.FALSE);
 				++pc;
 				break;
 			case LOAD_NULL:
-				stack.push(null);
+				PUSH(null);
 				++pc;
 				break;
 			case SET_LVAR:
@@ -239,9 +255,9 @@ public class VM {
 			case MAKE_ARRAY: {
 				LinkedList<Object> list = new LinkedList<Object>();
 				for (int i = 0; i < code.arg1; ++i) {
-					list.addFirst(stack.pop());
+					list.addFirst(POP());
 				}
-				stack.push(list);
+				PUSH(list);
 				++pc;
 				break;
 			}
@@ -263,7 +279,7 @@ public class VM {
 				pc = code.arg1;
 				break;
 			case JUMP_IF_FALSE: {
-				boolean b = isTrue(stack.pop());
+				boolean b = isTrue(POP());
 				if (!b) {
 					pc += code.arg1;
 				} else {
@@ -272,15 +288,15 @@ public class VM {
 				break;
 			}
 			case INCLUDE: {
-				String path = (String) stack.pop();
+				String path = (String) POP();
 				Irep compiledIrep = loader.compile(Paths.get(path), syntax);
 				String result = this.newVM(compiledIrep, vars).run();
-				stack.push(result);
+				PUSH(result);
 				++pc;
 				break;
 			}
 			case WRAP: {
-				String path = (String) stack.pop();
+				String path = (String) POP();
 				Irep compiledIrep = loader.compile(Paths.get(path), syntax);
 				HashMap<String, Object> newvars = new HashMap<>(vars);
 				newvars.put("content", buffer.toString());
@@ -292,77 +308,77 @@ public class VM {
 			}
 			case ATTRIBUTE: { // PUSH(POP()[POP()])
 				// container[index]
-				Object index = stack.pop();
-				Object container = stack.pop();
-				stack.push(this.getAttribute(container, index));
+				Object index = POP();
+				Object container = POP();
+				PUSH(this.getAttribute(container, index));
 				++pc;
 				break;
 			}
 			case MAKE_MAP: {
 				Map<String, Object> map = new HashMap<>();
 				for (int i = 0; i < code.arg1; ++i) {
-					Object value = stack.pop();
-					Object key = stack.pop();
+					Object value = POP();
+					Object key = POP();
 					map.put(key.toString(), value);
 				}
-				stack.push(map);
+				PUSH(map);
 				++pc;
 				break;
 			}
 			case LC: {
-				Object s = stack.pop();
-				stack.push(s.toString().toLowerCase());
+				Object s = POP();
+				PUSH(s.toString().toLowerCase());
 				++pc;
 				break;
 			}
 			case UC: {
-				Object s = stack.pop();
-				stack.push(s.toString().toUpperCase());
+				Object s = POP();
+				PUSH(s.toString().toUpperCase());
 				++pc;
 				break;
 			}
 			case URI_ESCAPE: {
-				Object o = stack.pop();
+				Object o = POP();
 				String escaped = UrlEscapers.urlFormParameterEscaper().escape(
 						o.toString());
-				stack.push(escaped);
+				PUSH(escaped);
 				++pc;
 				break;
 			}
 			case SPRINTF: {
 				Object[] args = new Object[code.arg1 - 1];
 				for (int i = 1; i < code.arg1; ++i) {
-					args[code.arg1 - i - 1] = stack.pop();
+					args[code.arg1 - i - 1] = POP();
 				}
-				String format = stack.pop().toString();
+				String format = POP().toString();
 				String result = String.format(format, args);
-				stack.push(result);
+				PUSH(result);
 				++pc;
 				break;
 			}
 			case FUNCALL: {
-				doFuncall(code.arg1, stack);
+				doFuncall(code.arg1);
 				++pc;
 				break;
 			}
 			case MAKE_RANGE: {
-				doMakeRange(stack);
+				doMakeRange();
 				++pc;
 				break;
 			}
 			case NOT: {
-				Boolean b = convertToBoolean(stack.pop());
-				stack.push(!b);
+				Boolean b = convertToBoolean(POP());
+				PUSH(!b);
 				++pc;
 				break;
 			}
 			case METHOD_CALL: {
-				stack.push(doMethodCall(code.arg1, stack));
+				PUSH(doMethodCall(code.arg1));
 				++pc;
 				break;
 			}
 			case LOOP: {
-				stack.push(loopStack.lastElement());
+				PUSH(loopStack.lastElement());
 				++pc;
 				break;
 			}
@@ -374,18 +390,18 @@ public class VM {
 
 	private void opLoadLvar(Code code) {
 		Object o = localVars[code.arg1];
-		stack.push(o);
+		PUSH(o);
 		++pc;
 	}
 
 	private void opSetLvar(Code code) {
-		Object o = stack.pop();
+		Object o = POP();
 		localVars[code.arg1] = o;
 		++pc;
 	}
 
 	private void opAppend() {
-		Object obj = stack.pop();
+		Object obj = POP();
 		if (obj == null) {
 			warn("Appending null");
 			buffer.append("(null)");
@@ -399,14 +415,14 @@ public class VM {
 
 	private void opSetVar(Object[] pool, Code code) {
 		// vars[pool[arg1]]=POP()
-		Object tos = stack.pop();
+		Object tos = POP();
 		vars.put((String) pool[code.arg1], tos);
 		++pc;
 	}
 
 	private void opLoadVar(Object[] pool, Code code) {
 		Object v = vars.get(pool[code.arg1]);
-		stack.push(v);
+		PUSH(v);
 		++pc;
 	}
 
@@ -417,7 +433,7 @@ public class VM {
 		Iterator<Object> iterator = this.getIterator();
 		Loop loop = new Loop(iterator, pc);
 		loopStack.push(loop);
-		stack.push(loop.next());
+		PUSH(loop.next());
 
 		++pc;
 	}
@@ -430,7 +446,7 @@ public class VM {
 		Loop loop = loopStack.lastElement();
 		if (loop.hasNext()) {
 			Object next = loop.next();
-			stack.push(next);
+			PUSH(next);
 			pc = loop.getPC() + 1;
 		} else {
 			loopStack.pop();
@@ -438,14 +454,14 @@ public class VM {
 		}
 	}
 
-	private Object doMethodCall(int paramCount, Stack<Object> stack) {
+	private Object doMethodCall(int paramCount) {
 		Object[] params = new Object[paramCount];
 		for (int i = 0; i < paramCount; ++i) {
-			params[paramCount - i - 1] = stack.pop();
+			params[paramCount - i - 1] = POP();
 		}
 
-		Object methodName = stack.pop();
-		Object object = stack.pop();
+		Object methodName = POP();
+		Object object = POP();
 
 		try {
 			MethodAccess access = methodAccessCache.get(object.getClass());
@@ -475,9 +491,9 @@ public class VM {
 		}
 	}
 
-	private void doMakeRange(Stack<Object> stack) throws JTTError {
-		Object lhs = stack.pop();
-		Object rhs = stack.pop();
+	private void doMakeRange() throws JTTError {
+		Object lhs = POP();
+		Object rhs = POP();
 		if (!(lhs instanceof Integer)) {
 			throw new JTTError(
 					"Left side of range construction operator should be Integer but : "
@@ -491,25 +507,25 @@ public class VM {
 
 		int startInclusive = ((Integer) lhs).intValue();
 		int endInclusive = ((Integer) rhs).intValue();
-		stack.push(IntStream.rangeClosed(startInclusive, endInclusive));
+		PUSH(IntStream.rangeClosed(startInclusive, endInclusive));
 	}
 
-	private void doFuncall(int arglen, Stack<Object> stack) {
-		Object method = stack.pop();
+	private void doFuncall(int arglen) {
+		Object method = POP();
 		if (method instanceof String) {
 			Function function = this.functions.get(method);
 			if (function != null) {
 				Object[] objects = new Object[arglen];
 				for (int i = 0; i < arglen; ++i) {
-					objects[arglen - i - 1] = stack.pop();
+					objects[arglen - i - 1] = POP();
 				}
-				stack.push(function.call(objects));
+				PUSH(function.call(objects));
 			} else {
 				warn("Unknown function: " + method);
 				for (int i = 0; i < arglen + 1; ++i) {
-					stack.pop();
+					POP();
 				}
-				stack.push(null);
+				PUSH(null);
 			}
 		} else {
 			throw new RuntimeException("NIY: " + method.getClass());
@@ -566,8 +582,8 @@ public class VM {
 	}
 
 	private void opConcat() {
-		final Object lhs = stack.pop();
-		final Object rhs = stack.pop();
+		final Object lhs = POP();
+		final Object rhs = POP();
 
 		StringBuilder builder = new StringBuilder();
 		if (lhs == null) {
@@ -581,7 +597,7 @@ public class VM {
 			builder.append(rhs.toString());
 		}
 
-		stack.push(builder.toString());
+		PUSH(builder.toString());
 	}
 
 	private void warn(String message) {
@@ -604,14 +620,14 @@ public class VM {
 	}
 
 	private void opGetElem() throws VMError {
-		Object key = stack.pop();
-		Object container = stack.pop();
+		Object key = POP();
+		Object container = POP();
 		if (container instanceof Map) {
 			Object elem = ((Map<?, ?>) container).get(key);
-			stack.push(elem);
+			PUSH(elem);
 		} else if (container instanceof List) {
 			Object elem = ((List<?>) container).get((Integer) key);
-			stack.push(elem);
+			PUSH(elem);
 		} else {
 			throw this.createError("Container must be List or Map: "
 					+ container.getClass());
@@ -815,7 +831,7 @@ public class VM {
 
 	// Get iterator from top of stack.
 	private Iterator<Object> getIterator() {
-		Object container = stack.pop();
+		Object container = POP();
 
 		if (container instanceof Collection) {
 			// TODO better casting
