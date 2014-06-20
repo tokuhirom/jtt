@@ -1,7 +1,6 @@
 package me.geso.jtt.vm;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,7 +48,7 @@ public class VM {
 	private final StringBuilder buffer;
 	private final Stack<Object> stack;
 	private final Stack<Loop> loopStack;
-	private final ArrayList<Object> localVars;
+	private final Object[] localVars;
 	private int pc;
 	private Map<String, Object> vars;
 
@@ -83,7 +82,7 @@ public class VM {
 		}
 		this.stack = new Stack<Object>();
 		this.loopStack = new Stack<Loop>();
-		this.localVars = new ArrayList<Object>(irep.getLocalVariableCount());
+		this.localVars = new Object[irep.getLocalVariableCount()];
 
 		this.pc = 0;
 	}
@@ -374,14 +373,14 @@ public class VM {
 	}
 
 	private void opLoadLvar(Code code) {
-		Object o = localVars.get(code.arg1);
+		Object o = localVars[code.arg1];
 		stack.push(o);
 		++pc;
 	}
 
 	private void opSetLvar(Code code) {
 		Object o = stack.pop();
-		localVars.add(code.arg1, o);
+		localVars[code.arg1] = o;
 		++pc;
 	}
 
