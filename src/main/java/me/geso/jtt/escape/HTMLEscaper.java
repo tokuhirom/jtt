@@ -24,7 +24,7 @@ public class HTMLEscaper extends Escaper {
 			// Integer doesn't need HTML escape.
 			return str.toString();
 		} else {
-			return this.escape(str.toString());
+			return HtmlEscapers.htmlEscaper().escape(str.toString());
 		}
 	}
 

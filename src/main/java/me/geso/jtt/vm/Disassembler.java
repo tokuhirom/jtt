@@ -13,6 +13,9 @@ public class Disassembler {
 			if (code.op == OP.LOAD_CONST) {
 				Object obj = irep.getPool()[code.arg1];
 				detail = obj == null ? "(null)" : " # PUSH(" + obj.toString() + ")";
+			} else if (code.op == OP.APPEND_RAW) {
+				Object obj = irep.getPool()[code.arg1];
+				detail = obj == null ? "(null)" : " # APPEND_RAW(" + escape(obj.toString()) + ")";
 			} else if (code.op == OP.LOAD_VAR) {
 				Object obj = irep.getPool()[code.arg1];
 				detail = obj == null ? "(null)" : " # " + obj.toString() + " = POP()";
@@ -39,5 +42,11 @@ public class Disassembler {
 		}
 
 		return buffer.toString();
+	}
+
+	private String escape(String s) {
+		s = s.replace("\\", "\\\\");
+		s = s.replace("\n", "\\n");
+		return s;
 	}
 }

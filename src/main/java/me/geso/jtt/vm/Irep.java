@@ -10,6 +10,10 @@ public class Irep {
 	private final Object[] pool;
 	private final Integer[] lineNumbers;
 	private final Source source;
+	/**
+	 * Save the last time string size.
+	 */
+	private int capacityHint = -1;
 
 	public Irep(List<Code> iseq, List<Object> pool,
 			List<Integer> lineNumbers, Source source) {
@@ -41,5 +45,13 @@ public class Irep {
 	
 	public List<String> getSourceLines() throws IOException {
 		return source.getSourceLines();
+	}
+	
+	public int getCapacityHint() {
+		return capacityHint;
+	}
+
+	public void setCapacityHint(int capacityHint) {
+		this.capacityHint = capacityHint;
 	}
 }

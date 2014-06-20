@@ -4,7 +4,6 @@ This file lists To-Does for JTT project.
 
 ## DOING
 
-* Fix the test case for in memory template cache.
 * Benchmarking with Velocity.
 
 ## TODO
@@ -12,6 +11,9 @@ This file lists To-Does for JTT project.
 * run `[% INCLUDE "hoge" WITH foo=bar %]`
 * compile `[% INCLUDE "hoge" WITH foo=bar %]`
 * benchmarking
+* register to sonatype
+* local variable should use list instead of map.
+* Should we add special op for loop.getCount()?
 
 ## DONE
 
@@ -83,3 +85,4 @@ This file lists To-Does for JTT project.
 * lex `[% WRAPPER %]`
 * parse `[% WRAPPER %]`
 * run `[% WRAPPER %]`
+* Fix the test case for in memory template cache.

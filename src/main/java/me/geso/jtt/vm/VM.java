@@ -53,7 +53,8 @@ public class VM {
 	private Map<String, Object> vars;
 
 	private VM newVM(Irep irep, Map<String, Object> vars) {
-		return new VM(syntax, loader, functions, warningListener, escaper, irep, vars);
+		return new VM(syntax, loader, functions, warningListener, escaper,
+				irep, vars);
 	}
 
 	public VM(Syntax syntax, TemplateLoader loader,
@@ -73,7 +74,12 @@ public class VM {
 		this.irep = irep;
 		this.vars = vars;
 
-		this.buffer = new StringBuilder();
+		int capacityHint = irep.getCapacityHint();
+		if (capacityHint >= 0) {
+			this.buffer = new StringBuilder(capacityHint);
+		} else {
+			this.buffer = new StringBuilder();
+		}
 		this.stack = new Stack<Object>();
 		this.loopStack = new Stack<Loop>();
 		this.localVarStack = new Stack<ArrayList<Object>>();
@@ -239,19 +245,12 @@ public class VM {
 				++pc;
 				break;
 			}
-			case LOAD_VAR: {
-				Object v = vars.get(pool[code.arg1]);
-				stack.push(v);
-				++pc;
+			case LOAD_VAR:
+				opLoadVar(pool, code);
 				break;
-			}
-			case SET_VAR: {
-				// vars[pool[arg1]]=POP()
-				Object tos = stack.pop();
-				vars.put((String) pool[code.arg1], tos);
-				++pc;
+			case SET_VAR:
+				opSetVar(pool, code);
 				break;
-			}
 			case MAKE_ARRAY: {
 				LinkedList<Object> list = new LinkedList<Object>();
 				for (int i = 0; i < code.arg1; ++i) {
@@ -261,46 +260,23 @@ public class VM {
 				++pc;
 				break;
 			}
-			case RETURN:
-				return buffer.toString();
-			case ITER_START: {
-				// Get an iterator object from TOS.
-				// Put iterator object on the loop stack.
-
-				Iterator<Object> iterator = this.getIterator();
-				Loop loop = new Loop(iterator, pc);
-				loopStack.push(loop);
-				stack.push(loop.next());
-
-				++pc;
-
-				break;
+			case RETURN: {
+				String result = new String(buffer);
+				this.irep.setCapacityHint(result.length());
+				return result;
 			}
-			case FOR_ITER: {
-				// FOR_ITER()
-
-				assert loopStack.size() > 0;
-
-				Loop loop = loopStack.lastElement();
-				if (loop.hasNext()) {
-					Object next = loop.next();
-					stack.push(next);
-					pc = loop.getPC() + 1;
-				} else {
-					loopStack.pop();
-					++pc;
-				}
-
+			case ITER_START:
+				opIterStart();
 				break;
-			}
-			case JUMP: {
+			case FOR_ITER:
+				opForIter();
+				break;
+			case JUMP:
 				pc += code.arg1;
 				break;
-			}
-			case JUMP_ABS: {
+			case JUMP_ABS:
 				pc = code.arg1;
 				break;
-			}
 			case JUMP_IF_FALSE: {
 				boolean b = isTrue(stack.pop());
 				if (!b) {
@@ -408,6 +384,47 @@ public class VM {
 			default:
 				throw new RuntimeException("SHOULD NOT REACH HERE: " + code.op);
 			}
+		}
+	}
+
+	private void opSetVar(Object[] pool, Code code) {
+		// vars[pool[arg1]]=POP()
+		Object tos = stack.pop();
+		vars.put((String) pool[code.arg1], tos);
+		++pc;
+	}
+
+	private void opLoadVar(Object[] pool, Code code) {
+		Object v = vars.get(pool[code.arg1]);
+		stack.push(v);
+		++pc;
+	}
+
+	private void opIterStart() {
+		// Get an iterator object from TOS.
+		// Put iterator object on the loop stack.
+
+		Iterator<Object> iterator = this.getIterator();
+		Loop loop = new Loop(iterator, pc);
+		loopStack.push(loop);
+		stack.push(loop.next());
+
+		++pc;
+	}
+
+	private void opForIter() {
+		// FOR_ITER()
+
+		assert loopStack.size() > 0;
+
+		Loop loop = loopStack.lastElement();
+		if (loop.hasNext()) {
+			Object next = loop.next();
+			stack.push(next);
+			pc = loop.getPC() + 1;
+		} else {
+			loopStack.pop();
+			++pc;
 		}
 	}
 
