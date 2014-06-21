@@ -146,6 +146,7 @@ public class VMTest {
 
 		IrepBuilder builder = newIrepBuilder();
 		builder.addPool(OP.LOAD_CONST, Lists.newArrayList("foo", "bar"), nop);
+		builder.increaseLoopStackSize();
 		builder.add(OP.ITER_START, nop);
 		builder.addPool(OP.SET_VAR, "v", nop);
 		builder.addPool(OP.LOAD_VAR, "v", nop);

@@ -240,6 +240,7 @@ class Visitor {
 
 			visitAst(container);
 			builder.add(OP.ITER_START, node);
+			builder.increaseLoopStackSize();
 
 			int lvar = declareLocalVariable(var.getText());
 			builder.add(OP.SET_LVAR, lvar, node);

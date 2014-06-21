@@ -20,6 +20,7 @@ public class IrepBuilder {
 	private final Map<Object, Integer> poolSeen = new HashMap<Object, Integer>();
 	private final List<Integer> lineNumbers = new ArrayList<>();
 	private final Source source;
+	private int loopStackSize = 0;
 
 	public IrepBuilder(Source source) {
 		this.source = source;
@@ -82,7 +83,11 @@ public class IrepBuilder {
 	}
 
 	public Irep build(int localVarsNum) {
-		return new Irep(iseq, pool, this.lineNumbers, this.source, localVarsNum);
+		return new Irep(iseq, pool, this.lineNumbers, this.source, localVarsNum, this.loopStackSize);
+	}
+	
+	public void increaseLoopStackSize() {
+		this.loopStackSize++;
 	}
 
 	public String toString() {

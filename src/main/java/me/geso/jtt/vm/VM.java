@@ -47,10 +47,11 @@ public class VM {
 	 */
 	private final StringBuilder buffer;
 	private final Object[] stack;
-	private final Stack<Loop> loopStack;
+	private final Loop[] loopStack;
 	private final Object[] localVars;
 	private int pc;
 	private int sp;
+	private int loopSP;
 	private Map<String, Object> vars;
 
 	private VM newVM(Irep irep, Map<String, Object> vars) {
@@ -67,6 +68,7 @@ public class VM {
 		}
 
 		this.sp = 0;
+		this.loopSP = 0;
 		this.loader = loader;
 		this.syntax = syntax;
 		this.functions = functions;
@@ -83,7 +85,7 @@ public class VM {
 			this.buffer = new StringBuilder();
 		}
 		this.stack = new Object[irep.getIseq().length];
-		this.loopStack = new Stack<Loop>();
+		this.loopStack = new Loop[irep.getLoopStackSize()];
 		this.localVars = new Object[irep.getLocalVariableCount()];
 
 		this.pc = 0;
@@ -378,7 +380,7 @@ public class VM {
 				break;
 			}
 			case LOOP: {
-				PUSH(loopStack.lastElement());
+				PUSH(loopStack[loopSP-1]);
 				++pc;
 				break;
 			}
@@ -432,7 +434,8 @@ public class VM {
 
 		Iterator<Object> iterator = this.getIterator();
 		Loop loop = new Loop(iterator, pc);
-		loopStack.push(loop);
+		loopStack[loopSP] = loop;
+		++loopSP;
 		PUSH(loop.next());
 
 		++pc;
@@ -441,15 +444,15 @@ public class VM {
 	private void opForIter() {
 		// FOR_ITER()
 
-		assert loopStack.size() > 0;
+		assert loopSP > 0;
 
-		Loop loop = loopStack.lastElement();
+		Loop loop = loopStack[loopSP-1];
 		if (loop.hasNext()) {
 			Object next = loop.next();
 			PUSH(next);
 			pc = loop.getPC() + 1;
 		} else {
-			loopStack.pop();
+			--loopSP;
 			++pc;
 		}
 	}
