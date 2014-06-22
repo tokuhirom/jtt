@@ -12,7 +12,6 @@ This file lists To-Does for JTT project.
 * compile `[% INCLUDE "hoge" WITH foo=bar %]`
 * benchmarking
 * register to sonatype
-* local variable should use list instead of map.
 * Remove unused enum elements
 * Constant folding
 * We should deprecate SET_LVAR with register.
@@ -96,3 +95,4 @@ This file lists To-Does for JTT project.
 * Fix the test case for in memory template cache.
 * Benchmarking with Velocity.
 * Add LOAD_INT op.
+* local variable should use list instead of map.
