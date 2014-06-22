@@ -384,7 +384,7 @@ public class TTParserTest {
     public void testRangeOperator() throws ParserError {
         Node node = parse("[% 1..3 %]");
         assertEquals(
-                "(template (expression (range (integer 3) (integer 1))))",
+                "(template (expression (range (integer 1) (integer 3))))",
                 node.toString());
     }
 

@@ -36,7 +36,7 @@ public class Irep {
 	}
 
 	public String toString() {
-		return new Disassembler().disasm(this);
+		return new Disassembler().disasm(this, -1);
 	}
 
 	public int getLineNumber(int pos) {
@@ -65,5 +65,9 @@ public class Irep {
 
 	public int getLoopStackSize() {
 		return loopStackSize;
+	}
+
+	public int getRegisterSize() {
+		return this.getIseq().length;
 	}
 }

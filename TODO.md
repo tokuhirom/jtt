@@ -4,7 +4,7 @@ This file lists To-Does for JTT project.
 
 ## DOING
 
-* Benchmarking with Velocity.
+* Make it register machine
 
 ## TODO
 
@@ -13,6 +13,14 @@ This file lists To-Does for JTT project.
 * benchmarking
 * register to sonatype
 * local variable should use list instead of map.
+* Remove unused enum elements
+* Constant folding
+* We should deprecate SET_LVAR with register.
+* `[% FOR i IN [] %]` ... Empty array can't work in the iterator.
+* `[% {}.getKeys() %]` ... Empty hash
+
+## PENDING
+
 * Should we add special op for loop.getCount()?
 
 ## DONE
@@ -86,3 +94,5 @@ This file lists To-Does for JTT project.
 * parse `[% WRAPPER %]`
 * run `[% WRAPPER %]`
 * Fix the test case for in memory template cache.
+* Benchmarking with Velocity.
+* Add LOAD_INT op.

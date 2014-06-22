@@ -45,11 +45,10 @@ public class VM {
 	 * VM innerr status.
 	 */
 	private final StringBuilder buffer;
-	private final Object[] stack;
+	private final Object[] regs;
 	private final Loop[] loopStack;
 	private final Object[] localVars;
 	private int pc;
-	private int sp;
 	private int loopSP;
 	private Map<String, Object> vars;
 
@@ -66,7 +65,6 @@ public class VM {
 			throw new IllegalArgumentException("vars must not be null");
 		}
 
-		this.sp = 0;
 		this.loopSP = 0;
 		this.loader = loader;
 		this.syntax = syntax;
@@ -83,25 +81,12 @@ public class VM {
 		} else {
 			this.buffer = new StringBuilder();
 		}
-		this.stack = new Object[irep.getIseq().length];
+		// TODO optimize register size.
+		this.regs = new Object[irep.getRegisterSize()];
 		this.loopStack = new Loop[irep.getLoopStackSize()];
 		this.localVars = new Object[irep.getLocalVariableCount()];
 
 		this.pc = 0;
-	}
-	
-	/**
-	 * Push object to stack top.
-	 */
-	private void PUSH(Object object) {
-		this.stack[sp] = object;
-		++sp;
-	}
-
-	private Object POP() {
-		Object object = this.stack[sp-1];
-		--sp;
-		return object;
 	}
 
 	public String run() throws JTTError {
@@ -116,124 +101,103 @@ public class VM {
 
 			switch (code.op) {
 			case LOAD_CONST:
-				PUSH(pool[code.arg1]);
+				assert code.b != -1;
+				regs[code.b] = pool[code.a];
+				++pc;
+				break;
+			case LOAD_INT:
+				regs[code.b] = code.a;
 				++pc;
 				break;
 			case APPEND_RAW: {
-				buffer.append(pool[code.arg1]);
+				buffer.append(pool[code.a]);
 				++pc;
 				break;
 			}
 			case APPEND:
-				opAppend();
+				opAppend(code);
 				break;
 			case ADD: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doAdd(lhs, rhs));
+				regs[code.a] = doAdd(regs[code.a], regs[code.b]);
 				++pc;
 				break;
 			}
 			case MODULO: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doModulo(lhs, rhs));
+				regs[code.a] = doModulo(regs[code.a], regs[code.b]);
 				++pc;
 				break;
 			}
 			case SUBTRACT: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doSubtract(lhs, rhs));
+				regs[code.a] = doSubtract(regs[code.a], regs[code.b]);
 				++pc;
 				break;
 			}
 			case MULTIPLY: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doMultiply(lhs, rhs));
+				regs[code.a] = doMultiply(regs[code.a], regs[code.b]);
 				++pc;
 				break;
 			}
 			case DIVIDE: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doDivide(lhs, rhs));
+				regs[code.a] = doDivide(regs[code.a], regs[code.b]);
 				++pc;
 				break;
 			}
 			case ANDAND: { // && operator
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(convertToBoolean(lhs) && convertToBoolean(rhs));
+				regs[code.a] = convertToBoolean(regs[code.a])
+						&& convertToBoolean(regs[code.b]);
 				++pc;
 				break;
 			}
 			case OROR: { // && operator
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(convertToBoolean(lhs) || convertToBoolean(rhs));
+				regs[code.a] = convertToBoolean(regs[code.a])
+						|| convertToBoolean(regs[code.b]);
 				++pc;
 				break;
 			}
 			case MATCH: // Smart match for SWITCH.
 			case EQUALS: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doEquals(lhs, rhs));
+				regs[code.a] = doEquals(regs[code.a], regs[code.b]);
 				++pc;
 				break;
 			}
-			case NE: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doNotEquals(lhs, rhs));
+			case NE:
+				regs[code.a] = doNotEquals(regs[code.a], regs[code.b]);
 				++pc;
 				break;
-			}
-			case GT: {
-				assert sp >= 2;
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doGT(lhs, rhs));
+			case GT:
+				regs[code.a] = doGT(regs[code.a], regs[code.b]);
 				++pc;
 				break;
-			}
-			case GE: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doGE(lhs, rhs));
+			case GE:
+				regs[code.a] = doGE(regs[code.a], regs[code.b]);
 				++pc;
 				break;
-			}
-			case LT: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doLT(lhs, rhs));
+			case LT:
+				regs[code.a] = doLT(regs[code.a], regs[code.b]);
 				++pc;
 				break;
-			}
-			case LE: {
-				Object lhs = POP();
-				Object rhs = POP();
-				PUSH(doLE(lhs, rhs));
+			case LE:
+				regs[code.a] = doLE(regs[code.a], regs[code.b]);
 				++pc;
 				break;
-			}
 			case CONCAT:
-				opConcat();
+				regs[code.a] = opConcat(regs[code.a], regs[code.b]);
 				++pc;
 				break;
 			case LOAD_TRUE:
-				PUSH(Boolean.TRUE);
+				regs[code.a] = Boolean.TRUE;
 				++pc;
 				break;
 			case LOAD_FALSE:
-				PUSH(Boolean.FALSE);
+				regs[code.a] = Boolean.FALSE;
 				++pc;
 				break;
 			case LOAD_NULL:
-				PUSH(null);
+				regs[code.a] = null;
+				++pc;
+				break;
+			case MOVE:
+				regs[code.a] = regs[code.b];
 				++pc;
 				break;
 			case SET_LVAR:
@@ -243,7 +207,7 @@ public class VM {
 				opLoadLvar(code);
 				break;
 			case GET_ELEM: { // a[0], a['hoge']
-				this.opGetElem();
+				this.opGetElem(code);
 				++pc;
 				break;
 			}
@@ -255,10 +219,10 @@ public class VM {
 				break;
 			case MAKE_ARRAY: {
 				LinkedList<Object> list = new LinkedList<Object>();
-				for (int i = 0; i < code.arg1; ++i) {
-					list.addFirst(POP());
+				for (int i = 0; i < code.b; ++i) {
+					list.add(regs[code.a + i]);
 				}
-				PUSH(list);
+				regs[code.a] = list;
 				++pc;
 				break;
 			}
@@ -268,36 +232,36 @@ public class VM {
 				return result;
 			}
 			case ITER_START:
-				opIterStart();
+				opIterStart(code);
 				break;
 			case FOR_ITER:
-				opForIter();
+				opForIter(code);
 				break;
 			case JUMP:
-				pc += code.arg1;
+				pc += code.a;
 				break;
 			case JUMP_ABS:
-				pc = code.arg1;
+				pc = code.a;
 				break;
 			case JUMP_IF_FALSE: {
-				boolean b = isTrue(POP());
+				boolean b = isTrue(regs[code.a]);
 				if (!b) {
-					pc += code.arg1;
+					pc += code.b;
 				} else {
 					++pc;
 				}
 				break;
 			}
 			case INCLUDE: {
-				String path = (String) POP();
+				String path = (String) regs[code.a];
 				Irep compiledIrep = loader.compile(Paths.get(path), syntax);
 				String result = this.newVM(compiledIrep, vars).run();
-				PUSH(result);
+				regs[code.a] = result;
 				++pc;
 				break;
 			}
 			case WRAP: {
-				String path = (String) POP();
+				String path = (String) regs[code.a];
 				Irep compiledIrep = loader.compile(Paths.get(path), syntax);
 				HashMap<String, Object> newvars = new HashMap<>(vars);
 				newvars.put("content", buffer.toString());
@@ -307,79 +271,71 @@ public class VM {
 				++pc;
 				break;
 			}
-			case ATTRIBUTE: { // PUSH(POP()[POP()])
-				// container[index]
-				Object index = POP();
-				Object container = POP();
-				PUSH(this.getAttribute(container, index));
+			case ATTRIBUTE: {
+				regs[code.a] = this.getAttribute(regs[code.a], regs[code.b]);
 				++pc;
 				break;
 			}
 			case MAKE_MAP: {
 				Map<String, Object> map = new HashMap<>();
-				for (int i = 0; i < code.arg1; ++i) {
-					Object value = POP();
-					Object key = POP();
+				for (int i = 0; i < code.b; i += 2) {
+					Object key = regs[code.a + i];
+					Object value = regs[code.a + i + 1];
 					map.put(key.toString(), value);
 				}
-				PUSH(map);
+				regs[code.a] = map;
 				++pc;
 				break;
 			}
 			case LC: {
-				Object s = POP();
-				PUSH(s.toString().toLowerCase());
+				regs[code.a] = regs[code.a].toString().toLowerCase();
 				++pc;
 				break;
 			}
 			case UC: {
-				Object s = POP();
-				PUSH(s.toString().toUpperCase());
+				regs[code.a] = regs[code.a].toString().toUpperCase();
 				++pc;
 				break;
 			}
 			case URI_ESCAPE: {
-				Object o = POP();
-				String escaped = UrlEscapers.urlFormParameterEscaper().escape(
-						o.toString());
-				PUSH(escaped);
+				regs[code.a] = UrlEscapers.urlFormParameterEscaper().escape(
+						regs[code.a].toString());
 				++pc;
 				break;
 			}
 			case SPRINTF: {
-				Object[] args = new Object[code.arg1 - 1];
-				for (int i = 1; i < code.arg1; ++i) {
-					args[code.arg1 - i - 1] = POP();
+				Object[] args = new Object[code.b - 1];
+				for (int i = 1; i < code.b; ++i) {
+					args[i - 1] = regs[code.a + i];
 				}
-				String format = POP().toString();
+				String format = regs[code.a].toString();
 				String result = String.format(format, args);
-				PUSH(result);
+				regs[code.a] = result;
 				++pc;
 				break;
 			}
 			case FUNCALL: {
-				doFuncall(code.arg1);
+				doFuncall(code);
 				++pc;
 				break;
 			}
 			case MAKE_RANGE: {
-				doMakeRange();
+				doMakeRange(code);
 				++pc;
 				break;
 			}
 			case NOT: {
-				Boolean b = convertToBoolean(POP());
-				PUSH(!b);
+				regs[code.a] = !convertToBoolean(regs[code.a]);
 				++pc;
 				break;
 			}
 			case METHOD_CALL: {
-				PUSH(doMethodCall(code.arg1));
+				regs[code.a] = doMethodCall(code);
 				++pc;
 				break;
 			}
 			case LOOP: {
-				PUSH(loopStack[loopSP-1]);
+				regs[code.a] = loopStack[loopSP - 1];
 				++pc;
 				break;
 			}
@@ -390,24 +346,27 @@ public class VM {
 	}
 
 	private void opLoadLvar(Code code) {
-		Object o = localVars[code.arg1];
-		PUSH(o);
+		regs[code.b] = localVars[code.a];
 		++pc;
 	}
 
 	private void opSetLvar(Code code) {
-		Object o = POP();
-		localVars[code.arg1] = o;
+		localVars[code.a] = regs[code.b];
 		++pc;
 	}
 
-	private void opAppend() {
-		Object obj = POP();
+	/**
+	 * Append regs[A] into string builder.
+	 * 
+	 * @param code
+	 */
+	private void opAppend(Code code) {
+		Object obj = regs[code.a];
 		if (obj == null) {
 			warn("Appending null");
 			buffer.append("(null)");
 		} else if (obj instanceof JTTRawString) {
-			buffer.append(((JTTRawString)obj).toString());
+			buffer.append(((JTTRawString) obj).toString());
 		} else {
 			buffer.append(escaper.escape(obj.toString()));
 		}
@@ -415,40 +374,57 @@ public class VM {
 	}
 
 	private void opSetVar(Object[] pool, Code code) {
-		// vars[pool[arg1]]=POP()
-		Object tos = POP();
-		vars.put((String) pool[code.arg1], tos);
+		vars.put((String) pool[code.a], regs[code.b]);
 		++pc;
 	}
 
 	private void opLoadVar(Object[] pool, Code code) {
-		Object v = vars.get(pool[code.arg1]);
-		PUSH(v);
+		regs[code.b] = vars.get(pool[code.a]);
 		++pc;
 	}
 
-	private void opIterStart() {
-		// Get an iterator object from TOS.
-		// Put iterator object on the loop stack.
-
-		Iterator<Object> iterator = this.getIterator();
+	/**
+	 * Start new iterator. Created new iterator will put on the regs[A].
+	 */
+	private void opIterStart(Code code) {
+		Object container = regs[code.a];
+		Iterator<Object> iterator = this.getIterator(container);
 		Loop loop = new Loop(iterator, pc);
 		loopStack[loopSP] = loop;
 		++loopSP;
-		PUSH(loop.next());
+		regs[code.a] = loop.next();
 
 		++pc;
 	}
 
-	private void opForIter() {
+	// Get iterator from top of stack.
+	private Iterator<Object> getIterator(Object container) {
+		if (container instanceof Collection) {
+			// TODO better casting
+			@SuppressWarnings("unchecked")
+			Iterator<Object> iterator = ((Collection<Object>) container)
+					.iterator();
+			return iterator;
+		} else if (container instanceof BaseStream) {
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			Iterator<Object> iterator = ((BaseStream) container).iterator();
+			return iterator;
+		} else {
+			throw this.createError("Non container type detected in FOREACH.");
+		}
+	}
+
+	/**
+	 * Get next element from the current iterator.
+	 */
+	private void opForIter(Code code) {
 		// FOR_ITER()
 
 		assert loopSP > 0;
 
-		Loop loop = loopStack[loopSP-1];
+		Loop loop = loopStack[loopSP - 1];
 		if (loop.hasNext()) {
-			Object next = loop.next();
-			PUSH(next);
+			regs[code.a] = loop.next();
 			pc = loop.getPC() + 1;
 		} else {
 			--loopSP;
@@ -456,14 +432,14 @@ public class VM {
 		}
 	}
 
-	private Object doMethodCall(int paramCount) {
-		Object[] params = new Object[paramCount];
-		for (int i = 0; i < paramCount; ++i) {
-			params[paramCount - i - 1] = POP();
+	private Object doMethodCall(Code code) {
+		Object[] params = new Object[code.b];
+		for (int i = 0; i < code.b; ++i) {
+			params[i] = regs[code.a + i + 2];
 		}
 
-		Object methodName = POP();
-		Object object = POP();
+		Object methodName = regs[code.a + 1];
+		Object object = regs[code.a];
 
 		try {
 			MethodAccess access = methodAccessCache.get(object.getClass());
@@ -493,9 +469,9 @@ public class VM {
 		}
 	}
 
-	private void doMakeRange() throws JTTError {
-		Object lhs = POP();
-		Object rhs = POP();
+	private void doMakeRange(Code code) throws JTTError {
+		Object lhs = regs[code.a];
+		Object rhs = regs[code.b];
 		if (!(lhs instanceof Integer)) {
 			throw new JTTError(
 					"Left side of range construction operator should be Integer but : "
@@ -509,25 +485,22 @@ public class VM {
 
 		int startInclusive = ((Integer) lhs).intValue();
 		int endInclusive = ((Integer) rhs).intValue();
-		PUSH(IntStream.rangeClosed(startInclusive, endInclusive));
+		regs[code.a] = IntStream.rangeClosed(startInclusive, endInclusive);
 	}
 
-	private void doFuncall(int arglen) {
-		Object method = POP();
+	private void doFuncall(Code code) {
+		Object method = regs[code.a];
 		if (method instanceof String) {
 			Function function = this.functions.get(method);
 			if (function != null) {
-				Object[] objects = new Object[arglen];
-				for (int i = 0; i < arglen; ++i) {
-					objects[arglen - i - 1] = POP();
+				Object[] objects = new Object[code.b];
+				for (int i = 0; i < code.b; ++i) {
+					objects[i] = regs[code.a + 1 + i];
 				}
-				PUSH(function.call(objects));
+				regs[code.a] = function.call(objects);
 			} else {
 				warn("Unknown function: " + method);
-				for (int i = 0; i < arglen + 1; ++i) {
-					POP();
-				}
-				PUSH(null);
+				regs[code.a] = null;
 			}
 		} else {
 			throw new RuntimeException("NIY: " + method.getClass());
@@ -583,10 +556,7 @@ public class VM {
 		}
 	}
 
-	private void opConcat() {
-		final Object lhs = POP();
-		final Object rhs = POP();
-
+	private Object opConcat(Object lhs, Object rhs) {
 		StringBuilder builder = new StringBuilder();
 		if (lhs == null) {
 			warn("null in string concatenation.");
@@ -599,7 +569,7 @@ public class VM {
 			builder.append(rhs.toString());
 		}
 
-		PUSH(builder.toString());
+		return builder.toString();
 	}
 
 	private void warn(String message) {
@@ -621,15 +591,15 @@ public class VM {
 		return true;
 	}
 
-	private void opGetElem() throws VMError {
-		Object key = POP();
-		Object container = POP();
+	private void opGetElem(Code code) throws VMError {
+		Object container = regs[code.a];
+		Object key = regs[code.b];
 		if (container instanceof Map) {
 			Object elem = ((Map<?, ?>) container).get(key);
-			PUSH(elem);
+			regs[code.a] = elem;
 		} else if (container instanceof List) {
 			Object elem = ((List<?>) container).get((Integer) key);
-			PUSH(elem);
+			regs[code.a] = elem;
 		} else {
 			throw this.createError("Container must be List or Map: "
 					+ container.getClass());
@@ -831,22 +801,16 @@ public class VM {
 		}
 	}
 
-	// Get iterator from top of stack.
-	private Iterator<Object> getIterator() {
-		Object container = POP();
-
-		if (container instanceof Collection) {
-			// TODO better casting
-			@SuppressWarnings("unchecked")
-			Iterator<Object> iterator = ((Collection<Object>) container)
-					.iterator();
-			return iterator;
-		} else if (container instanceof BaseStream) {
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			Iterator<Object> iterator = ((BaseStream) container).iterator();
-			return iterator;
-		} else {
-			throw this.createError("Non container type detected in FOREACH.");
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Regs: [");
+		for (Object o : this.regs) {
+			builder.append(o);
+			builder.append(",");
 		}
+		builder.append("]\n");
+		builder.append(new Disassembler().disasm(this.irep, this.pc));
+		return new String(builder);
 	}
+
 }

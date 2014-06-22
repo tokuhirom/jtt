@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import me.geso.jtt.exception.JTTCompilerError;
+import me.geso.jtt.exception.JTTError;
 import me.geso.jtt.exception.ParserError;
 import me.geso.jtt.parser.Node;
 import me.geso.jtt.parser.NodeType;
@@ -22,6 +23,7 @@ class Visitor {
 	private final Stack<Map<String, Integer>> lvarStack = new Stack<>();
 	private final Stack<List<Code>> nextStack = new Stack<>();
 	private int lvarIndex = 0;
+	private int regIndex = 0;
 
 	public Visitor(Source source) {
 		this.builder = new IrepBuilder(source);
@@ -48,98 +50,127 @@ class Visitor {
 		return null;
 	}
 
-	private void visitAst(Node node) {
+	private void visitAst(Node node, int reg) {
 		switch (node.getType()) {
-		case EXPRESSION:
-			for (Node n : node.getChildren()) {
-				visitAst(n);
+		case EXPRESSION: {
+			int a = this.reserveReg();
+			for (int i = 0; i < node.getChildren().size(); ++i) {
+				visitAst(node.getChildren().get(i), a);
 			}
 			if (node.getChildren().get(0).getType() != NodeType.SET) {
-				builder.add(OP.APPEND, node);
+				builder.add(OP.APPEND, a, node);
 			}
-			break;
+			return;
+		}
 		case TEMPLATE:
 			for (Node n : node.getChildren()) {
-				visitAst(n);
+				visitAst(n, reg);
 			}
-			break;
-		case ARRAY:
-			for (Node n : node.getChildren()) {
-				visitAst(n);
+			return;
+		case ARRAY: {
+			if (node.getChildren().size() > 0) {
+				int[] srcRegs = new int[node.getChildren().size()];
+				for (int i = 0; i < node.getChildren().size(); ++i) {
+					srcRegs[i] = this.reserveReg();
+				}
+
+				for (int i = 0; i < node.getChildren().size(); ++i) {
+					visitAst(node.getChildren().get(i), srcRegs[i]);
+				}
+				builder.add(OP.MAKE_ARRAY, srcRegs[0], node.getChildren()
+						.size(), node);
+				builder.add(OP.MOVE, reg, srcRegs[0], node);
+				return;
+			} else {
+				builder.add(OP.MAKE_ARRAY, reg, 0, node);
 			}
-			builder.add(OP.MAKE_ARRAY, node.getChildren().size(), node);
-			break;
+			return;
+		}
 		case ADD:
-			compileBinOp(node, OP.ADD);
-			break;
+			compileBinOp(node, OP.ADD, reg);
+			return;
 		case SUBTRACT:
-			compileBinOp(node, OP.SUBTRACT);
-			break;
+			compileBinOp(node, OP.SUBTRACT, reg);
+			return;
 		case MULTIPLY:
-			compileBinOp(node, OP.MULTIPLY);
-			break;
+			compileBinOp(node, OP.MULTIPLY, reg);
+			return;
 		case DIVIDE:
-			compileBinOp(node, OP.DIVIDE);
-			break;
+			compileBinOp(node, OP.DIVIDE, reg);
+			return;
 		case MODULO:
-			compileBinOp(node, OP.MODULO);
-			break;
+			compileBinOp(node, OP.MODULO, reg);
+			return;
 		case EQUALS:
-			compileBinOp(node, OP.EQUALS);
-			break;
+			compileBinOp(node, OP.EQUALS, reg);
+			return;
 		case GT:
-			compileBinOp(node, OP.GT);
-			break;
+			compileBinOp(node, OP.GT, reg);
+			return;
 		case GE:
-			compileBinOp(node, OP.GE);
-			break;
+			compileBinOp(node, OP.GE, reg);
+			return;
 		case LT:
-			compileBinOp(node, OP.LT);
-			break;
+			compileBinOp(node, OP.LT, reg);
+			return;
 		case LE:
-			compileBinOp(node, OP.LE);
-			break;
+			compileBinOp(node, OP.LE, reg);
+			return;
 		case NE:
-			compileBinOp(node, OP.NE);
-			break;
+			compileBinOp(node, OP.NE, reg);
+			return;
 		case CONCAT:
-			compileBinOp(node, OP.CONCAT);
-			break;
+			compileBinOp(node, OP.CONCAT, reg);
+			return;
 		case ANDAND:
-			compileBinOp(node, OP.ANDAND);
-			break;
+			compileBinOp(node, OP.ANDAND, reg);
+			return;
 		case OROR:
-			compileBinOp(node, OP.OROR);
-			break;
+			compileBinOp(node, OP.OROR, reg);
+			return;
 		case RAW_STRING:
 			builder.addPool(OP.APPEND_RAW, node.getText(), node);
-			break;
+			return;
 		case INTEGER:
-			builder.addPool(OP.LOAD_CONST, Integer.valueOf(node.getText()),
-					node);
-			break;
+			if (reg == -1) {
+				throw new JTTError("'integer' in void context");
+			}
+			builder.add(OP.LOAD_INT, Integer.valueOf(node.getText()), reg, node);
+			return;
 		case DOUBLE:
-			builder.addPool(OP.LOAD_CONST, Double.valueOf(node.getText()), node);
-			break;
+			if (reg == -1) {
+				throw new JTTError("'double' in void context");
+			}
+			builder.addPool(OP.LOAD_CONST, Double.valueOf(node.getText()), reg,
+					node);
+			return;
 		case LOOP:
-			builder.add(OP.LOOP, node);
-			break;
+			builder.add(OP.LOOP, reg, node);
+			return;
 		case TRUE:
-			builder.add(OP.LOAD_TRUE, node);
-			break;
+			if (reg == -1) {
+				throw new JTTError("'true' in void context");
+			}
+			builder.add(OP.LOAD_TRUE, reg, node);
+			return;
 		case FALSE:
-			builder.add(OP.LOAD_FALSE, node);
-			break;
+			builder.add(OP.LOAD_FALSE, reg, node);
+			return;
 		case NULL:
-			builder.add(OP.LOAD_NULL, node);
-			break;
+			builder.add(OP.LOAD_NULL, reg, node);
+			return;
 		case SET: {
 			// (set ident expr)
 			Node ident = node.getChildren().get(0);
 			Node expr = node.getChildren().get(1);
-			visitAst(expr);
-			builder.addPool(OP.SET_VAR, ident.getText(), node);
-			break;
+			// int a = this.reserveReg();
+			// visitAst(expr, a);
+			// int lvar = this.declareLocalVariable(ident.getText());
+			// builder.addPool(OP.SET_LVAR, lvar, a, node);
+			int a = this.reserveReg();
+			visitAst(expr, a);
+			builder.addPool(OP.SET_VAR, ident.getText(), a, node);
+			return;
 		}
 		case IF: {
 			// (if cond body else)
@@ -148,21 +179,22 @@ class Visitor {
 			Node bodyClause = children.get(1);
 			Node elseClause = children.get(2);
 
-			visitAst(condClause);
-			Code condJump = builder.addLazy(OP.JUMP_IF_FALSE, condClause);
+			int a = this.reserveReg();
+			visitAst(condClause, a);
+			Code condJump = builder.addLazy(OP.JUMP_IF_FALSE, a, condClause);
 			int pos = builder.getSize();
-			visitAst(bodyClause);
+			visitAst(bodyClause, reg);
 			if (elseClause != null) {
 				Code code = builder.addLazy(OP.JUMP, elseClause);
 
-				condJump.arg1 = builder.getSize() - pos + 1;
+				condJump.b = builder.getSize() - pos + 1;
 				int elseStart = builder.getSize();
-				visitAst(elseClause);
-				code.arg1 = builder.getSize() - elseStart + 1;
+				visitAst(elseClause, reg);
+				code.a = builder.getSize() - elseStart + 1;
 			} else {
-				condJump.arg1 = builder.getSize() - pos + 1;
+				condJump.b = builder.getSize() - pos + 1;
 			}
-			break;
+			return;
 		}
 		case SWITCH: {
 			// (template (switch (case (integer 1) (template (raw_string
@@ -170,10 +202,11 @@ class Visitor {
 			// (template (raw_string c)))))"
 			ArrayList<Code> gotoLast = new ArrayList<>();
 
+			int varReg = this.reserveReg();
+			int tmpReg = this.reserveReg();
+
 			// first argument for switch stmt.
-			visitAst(node.getChildren().get(0));
-			int lvar = declareLocalVariable(null);
-			builder.add(OP.SET_LVAR, lvar, node);
+			visitAst(node.getChildren().get(0), varReg);
 
 			for (int i = 1; i < node.getChildren().size(); ++i) {
 				Node n = node.getChildren().get(i);
@@ -181,17 +214,18 @@ class Visitor {
 				if (n.getType() == NodeType.CASE) {
 					if (n.getChildren().get(0) != null) {
 						// condition
-						builder.add(OP.LOAD_LVAR, lvar, n);
-						visitAst(n.getChildren().get(0));
-						builder.add(OP.MATCH, n);
-						Code jmp = builder.addLazy(OP.JUMP_IF_FALSE, n);
+						int b = this.reserveReg();
+						visitAst(n.getChildren().get(0), b);
+						builder.add(OP.MOVE, tmpReg, varReg, n);
+						builder.add(OP.MATCH, tmpReg, b, n);
+						Code jmp = builder.addLazy(OP.JUMP_IF_FALSE, tmpReg, n);
 						int pos = builder.getSize();
 						// body
-						visitAst(n.getChildren().get(1));
+						visitAst(n.getChildren().get(1), -1);
 						gotoLast.add(builder.addLazy(OP.JUMP_ABS, n));
-						jmp.arg1 = builder.getSize() - pos + 1;
+						jmp.b = builder.getSize() - pos + 1;
 					} else {
-						visitAst(n.getChildren().get(1));
+						visitAst(n.getChildren().get(1), -1);
 						gotoLast.add(builder.addLazy(OP.JUMP_ABS, n));
 					}
 				} else {
@@ -199,38 +233,60 @@ class Visitor {
 				}
 			}
 			for (Code c : gotoLast) {
-				c.arg1 = builder.getSize();
+				c.a = builder.getSize();
 			}
-			break;
+			return;
 		}
 		case RANGE: {
 			assert node.getChildren().size() == 2;
 			Node lhs = node.getChildren().get(0);
 			Node rhs = node.getChildren().get(1);
-			visitAst(lhs);
-			visitAst(rhs);
-			builder.add(OP.MAKE_RANGE, node);
-			break;
+			visitAst(lhs, reg);
+			int b = this.reserveReg();
+			visitAst(rhs, b);
+			builder.add(OP.MAKE_RANGE, reg, b, node);
+			return;
 		}
 		case NOT: {
-			visitAst(node.getChildren().get(0));
-			builder.add(OP.NOT, node);
-			break;
+			visitAst(node.getChildren().get(0), reg);
+			builder.add(OP.NOT, reg, node);
+			return;
 		}
 		case IDENT: {
+			if (reg == -1) {
+				throw new JTTError("ident in void context.");
+			}
 			Integer idx = this.getLocalVariableIndex(node.getText());
 			if (idx != null) {
 				// local variable
-				builder.add(OP.LOAD_LVAR, idx, node);
+				builder.add(OP.LOAD_LVAR, idx, reg, node);
 			} else {
 				// global vars(maybe passed from external world)
-				builder.addPool(OP.LOAD_VAR, node.getText(), node);
+				builder.addPool(OP.LOAD_VAR, node.getText(), reg, node);
 			}
-			break;
+			return;
+		}
+		case DOLLARVAR: {
+			if (reg == -1) {
+				throw new JTTError("ident in void context.");
+			}
+
+			Integer idx = this.getLocalVariableIndex(node.getText());
+			if (idx != null) {
+				// local variable
+				builder.add(OP.LOAD_LVAR, idx, reg, node);
+			} else {
+				// global vars(maybe passed from external world)
+				builder.addPool(OP.LOAD_VAR, node.getText(), reg, node);
+			}
+			return;
 		}
 		case STRING:
-			builder.addPool(OP.LOAD_CONST, node.getText(), node);
-			break;
+			if (reg == -1) {
+				throw new JTTError("'string' in void context");
+			}
+			builder.addPool(OP.LOAD_CONST, node.getText(), reg, node);
+			return;
 		case FOREACH: { // [% FOR x IN y %]
 			assert node.getChildren().size() == 3;
 
@@ -238,33 +294,34 @@ class Visitor {
 			Node container = node.getChildren().get(1);
 			Node body = node.getChildren().get(2);
 
-			visitAst(container);
-			builder.add(OP.ITER_START, node);
+			int containerReg = this.reserveReg();
+			visitAst(container, containerReg);
+			builder.add(OP.ITER_START, containerReg, node);
 			builder.increaseLoopStackSize();
 
 			int lvar = declareLocalVariable(var.getText());
-			builder.add(OP.SET_LVAR, lvar, node);
+			builder.add(OP.SET_LVAR, lvar, containerReg, node);
 
 			nextStack.add(new ArrayList<Code>());
 			lastStack.add(new ArrayList<Code>());
 
-			visitAst(body);
+			visitAst(body, -1);
 
 			int nextPos = builder.getSize();
-			builder.add(OP.FOR_ITER, node);
+			builder.add(OP.FOR_ITER, containerReg, node);
 			int lastPos = builder.getSize();
 
 			for (Code code : lastStack.lastElement()) {
-				code.arg1 = lastPos;
+				code.a = lastPos;
 			}
 			lastStack.pop();
 
 			for (Code code : nextStack.lastElement()) {
-				code.arg1 = nextPos;
+				code.a = nextPos;
 			}
 			nextStack.pop();
 
-			break;
+			return;
 		}
 		case WHILE: {
 			// (while expr body)
@@ -275,124 +332,162 @@ class Visitor {
 
 			int nextPos = builder.getSize();
 
-			visitAst(expr);
+			int exprReg = this.reserveReg();
+			visitAst(expr, exprReg);
 
-			Code jumpAfterCond = builder.addLazy(OP.JUMP_IF_FALSE, expr);
+			Code jumpAfterCond = builder.addLazy(OP.JUMP_IF_FALSE, exprReg,
+					expr);
 			int afterExprPos = builder.getSize();
 
 			nextStack.add(new ArrayList<Code>());
 			lastStack.add(new ArrayList<Code>());
 
-			visitAst(body);
+			visitAst(body, -1);
 
 			builder.add(OP.JUMP, pos - builder.getSize(), node);
-			jumpAfterCond.arg1 = builder.getSize() - afterExprPos + 1;
+			jumpAfterCond.b = builder.getSize() - afterExprPos + 1;
 
 			for (Code code : lastStack.lastElement()) {
-				code.arg1 = builder.getSize();
+				code.a = builder.getSize();
 			}
 			lastStack.pop();
 
 			for (Code code : nextStack.lastElement()) {
-				code.arg1 = nextPos;
+				code.a = nextPos;
 			}
 			nextStack.pop();
 
-			break;
+			return;
 		}
 		case NEXT: {
 			Code code = builder.addLazy(OP.JUMP_ABS, node);
 			nextStack.lastElement().add(code);
-			break;
+			return;
 		}
 		case LAST: {
 			Code code = builder.addLazy(OP.JUMP_ABS, node);
 			lastStack.lastElement().add(code);
-			break;
+			return;
 		}
 		case INCLUDE: {
-			visitAst(node.getChildren().get(0));
-			builder.add(OP.INCLUDE, node);
-			builder.add(OP.APPEND, node);
-			break;
+			int a = this.reserveReg();
+			visitAst(node.getChildren().get(0), a);
+			builder.add(OP.INCLUDE, a, node);
+			builder.add(OP.APPEND, a, node);
+			return;
 		}
 		case ATTRIBUTE: {
 			Node key = node.getChildren().get(0);
 			Node val = node.getChildren().get(1);
 
-			visitAst(key);
-			visitAst(val);
+			visitAst(key, reg);
+			int b = this.reserveReg();
+			visitAst(val, b);
 
-			builder.add(OP.ATTRIBUTE, node);
-			break;
+			builder.add(OP.ATTRIBUTE, reg, b, node);
+			return;
 		}
 		case MAP: {
 			List<Node> children = node.getChildren();
+			int[] regs = new int[children.size()];
+			for (int i = 0; i < children.size(); i++) {
+				regs[i] = this.reserveReg();
+			}
 			for (int i = 0; i < children.size(); i += 2) {
 				Node key = children.get(i);
 				Node value = children.get(i + 1);
 				if (key.getType() == NodeType.IDENT) {
-					builder.addPool(OP.LOAD_CONST, key.getText(), node);
+					builder.addPool(OP.LOAD_CONST, key.getText(), regs[i], node);
 				} else {
-					visitAst(key);
+					visitAst(key, regs[i]);
 				}
-				visitAst(value);
+				visitAst(value, regs[i + 1]);
 			}
 
-			builder.add(OP.MAKE_MAP, children.size() / 2, node);
-			break;
-		}
-		case DOLLARVAR: {
-			builder.addPool(OP.LOAD_VAR, node.getText(), node);
-			break;
+			builder.add(OP.MAKE_MAP, regs[0], children.size(), node);
+			builder.add(OP.MOVE, reg, regs[0], node);
+			return;
 		}
 		case FUNCALL: {
 			Node func = node.getChildren().get(0);
 			if (func.getType() == NodeType.IDENT) {
-				// [% lc(3) %]
-				for (int i = 1; i < node.getChildren().size(); ++i) {
-					visitAst(node.getChildren().get(i));
-				}
 				if (func.getText().equals("lc")) {
 					if (node.getChildren().size() - 1 != 1) {
 						throw new JTTCompilerError(
 								"Invalid argument count for 'lc'");
 					}
-					builder.add(OP.LC, node.getChildren().size() - 1, func);
+					visitAst(node.getChildren().get(1), reg);
+					builder.add(OP.LC, reg, func);
+					return;
 				} else if (func.getText().equals("uc")) {
 					if (node.getChildren().size() - 1 != 1) {
 						throw new JTTCompilerError(
 								"Invalid argument count for 'uc'");
 					}
-					builder.add(OP.UC, node.getChildren().size() - 1, node);
-				} else if (func.getText().equals("sprintf")) {
-					builder.add(OP.SPRINTF, node.getChildren().size() - 1, node);
+					visitAst(node.getChildren().get(1), reg);
+					builder.add(OP.UC, reg, func);
+					return;
 				} else if (func.getText().equals("uri")
 						|| func.getText().equals("url")) {
 					if (node.getChildren().size() - 1 != 1) {
 						throw new JTTCompilerError(
 								"Invalid argument count for 'ur[il]'");
 					}
-					builder.add(OP.URI_ESCAPE, node.getChildren().size() - 1,
-							node);
+					visitAst(node.getChildren().get(1), reg);
+					builder.add(OP.URI_ESCAPE, reg, func);
+					return;
+				} else if (func.getText().equals("sprintf")) {
+					int[] regs = new int[node.getChildren().size()];
+					for (int i = 0; i < node.getChildren().size() - 1; ++i) {
+						regs[i] = this.reserveReg();
+					}
+					for (int i = 1; i < node.getChildren().size(); ++i) {
+						visitAst(node.getChildren().get(i), regs[i - 1]);
+					}
+					builder.add(OP.SPRINTF, regs[0],
+							node.getChildren().size() - 1, func);
+					builder.add(OP.MOVE, reg, regs[0], func);
+					return;
 				} else {
-					builder.addPool(OP.LOAD_CONST, func.getText(), node);
-					builder.add(OP.FUNCALL, node.getChildren().size() - 1, node);
+					// [% lc(3) %]
+					// (funcall (ident twice) (integer 3))
+					int[] regs = new int[node.getChildren().size()];
+					for (int i = 0; i < node.getChildren().size(); ++i) {
+						regs[i] = this.reserveReg();
+					}
+					builder.addPool(OP.LOAD_CONST, func.getText(), regs[0], node);
+					for (int i = 1; i < node.getChildren().size(); ++i) {
+						visitAst(node.getChildren().get(i), regs[i]);
+					}
+					builder.add(OP.FUNCALL, regs[0],
+							node.getChildren().size() - 1, node);
+					builder.add(OP.MOVE, reg, regs[0], node);
+					return;
 				}
 			} else if (func.getType() == NodeType.ATTRIBUTE) {
-				visitAst(func.getChildren().get(0)); // object
-				builder.addPool(OP.LOAD_CONST, func.getChildren().get(1)
-						.getText(), node); // method name
-				for (int i = 1; i < node.getChildren().size(); ++i) {
-					visitAst(node.getChildren().get(i));
+				// (funcall (attribute (array (integer 5) (integer 9) (integer
+				// 6) (integer 3)) (string size)))
+				// (funcall (attribute (string hoge) (string substring))
+				// (integer 2))
+				int[] regs = new int[node.getChildren().size() + 1];
+				for (int i = 0; i < node.getChildren().size() + 1; ++i) {
+					regs[i] = this.reserveReg();
 				}
-				builder.add(OP.METHOD_CALL, node.getChildren().size() - 1, node);
+				visitAst(func.getChildren().get(0), regs[0]); // object
+				builder.addPool(OP.LOAD_CONST, func.getChildren().get(1)
+						.getText(), regs[1], node); // method name
+				for (int i = 1; i < node.getChildren().size(); ++i) {
+					visitAst(node.getChildren().get(i), regs[i + 1]);
+				}
+				builder.add(OP.METHOD_CALL, regs[0],
+						node.getChildren().size() - 1, node);
+				builder.add(OP.MOVE, reg, regs[0], node);
 			} else {
 				throw new RuntimeException("Invalid funcall : "
 						+ func.getType());
 				// builder.add(OP.FUNCALL, node.getChildren().size() - 1);
 			}
-			break;
+			return;
 		}
 		case WRAPPER: {
 			// (template (wrapper (string foo.tt) (template (raw_string
@@ -400,35 +495,46 @@ class Visitor {
 			String fileName = node.getChildren().get(0).getText();
 			Node body = node.getChildren().get(1);
 
-			visitAst(body);
+			visitAst(body, -1);
+			int a = this.reserveReg();
+			builder.addPool(OP.LOAD_CONST, fileName, a, node);
+			builder.add(OP.WRAP, a, node);
 
-			builder.addPool(OP.LOAD_CONST, fileName, node);
-			builder.add(OP.WRAP, node);
-
-			break;
+			return;
 		}
-		default:
+		case DEFAULT:
+		case CASE:
+			// Because SWITCH handler eats the node.
 			throw new RuntimeException("Should not reach here: "
 					+ node.getType());
 		}
+
+		throw new RuntimeException("Should not reach here: " + node.getType());
 	}
 
-	void compileBinOp(Node node, OP op) throws JTTCompilerError {
+	private int reserveReg() {
+		int r = regIndex;
+		++regIndex;
+		return r;
+	}
+
+	private void compileBinOp(Node node, OP op, int reg)
+			throws JTTCompilerError {
 		assert node.getChildren().size() == 2;
-		for (int i = node.getChildren().size() - 1; i >= 0; --i) {
-			visitAst(node.getChildren().get(i));
-		}
-		builder.add(op, node);
+		visitAst(node.getChildren().get(0), reg);
+		int b = this.reserveReg();
+		visitAst(node.getChildren().get(1), b);
+		builder.add(op, reg, b, node);
 	}
 
 	public Irep getResult() {
 		builder.addReturn();
-		return builder.build(this.lvarIndex+1);
+		return builder.build(this.lvarIndex + 1);
 	}
 
 	public void start(Node ast) throws JTTCompilerError {
 		lvarStack.push(new HashMap<>());
-		this.visitAst(ast);
+		this.visitAst(ast, -1);
 	}
 }
 
