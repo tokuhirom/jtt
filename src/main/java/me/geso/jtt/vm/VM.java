@@ -81,8 +81,7 @@ public class VM {
 		} else {
 			this.buffer = new StringBuilder();
 		}
-		// TODO optimize register size.
-		this.regs = new Object[irep.getRegisterSize()];
+		this.regs = new Object[irep.getRegisterCount()];
 		this.loopStack = new Loop[irep.getLoopStackSize()];
 		this.localVars = new Object[irep.getLocalVariableCount()];
 

@@ -25,7 +25,7 @@ public class IrepBuilder {
 	public IrepBuilder(Source source) {
 		this.source = source;
 	}
-	
+
 	public int getLineNumber(int pc) {
 		return lineNumbers.get(pc);
 	}
@@ -106,16 +106,17 @@ public class IrepBuilder {
 		return iseq.size();
 	}
 
-	public Irep build(int localVarsNum) {
-		return new Irep(iseq, pool, this.lineNumbers, this.source, localVarsNum, this.loopStackSize);
+	public Irep build(int localVarsNum, int registerNum) {
+		return new Irep(iseq, pool, this.lineNumbers, this.source,
+				localVarsNum, this.loopStackSize, registerNum);
 	}
-	
+
 	public void increaseLoopStackSize() {
 		this.loopStackSize++;
 	}
 
 	public String toString() {
-		return new Disassembler().disasm(build(0), -1);
+		return new Disassembler().disasm(build(0, 0), -1);
 	}
 
 }

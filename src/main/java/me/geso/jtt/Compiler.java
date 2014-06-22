@@ -529,7 +529,7 @@ class Visitor {
 
 	public Irep getResult() {
 		builder.addReturn();
-		return builder.build(this.lvarIndex + 1);
+		return builder.build(this.lvarIndex + 1, this.regIndex+1);
 	}
 
 	public void start(Node ast) throws JTTCompilerError {

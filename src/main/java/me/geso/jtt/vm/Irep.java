@@ -16,15 +16,17 @@ public class Irep {
 	private int capacityHint = -1;
 	private final int localVariableCount;
 	private final int loopStackSize;
+	private final int registerCount;
 
 	public Irep(List<Code> iseq, List<Object> pool,
-			List<Integer> lineNumbers, Source source, int localVariableCount, int loopStackSize) {
+			List<Integer> lineNumbers, Source source, int localVariableCount, int loopStackSize, int registerCount) {
 		this.iseq = iseq.toArray(new Code[iseq.size()]);
 		this.pool = pool.toArray(new Object[pool.size()]);
 		this.lineNumbers = lineNumbers.toArray(new Integer[lineNumbers.size()]);
 		this.source = source;
 		this.localVariableCount = localVariableCount;
 		this.loopStackSize = loopStackSize;
+		this.registerCount = registerCount;
 	}
 
 	public Code[] getIseq() {
@@ -67,7 +69,7 @@ public class Irep {
 		return loopStackSize;
 	}
 
-	public int getRegisterSize() {
-		return this.getIseq().length;
+	public int getRegisterCount() {
+		return registerCount;
 	}
 }

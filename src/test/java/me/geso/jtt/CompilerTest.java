@@ -259,7 +259,6 @@ public class CompilerTest {
 	@Test
 	public void testWhile() throws JTTCompilerError, ParserError, IOException,
 			TemplateLoadingError {
-		Map<String, Object> vars = new HashMap<String, Object>();
 		assertEquals(
 				"321ok",
 				eval("[% SET x=3 %][% WHILE x > 0 %][% x %][% SET x = x - 1 %][% END %]ok"));
@@ -320,8 +319,8 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testConditionalOperator2() throws JTTCompilerError, ParserError,
-			IOException, TemplateLoadingError {
+	public void testConditionalOperator2() throws JTTCompilerError,
+			ParserError, IOException, TemplateLoadingError {
 		assertEquals("43ok", eval("[% true ? 4 : 9 %][% false ? 5 : 3 %]ok"));
 	}
 
@@ -592,6 +591,7 @@ public class CompilerTest {
 		List<Token> tokens = syntax.tokenize(source, srcString);
 		Node ast = syntax.parse(source, tokens);
 		Irep irep = syntax.compile(source, ast);
-		return new VM(syntax, loader, null, null, new HTMLEscaper(), irep, vars).run();
+		return new VM(syntax, loader, null, null, new HTMLEscaper(), irep, vars)
+				.run();
 	}
 }
