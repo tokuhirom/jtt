@@ -100,8 +100,8 @@ public class Disassembler {
 			return String.format(" # regs[%d] = regs[%d] - regs[%d]", code.a,
 					code.a, code.b);
 		case FUNCALL:
-			return String.format(" # regs[%d] = funcall(regs[%d]..regs[%d])", code.a,
-					code.a, code.b);
+			return String.format(" # regs[%d] = funcall(regs[%d]..regs[%d])",
+					code.a, code.a, code.b);
 		case APPEND_RAW: {
 			Object obj = irep.getPool()[code.a];
 			return obj == null ? "(null)" : " # APPEND_RAW("
@@ -111,9 +111,9 @@ public class Disassembler {
 			return " # GOTO " + (code.a + pc);
 		case JUMP_IF_FALSE:
 			return " # GOTO " + (code.b + pc) + " UNLESS " + code.a;
+		default: // Support all types.
+			return "";
 		}
-		// TODO: Support all operators.
-		return "";
 	}
 
 	private String escape(String s) {
