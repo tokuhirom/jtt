@@ -25,7 +25,7 @@ public class IrepBuilder {
 	public IrepBuilder(Source source) {
 		this.source = source;
 	}
-	
+
 	public int getLineNumber(int pc) {
 		return lineNumbers.get(pc);
 	}
@@ -55,8 +55,20 @@ public class IrepBuilder {
 		return code;
 	}
 
-	public void add(OP op, int i, Node node) {
-		iseq.add(new Code(op, i));
+	public Code addLazy(OP op, int a, Node node) {
+		Code code = new Code(op, a);
+		iseq.add(code);
+		lineNumbers.add(node.getLineNumber());
+		return code;
+	}
+
+	public void add(OP op, int a, Node node) {
+		iseq.add(new Code(op, a));
+		lineNumbers.add(node.getLineNumber());
+	}
+
+	public void add(OP op, int a, int b, Node node) {
+		iseq.add(new Code(op, a, b));
 		lineNumbers.add(node.getLineNumber());
 	}
 
@@ -78,20 +90,33 @@ public class IrepBuilder {
 		}
 	}
 
+	public void addPool(OP op, Object o, int dst, Node node) {
+		if (poolSeen.containsKey(o)) {
+			Integer i = poolSeen.get(o);
+			this.add(op, i, dst, node);
+		} else {
+			pool.add(o);
+			Integer a = pool.size() - 1;
+			this.add(op, a, dst, node);
+			poolSeen.put(o, a);
+		}
+	}
+
 	public int getSize() {
 		return iseq.size();
 	}
 
-	public Irep build(int localVarsNum) {
-		return new Irep(iseq, pool, this.lineNumbers, this.source, localVarsNum, this.loopStackSize);
+	public Irep build(int localVarsNum, int registerNum) {
+		return new Irep(iseq, pool, this.lineNumbers, this.source,
+				localVarsNum, this.loopStackSize, registerNum);
 	}
-	
+
 	public void increaseLoopStackSize() {
 		this.loopStackSize++;
 	}
 
 	public String toString() {
-		return new Disassembler().disasm(build(0));
+		return new Disassembler().disasm(build(0, 0), -1);
 	}
 
 }

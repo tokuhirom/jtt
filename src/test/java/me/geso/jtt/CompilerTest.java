@@ -32,6 +32,7 @@ public class CompilerTest {
 		assertEquals("hoge", eval("hoge"));
 	}
 
+	// (template (raw_string hoge) (expression (integer 5963)))
 	@Test
 	public void testInt() throws JTTCompilerError, ParserError, IOException,
 			TemplateLoadingError {
@@ -166,7 +167,8 @@ public class CompilerTest {
 	@Test
 	public void testArray() throws JTTCompilerError, ParserError, IOException,
 			TemplateLoadingError {
-		assertEquals("123", eval("[% FOR x IN [1,2,3,] %][% x %][% END %]"));
+		assertEquals("5963", eval("[% FOR x IN [5,9,6,3,] %][% x %][% END %]"));
+		// assertEquals("", eval("[% FOR x IN [] %][% x %][% END %]"));
 	}
 
 	@Test
@@ -313,6 +315,12 @@ public class CompilerTest {
 	@Test
 	public void testConditionalOperator() throws JTTCompilerError, ParserError,
 			IOException, TemplateLoadingError {
+		assertEquals("4", eval("[% true ? 4 : 9 %]"));
+	}
+
+	@Test
+	public void testConditionalOperator2() throws JTTCompilerError,
+			ParserError, IOException, TemplateLoadingError {
 		assertEquals("43ok", eval("[% true ? 4 : 9 %][% false ? 5 : 3 %]ok"));
 	}
 
@@ -328,11 +336,7 @@ public class CompilerTest {
 	@Test
 	public void testMapLiteral() throws JTTCompilerError, ParserError,
 			IOException, TemplateLoadingError {
-		Map<String, Object> map = new HashMap<>();
-		map.put("hoge", "fuga");
-
 		Map<String, Object> vars = new HashMap<String, Object>();
-		vars.put("o", map);
 
 		assertEquals("fuga",
 				eval("[% {hoge=>\"fuga\", gogo=>4649}.hoge %]", vars));
@@ -487,6 +491,16 @@ public class CompilerTest {
 			IOException, TemplateLoadingError {
 		assertEquals(
 				"9",
+				eval("[% ary[i] %]",
+						ImmutableMap.of("i", 1, "ary",
+								Lists.newArrayList(5, 9, 6, 3))));
+	}
+
+	@Test
+	public void testArrayAccess2() throws JTTCompilerError, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals(
+				"9",
 				eval("[% ary[$i] %]",
 						ImmutableMap.of("i", 1, "ary",
 								Lists.newArrayList(5, 9, 6, 3))));
@@ -577,6 +591,7 @@ public class CompilerTest {
 		List<Token> tokens = syntax.tokenize(source, srcString);
 		Node ast = syntax.parse(source, tokens);
 		Irep irep = syntax.compile(source, ast);
-		return new VM(syntax, loader, null, null, new HTMLEscaper(), irep, vars).run();
+		return new VM(syntax, loader, null, null, new HTMLEscaper(), irep, vars)
+				.run();
 	}
 }

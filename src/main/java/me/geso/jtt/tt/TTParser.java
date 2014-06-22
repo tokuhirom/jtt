@@ -688,8 +688,8 @@ class TTParser implements Parser {
 				}
 
 				List<Node> children = new ArrayList<>();
-				children.add(l);
 				children.add(n);
+				children.add(l);
 				n = new Node(NodeType.RANGE, children, PREV_LINE_NUMBER());
 			}
 		}
