@@ -30,6 +30,7 @@ public class InMemoryTemplateCache implements TemplateCache {
 		this.cacheMode = cacheMode;
 	}
 
+	// TODO We should care the relative file path.
 	@Override
 	public Irep get(Path filePath) {
 		CacheEntry entry = cache.get(filePath.toAbsolutePath().toString());
