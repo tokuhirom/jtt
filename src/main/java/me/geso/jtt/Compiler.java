@@ -144,11 +144,14 @@ class Visitor {
 			builder.addPool(OP.LOAD_CONST, Double.valueOf(node.getText()), reg,
 					node);
 			return;
-		case LOOP:
-			builder.add(OP.LOOP, reg, node);
+		case LOOP_INDEX:
+			builder.add(OP.LOOP_INDEX, reg, node);
 			return;
 		case LOOP_COUNT:
 			builder.add(OP.LOOP_COUNT, reg, node);
+			return;
+		case LOOP_HAS_NEXT:
+			builder.add(OP.LOOP_HAS_NEXT, reg, node);
 			return;
 		case TRUE:
 			if (reg == -1) {

@@ -1070,12 +1070,22 @@ class TTParser implements Parser {
 							p.commit();
 							node = new Node(NodeType.LOOP_COUNT,
 									PREV_LINE_NUMBER());
+						} else if ("index".equals(CURRENT_STRING())) {
+							++pos;
+							p.commit();
+							node = new Node(NodeType.LOOP_INDEX,
+									PREV_LINE_NUMBER());
+						} else if ("has_next".equals(CURRENT_STRING())) {
+							++pos;
+							p.commit();
+							node = new Node(NodeType.LOOP_HAS_NEXT,
+									PREV_LINE_NUMBER());
 						}
 					}
 				}
 			}
 			if (node == null) {
-				node = new Node(NodeType.LOOP, PREV_LINE_NUMBER());
+				node = new Node(NodeType.LOOP_INDEX, PREV_LINE_NUMBER());
 			}
 			return node;
 		} else {

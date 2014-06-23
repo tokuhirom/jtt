@@ -23,4 +23,8 @@ public class Loop {
 		++count;
 		return iterator.next();
 	}
+
+	public Object getIndex() {
+		return count-1;
+	}
 }

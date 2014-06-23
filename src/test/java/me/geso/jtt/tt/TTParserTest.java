@@ -490,6 +490,13 @@ public class TTParserTest {
     }
 
     @Test
+    public void testLoopHasNext() throws ParserError {
+        assertEquals(
+                "(template (expression (loop_has_next)))",
+                parse("[% loop.has_next %]").toString());
+    }
+
+    @Test
     public void testFile() throws ParserError {
         assertEquals(
                 "(template (expression (string -)))",

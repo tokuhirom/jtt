@@ -559,10 +559,19 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void testLoopIndex() throws JTTCompilerError, ParserError,
+			IOException, TemplateLoadingError {
+		assertEquals("0123",
+				eval("[% FOR x IN [5,9,6,3] %][% loop.index %][% END %]"));
+		assertEquals("0123",
+				eval("[% FOR x IN [5,9,6,3] %][% loop %][% END %]"));
+	}
+
+	@Test
 	public void testLoopHasNext() throws JTTCompilerError, ParserError,
 			IOException, TemplateLoadingError {
-		assertEquals("truefalse",
-				eval("[% FOR x IN [5,9] %][% loop.hasNext() %][% END %]"));
+		assertEquals("truetruefalse",
+				eval("[% FOR x IN [1,8,4] %][% loop.has_next %][% END %]"));
 	}
 
 	@Test

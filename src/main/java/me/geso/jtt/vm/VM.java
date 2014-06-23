@@ -333,8 +333,8 @@ public class VM {
 				++pc;
 				break;
 			}
-			case LOOP: {
-				regs[code.a] = loopStack[loopSP - 1];
+			case LOOP_INDEX: {
+				regs[code.a] = loopStack[loopSP - 1].getIndex();
 				++pc;
 				break;
 			}
@@ -343,6 +343,10 @@ public class VM {
 				++pc;
 				break;
 			}
+			case LOOP_HAS_NEXT:
+				regs[code.a] = loopStack[loopSP - 1].hasNext();
+				++pc;
+				break;
 			default:
 				throw new RuntimeException("SHOULD NOT REACH HERE: " + code.op);
 			}

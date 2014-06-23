@@ -9,6 +9,6 @@ loop object has following methods:
 Get the current index for the current loop.
 This method returns 1 origin value.
 
-## `loop.hasNext()`
+## `loop.has_next`
 
 Return true if the loop has next turn. False otherwise.
