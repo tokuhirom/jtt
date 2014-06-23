@@ -147,6 +147,9 @@ class Visitor {
 		case LOOP:
 			builder.add(OP.LOOP, reg, node);
 			return;
+		case LOOP_COUNT:
+			builder.add(OP.LOOP_COUNT, reg, node);
+			return;
 		case TRUE:
 			if (reg == -1) {
 				throw new JTTError("'true' in void context");

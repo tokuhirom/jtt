@@ -338,6 +338,11 @@ public class VM {
 				++pc;
 				break;
 			}
+			case LOOP_COUNT: {
+				regs[code.a] = loopStack[loopSP - 1].getCount();
+				++pc;
+				break;
+			}
 			default:
 				throw new RuntimeException("SHOULD NOT REACH HERE: " + code.op);
 			}

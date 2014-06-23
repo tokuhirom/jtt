@@ -496,13 +496,16 @@ class TTParser implements Parser {
 		}
 
 		if (!EAT(TokenType.OPEN)) {
-			throw new ParserError("Unknown parser error around ELSE keyword", this);
+			throw new ParserError("Unknown parser error around ELSE keyword",
+					this);
 		}
 		if (!EAT(TokenType.ELSE)) {
-			throw new ParserError("Unknown parser error around ELSE keyword", this);
+			throw new ParserError("Unknown parser error around ELSE keyword",
+					this);
 		}
 		if (!EAT(TokenType.CLOSE)) {
-			throw new ParserError("Missing closing tag around ELSE keyword", this);
+			throw new ParserError("Missing closing tag around ELSE keyword",
+					this);
 		}
 
 		Node elseBody = parseTemplateBody();
@@ -513,8 +516,8 @@ class TTParser implements Parser {
 	}
 
 	class PositionSaver implements Closeable {
-		TTParser parser;
-		int pos;
+		final TTParser parser;
+		final int pos;
 		boolean committed = false;
 
 		public PositionSaver(TTParser parser) {
@@ -552,7 +555,7 @@ class TTParser implements Parser {
 	int getPos() {
 		return this.pos;
 	}
-	
+
 	public String getFileName() {
 		return CURRENT_FILENAME();
 	}
@@ -1058,7 +1061,23 @@ class TTParser implements Parser {
 
 	private Node parseLoop() {
 		if (EAT(TokenType.LOOP)) {
-			return new Node(NodeType.LOOP, PREV_LINE_NUMBER());
+			Node node = null;
+			try (PositionSaver p = new PositionSaver(this)) {
+				if (EAT(TokenType.DOT)) {
+					if (CURRENT_TYPE() == TokenType.IDENT) {
+						if ("count".equals(CURRENT_STRING())) {
+							++pos;
+							p.commit();
+							node = new Node(NodeType.LOOP_COUNT,
+									PREV_LINE_NUMBER());
+						}
+					}
+				}
+			}
+			if (node == null) {
+				node = new Node(NodeType.LOOP, PREV_LINE_NUMBER());
+			}
+			return node;
 		} else {
 			return null;
 		}

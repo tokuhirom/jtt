@@ -476,10 +476,17 @@ public class TTParserTest {
     }
 
     @Test
+    public void testLoop() throws ParserError {
+        assertEquals(
+                "(template (expression (loop)))",
+                parse("[% loop %]").toString());
+    }
+
+    @Test
     public void testLoopCount() throws ParserError {
         assertEquals(
-                "(template (expression (funcall (attribute (loop) (string getCount)))))",
-                parse("[% loop.getCount() %]").toString());
+                "(template (expression (loop_count)))",
+                parse("[% loop.count %]").toString());
     }
 
     @Test
