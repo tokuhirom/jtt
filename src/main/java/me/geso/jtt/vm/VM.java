@@ -388,7 +388,7 @@ public class VM {
 	private void opForStart(final Code code) {
 		Object container = regs[code.a];
 		Iterator<Object> iterator = this.getIterator(container);
-		Loop loop = new Loop(iterator, pc);
+		Loop loop = new Loop(iterator);
 		loopStack[loopSP] = loop;
 		++loopSP;
 
