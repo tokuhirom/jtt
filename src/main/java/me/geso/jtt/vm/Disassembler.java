@@ -86,10 +86,10 @@ public class Disassembler {
 		case LE:
 			return String.format(" # regs[%s] = regs[%d] <= regs[%d]", code.a,
 					code.a, code.b);
-		case ITER_START:
-			return String.format(" # regs[%d] = ITER()", code.a);
+		case FOR_START:
+			return String.format(" # MAKE_ITER(regs[%d])", code.a);
 		case FOR_ITER:
-			return String.format(" # regs[%d] = FOR_ITER()", code.a);
+			return String.format(" # regs[%d] = FOR_ITER(); GOTO %d IF END", code.a, code.b);
 		case MODULO:
 			return String.format(" # regs[%d] = regs[%d] % regs[%d]", code.a,
 					code.a, code.b);

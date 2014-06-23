@@ -230,8 +230,8 @@ public class VM {
 				this.irep.setCapacityHint(result.length());
 				return result;
 			}
-			case ITER_START:
-				opIterStart(code);
+			case FOR_START:
+				opForStart(code);
 				break;
 			case FOR_ITER:
 				opForIter(code);
@@ -385,13 +385,12 @@ public class VM {
 	/**
 	 * Start new iterator. Created new iterator will put on the regs[A].
 	 */
-	private void opIterStart(Code code) {
+	private void opForStart(final Code code) {
 		Object container = regs[code.a];
 		Iterator<Object> iterator = this.getIterator(container);
 		Loop loop = new Loop(iterator, pc);
 		loopStack[loopSP] = loop;
 		++loopSP;
-		regs[code.a] = loop.next();
 
 		++pc;
 	}
@@ -424,10 +423,11 @@ public class VM {
 		Loop loop = loopStack[loopSP - 1];
 		if (loop.hasNext()) {
 			regs[code.a] = loop.next();
-			pc = loop.getPC() + 1;
-		} else {
-			--loopSP;
 			++pc;
+		} else {
+			// There is no rest element in iterator.
+			--loopSP;
+			pc = code.b;
 		}
 	}
 
@@ -809,6 +809,8 @@ public class VM {
 		}
 		builder.append("]\n");
 		builder.append(new Disassembler().disasm(this.irep, this.pc));
+		builder.append("Buffer:\n");
+		builder.append(new String(this.buffer));
 		return new String(builder);
 	}
 

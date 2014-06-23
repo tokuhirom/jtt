@@ -148,11 +148,12 @@ public class VMTest {
 		IrepBuilder builder = newIrepBuilder();
 		builder.addPool(OP.LOAD_CONST, Lists.newArrayList("foo", "bar"), 0, nop);
 		builder.increaseLoopStackSize();
-		builder.add(OP.ITER_START, 0, nop);
+		builder.add(OP.FOR_START, 0, nop);
+		builder.add(OP.FOR_ITER, 0, 7, nop);
 		builder.addPool(OP.SET_VAR, "v", 0, nop);
 		builder.addPool(OP.LOAD_VAR, "v", 0, nop);
 		builder.add(OP.APPEND, 0, nop);
-		builder.add(OP.FOR_ITER, 0, nop);
+		builder.add(OP.JUMP_ABS, 2, nop);
 		builder.add(OP.RETURN, nop);
 		Irep irep = builder.build(0, 1);
 		String got = run(irep, vars);

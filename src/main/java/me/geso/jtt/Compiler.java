@@ -296,7 +296,10 @@ class Visitor {
 
 			int containerReg = this.reserveReg();
 			visitAst(container, containerReg);
-			builder.add(OP.ITER_START, containerReg, node);
+			builder.add(OP.FOR_START, containerReg, containerReg, node);
+			int gotoPos = builder.getSize();
+			int nextPos = builder.getSize();
+			Code forIterCode = builder.addLazy(OP.FOR_ITER, containerReg, node);
 			builder.increaseLoopStackSize();
 
 			int lvar = declareLocalVariable(var.getText());
@@ -307,8 +310,7 @@ class Visitor {
 
 			visitAst(body, -1);
 
-			int nextPos = builder.getSize();
-			builder.add(OP.FOR_ITER, containerReg, node);
+			builder.add(OP.JUMP_ABS, gotoPos, node);
 			int lastPos = builder.getSize();
 
 			for (Code code : lastStack.lastElement()) {
@@ -320,6 +322,8 @@ class Visitor {
 				code.a = nextPos;
 			}
 			nextStack.pop();
+
+			forIterCode.b = lastPos;
 
 			return;
 		}

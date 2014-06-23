@@ -168,7 +168,12 @@ public class CompilerTest {
 	public void testArray() throws JTTCompilerError, ParserError, IOException,
 			TemplateLoadingError {
 		assertEquals("5963", eval("[% FOR x IN [5,9,6,3,] %][% x %][% END %]"));
-		// assertEquals("", eval("[% FOR x IN [] %][% x %][% END %]"));
+	}
+
+	@Test
+	public void testArray2() throws JTTCompilerError, ParserError, IOException,
+			TemplateLoadingError {
+		assertEquals("", eval("[% FOR x IN [] %][% x %][% END %]"));
 	}
 
 	@Test
