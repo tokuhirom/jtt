@@ -16,7 +16,6 @@ This file lists To-Does for JTT project.
 * Constant folding
 * We should deprecate SET_LVAR with register.
 * `[% {}.getKeys() %]` ... Empty hash
-* Optimize `[% loop.count %]`
 
 ## PENDING
 
@@ -99,3 +98,4 @@ This file lists To-Does for JTT project.
 * Remove loop.getPC
 * `[% FOR i IN [] %]` ... Empty array can't work in the iterator.
 * Remove `addLazy(op, a, node)`. add() method should return code.
+* Optimize `[% loop.count %]`

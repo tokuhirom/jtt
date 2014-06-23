@@ -4,7 +4,7 @@ The "loop" variable
 You can use the `loop` variable in FOR/FOREACH loop.
 loop object has following methods:
 
-## `loop.getCount()`
+## `loop.count`
 
 Get the current index for the current loop.
 This method returns 1 origin value.

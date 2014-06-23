@@ -552,13 +552,6 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void testLoopCount() throws JTTCompilerError, ParserError,
-			IOException, TemplateLoadingError {
-		assertEquals("1234",
-				eval("[% FOR x IN [5,9,6,3] %][% loop.getCount() %][% END %]"));
-	}
-
-	@Test
 	public void testLoopCount2() throws JTTCompilerError, ParserError,
 			IOException, TemplateLoadingError {
 		assertEquals("1234",

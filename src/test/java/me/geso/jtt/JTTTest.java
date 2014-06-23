@@ -104,7 +104,7 @@ public class JTTTest {
 		assertEquals(
 				"evenoddeven",
 				renderString(
-						"[% FOR item IN items %][% ['odd','even'][loop.getCount()%2] %][% END %]",
+						"[% FOR item IN items %][% ['odd','even'][loop.count%2] %][% END %]",
 						params));
 	}
 

@@ -1,5 +1,5 @@
 [% FOR item IN items %]
-  [% loop.getCount() %]
+  [% loop.count %]
   [% item.name %]
   [% item.num %]
 [% END %]
