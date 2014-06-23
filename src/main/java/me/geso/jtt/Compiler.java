@@ -181,11 +181,11 @@ class Visitor {
 
 			int a = this.reserveReg();
 			visitAst(condClause, a);
-			Code condJump = builder.addLazy(OP.JUMP_IF_FALSE, a, condClause);
+			Code condJump = builder.add(OP.JUMP_IF_FALSE, a, condClause);
 			int pos = builder.getSize();
 			visitAst(bodyClause, reg);
 			if (elseClause != null) {
-				Code code = builder.addLazy(OP.JUMP, elseClause);
+				Code code = builder.add(OP.JUMP, elseClause);
 
 				condJump.b = builder.getSize() - pos + 1;
 				int elseStart = builder.getSize();
@@ -218,15 +218,15 @@ class Visitor {
 						visitAst(n.getChildren().get(0), b);
 						builder.add(OP.MOVE, tmpReg, varReg, n);
 						builder.add(OP.MATCH, tmpReg, b, n);
-						Code jmp = builder.addLazy(OP.JUMP_IF_FALSE, tmpReg, n);
+						Code jmp = builder.add(OP.JUMP_IF_FALSE, tmpReg, n);
 						int pos = builder.getSize();
 						// body
 						visitAst(n.getChildren().get(1), -1);
-						gotoLast.add(builder.addLazy(OP.JUMP_ABS, n));
+						gotoLast.add(builder.add(OP.JUMP_ABS, n));
 						jmp.b = builder.getSize() - pos + 1;
 					} else {
 						visitAst(n.getChildren().get(1), -1);
-						gotoLast.add(builder.addLazy(OP.JUMP_ABS, n));
+						gotoLast.add(builder.add(OP.JUMP_ABS, n));
 					}
 				} else {
 					throw new RuntimeException("SHOULD NOT REACH HERE");
@@ -299,7 +299,7 @@ class Visitor {
 			builder.add(OP.FOR_START, containerReg, containerReg, node);
 			int gotoPos = builder.getSize();
 			int nextPos = builder.getSize();
-			Code forIterCode = builder.addLazy(OP.FOR_ITER, containerReg, node);
+			Code forIterCode = builder.add(OP.FOR_ITER, containerReg, node);
 			builder.increaseLoopStackSize();
 
 			int lvar = declareLocalVariable(var.getText());
@@ -339,7 +339,7 @@ class Visitor {
 			int exprReg = this.reserveReg();
 			visitAst(expr, exprReg);
 
-			Code jumpAfterCond = builder.addLazy(OP.JUMP_IF_FALSE, exprReg,
+			Code jumpAfterCond = builder.add(OP.JUMP_IF_FALSE, exprReg,
 					expr);
 			int afterExprPos = builder.getSize();
 
@@ -364,12 +364,12 @@ class Visitor {
 			return;
 		}
 		case NEXT: {
-			Code code = builder.addLazy(OP.JUMP_ABS, node);
+			Code code = builder.add(OP.JUMP_ABS, node);
 			nextStack.lastElement().add(code);
 			return;
 		}
 		case LAST: {
-			Code code = builder.addLazy(OP.JUMP_ABS, node);
+			Code code = builder.add(OP.JUMP_ABS, node);
 			lastStack.lastElement().add(code);
 			return;
 		}

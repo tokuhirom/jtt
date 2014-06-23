@@ -15,11 +15,8 @@ This file lists To-Does for JTT project.
 * Remove unused enum elements
 * Constant folding
 * We should deprecate SET_LVAR with register.
-* `[% FOR i IN [] %]` ... Empty array can't work in the iterator.
 * `[% {}.getKeys() %]` ... Empty hash
-* Remove loop.getPC
 * Optimize `[% loop.count %]`
-* Remove `addLazy(op, a, node)`. add() method should return code.
 
 ## PENDING
 
@@ -99,3 +96,6 @@ This file lists To-Does for JTT project.
 * Benchmarking with Velocity.
 * Add LOAD_INT op.
 * local variable should use list instead of map.
+* Remove loop.getPC
+* `[% FOR i IN [] %]` ... Empty array can't work in the iterator.
+* Remove `addLazy(op, a, node)`. add() method should return code.

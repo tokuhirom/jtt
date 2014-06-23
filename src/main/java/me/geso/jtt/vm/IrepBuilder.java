@@ -43,33 +43,25 @@ public class IrepBuilder {
 		}
 	}
 
-	public void add(OP op, Node node) {
-		iseq.add(new Code(op));
-		lineNumbers.add(node.getLineNumber());
-	}
-
-	public Code addLazy(OP op, Node node) {
+	public Code add(OP op, Node node) {
 		Code code = new Code(op);
 		iseq.add(code);
 		lineNumbers.add(node.getLineNumber());
 		return code;
 	}
 
-	public Code addLazy(OP op, int a, Node node) {
+	public Code add(OP op, int a, Node node) {
 		Code code = new Code(op, a);
 		iseq.add(code);
 		lineNumbers.add(node.getLineNumber());
 		return code;
 	}
 
-	public void add(OP op, int a, Node node) {
-		iseq.add(new Code(op, a));
+	public Code add(OP op, int a, int b, Node node) {
+		Code code = new Code(op, a, b);
+		iseq.add(code);
 		lineNumbers.add(node.getLineNumber());
-	}
-
-	public void add(OP op, int a, int b, Node node) {
-		iseq.add(new Code(op, a, b));
-		lineNumbers.add(node.getLineNumber());
+		return code;
 	}
 
 	/**
@@ -77,28 +69,29 @@ public class IrepBuilder {
 	 *
 	 * @param op
 	 * @param o
+	 * @return 
 	 */
-	public void addPool(OP op, Object o, Node node) {
+	public Code addPool(OP op, Object o, Node node) {
 		if (poolSeen.containsKey(o)) {
 			Integer i = poolSeen.get(o);
-			this.add(op, i, node);
+			return this.add(op, i, node);
 		} else {
 			pool.add(o);
 			Integer i = pool.size() - 1;
-			this.add(op, i, node);
 			poolSeen.put(o, i);
+			return this.add(op, i, node);
 		}
 	}
 
-	public void addPool(OP op, Object o, int dst, Node node) {
+	public Code addPool(OP op, Object o, int dst, Node node) {
 		if (poolSeen.containsKey(o)) {
 			Integer i = poolSeen.get(o);
-			this.add(op, i, dst, node);
+			return this.add(op, i, dst, node);
 		} else {
 			pool.add(o);
 			Integer a = pool.size() - 1;
-			this.add(op, a, dst, node);
 			poolSeen.put(o, a);
+			return this.add(op, a, dst, node);
 		}
 	}
 
