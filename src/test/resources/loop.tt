@@ -1,5 +1,23 @@
+<html>
 [% FOR item IN items %]
-  [% loop.count %]
-  [% item.name %]
-  [% item.num %]
+<tr class="[% IF loop.count%2==0 %]odd[% ELSE %]even[% END %]">
+ <td style="text-align: center">[% loop.count %]</td>
+ <td>
+  <a href="/stocks/[% item.symbol %]">[% item.symbol %]</a>
+ </td>
+ <td>
+  <a href="[% item.url %]">[% item.name %]</a>
+ </td>
+ <td>
+  <strong>[% item.price %]</strong>
+ </td>
+ [% IF item.change < 0.0 %]
+ <td class="minus">[% item.change %]</td>
+ <td class="minus">[% item.ratio %]</td>
+ [% ELSE %]
+ <td>[% item.change %]</td>
+ <td>[% item.ratio %]</td>
+ [% END %]
+</tr>
 [% END %]
+</html>

@@ -13,7 +13,11 @@ import me.geso.jtt.JTTBuilder;
 
 class Item {
 	public String name;
-	public int num;
+	public String url;
+	public String symbol;
+	public double price;
+	public double change;
+	public double ratio;
 }
 
 public class BenchMarkRunner {
@@ -30,7 +34,11 @@ public class BenchMarkRunner {
 		IntStream.rangeClosed(0, 10000).forEach(i -> {
 			Item item = new Item();
 			item.name = "John";
-			item.num = 5963;
+			item.symbol = "John";
+			item.url = "John";
+			item.price = 3.14;
+			item.change = 3.14;
+			item.ratio = 3.14;
 			items.add(item);
 		});
 		for (int i = 0; i < 1000; ++i) {
