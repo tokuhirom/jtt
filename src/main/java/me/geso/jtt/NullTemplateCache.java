@@ -1,7 +1,5 @@
 package me.geso.jtt;
 
-import java.nio.file.Path;
-
 import me.geso.jtt.vm.Irep;
 
 /**
@@ -13,12 +11,12 @@ import me.geso.jtt.vm.Irep;
 public class NullTemplateCache implements TemplateCache {
 
 	@Override
-	public Irep get(Path filePath) {
+	public Irep get(String filePath) {
 		return null;
 	}
 
 	@Override
-	public void set(Path filePath, Irep irep) {
+	public void set(String filePath, Irep irep) {
 		// Do nothing.
 	}
 
