@@ -534,8 +534,13 @@ public class VM {
 			}
 
 			if (index instanceof String) {
-				Object result = access.get(container, (String) index);
-				return result;
+				try {
+					Object result = access.get(container, (String) index);
+					return result;
+				} catch (IllegalArgumentException e) {
+					warn(e.toString());
+					return null;
+				}
 			} else if (index == null) {
 				warn("null index for accessor name");
 				return null;
