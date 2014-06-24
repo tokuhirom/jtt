@@ -1,6 +1,5 @@
 package me.geso.jtt;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +32,7 @@ public class JTT {
 	}
 
 	public String renderFile(String file, Map<String, Object> vars) throws JTTError {
-		return this.renderFile(new File(file), vars);
-	}
-
-	public String renderFile(File file, Map<String, Object> vars) throws JTTError {
-		Irep irep = loader.compile(file.toPath(), this.syntax);
+		Irep irep = loader.compile(file, this.syntax);
 		String result = this.newVM(irep, vars).run();
 		return result;
 	}

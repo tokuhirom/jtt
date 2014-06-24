@@ -44,7 +44,7 @@ public class BenchMarkRunner {
 		for (int i = 0; i < 1000; ++i) {
 			Map<String, Object> vars = new HashMap<>();
 			vars.put("items", items);
-			jtt.renderFile(new File("loop.tt"), vars);
+			jtt.renderFile("loop.tt", vars);
 		}
 
 		long t2 = System.currentTimeMillis();

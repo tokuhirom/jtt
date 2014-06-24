@@ -159,7 +159,7 @@ public class JTTTest {
 			throws JTTError, TemplateLoadingError, IOException {
 		JTT jslate = new JTTBuilder().setIncludePaths(buildIncludePaths())
 				.build();
-		return jslate.renderFile(new File(fileName), vars);
+		return jslate.renderFile(fileName, vars);
 	}
 
 	private List<Path> buildIncludePaths() {

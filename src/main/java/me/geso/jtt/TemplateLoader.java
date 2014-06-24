@@ -21,21 +21,21 @@ public class TemplateLoader {
 		this.templateCache = templateCache;
 	}
 
-	public Irep compile(Path fileName, Syntax syntax) throws JTTError {
+	public Irep compile(String fileName, Syntax syntax) throws JTTError {
 		assert syntax != null;
-
-		{
-			Irep irep = this.templateCache.get(fileName);
-			if (irep != null) {
-				return irep;
-			}
-		}
 
 		for (Path path : includePaths) {
 			Path fullpath = path.resolve(fileName);
+			{
+				Irep irep = this.templateCache.get(fullpath);
+				if (irep != null) {
+					return irep;
+				}
+			}
+
 			if (fullpath.toFile().exists()) {
 				Irep irep = this.compileFile(fullpath, syntax);
-				this.templateCache.set(fileName, irep);
+				this.templateCache.set(fullpath, irep);
 				return irep;
 			}
 		}

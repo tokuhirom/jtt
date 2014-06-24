@@ -1,6 +1,5 @@
 package me.geso.jtt.vm;
 
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -245,7 +244,7 @@ public class VM {
 			}
 			case INCLUDE: {
 				String path = (String) regs[code.a];
-				Irep compiledIrep = loader.compile(Paths.get(path), syntax);
+				Irep compiledIrep = loader.compile(path, syntax);
 				String result = this.newVM(compiledIrep, vars).run();
 				regs[code.a] = result;
 				++pc;
@@ -253,7 +252,7 @@ public class VM {
 			}
 			case WRAP: {
 				String path = (String) regs[code.a];
-				Irep compiledIrep = loader.compile(Paths.get(path), syntax);
+				Irep compiledIrep = loader.compile(path, syntax);
 				HashMap<String, Object> newvars = new HashMap<>(vars);
 				newvars.put("content", buffer.toString());
 				buffer.delete(0, buffer.length());
