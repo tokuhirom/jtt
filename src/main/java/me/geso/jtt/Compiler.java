@@ -22,7 +22,6 @@ class Visitor {
 	private final Stack<List<Code>> lastStack = new Stack<>();
 	private final Stack<Map<String, Integer>> lvarStack = new Stack<>();
 	private final Stack<List<Code>> nextStack = new Stack<>();
-	private int lvarIndex = 0;
 	private int regIndex = 0;
 
 	public Visitor(Source source) {
@@ -31,12 +30,12 @@ class Visitor {
 
 	public int declareLocalVariable(String name) {
 		Map<String, Integer> lastElement = lvarStack.lastElement();
-		int idx = lvarIndex++;
+		int idx = this.reserveReg();
 		lastElement.put(name, idx);
 		return idx;
 	}
 
-	public Integer getLocalVariableIndex(String name) {
+	private Integer getLocalVariableIndex(String name) {
 		for (int i = 0; i < lvarStack.size(); ++i) {
 			Map<String, Integer> vars = lvarStack.get(i);
 			Iterator<String> iterator = vars.keySet().iterator();
@@ -262,10 +261,10 @@ class Visitor {
 			if (reg == -1) {
 				throw new JTTError("ident in void context.");
 			}
-			Integer idx = this.getLocalVariableIndex(node.getText());
-			if (idx != null) {
+			Integer lvarReg = this.getLocalVariableIndex(node.getText());
+			if (lvarReg != null) {
 				// local variable
-				builder.add(OP.LOAD_LVAR, idx, reg, node);
+				builder.add(OP.MOVE, reg, lvarReg, node);
 			} else {
 				// global vars(maybe passed from external world)
 				builder.addPool(OP.LOAD_VAR, node.getText(), reg, node);
@@ -277,10 +276,10 @@ class Visitor {
 				throw new JTTError("ident in void context.");
 			}
 
-			Integer idx = this.getLocalVariableIndex(node.getText());
-			if (idx != null) {
+			Integer lvarReg = this.getLocalVariableIndex(node.getText());
+			if (lvarReg != null) {
 				// local variable
-				builder.add(OP.LOAD_LVAR, idx, reg, node);
+				builder.add(OP.MOVE, reg, lvarReg, node);
 			} else {
 				// global vars(maybe passed from external world)
 				builder.addPool(OP.LOAD_VAR, node.getText(), reg, node);
@@ -309,7 +308,7 @@ class Visitor {
 			builder.increaseLoopStackSize();
 
 			int lvar = declareLocalVariable(var.getText());
-			builder.add(OP.SET_LVAR, lvar, containerReg, node);
+			builder.add(OP.MOVE, lvar, containerReg, node);
 
 			nextStack.add(new ArrayList<Code>());
 			lastStack.add(new ArrayList<Code>());
@@ -345,8 +344,7 @@ class Visitor {
 			int exprReg = this.reserveReg();
 			visitAst(expr, exprReg);
 
-			Code jumpAfterCond = builder.add(OP.JUMP_IF_FALSE, exprReg,
-					expr);
+			Code jumpAfterCond = builder.add(OP.JUMP_IF_FALSE, exprReg, expr);
 			int afterExprPos = builder.getSize();
 
 			nextStack.add(new ArrayList<Code>());
@@ -465,7 +463,8 @@ class Visitor {
 					for (int i = 0; i < node.getChildren().size(); ++i) {
 						regs[i] = this.reserveReg();
 					}
-					builder.addPool(OP.LOAD_CONST, func.getText(), regs[0], node);
+					builder.addPool(OP.LOAD_CONST, func.getText(), regs[0],
+							node);
 					for (int i = 1; i < node.getChildren().size(); ++i) {
 						visitAst(node.getChildren().get(i), regs[i]);
 					}
@@ -539,7 +538,7 @@ class Visitor {
 
 	public Irep getResult() {
 		builder.addReturn();
-		return builder.build(this.lvarIndex + 1, this.regIndex+1);
+		return builder.build(this.regIndex + 1);
 	}
 
 	public void start(Node ast) throws JTTCompilerError {

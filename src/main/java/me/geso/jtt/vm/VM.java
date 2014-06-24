@@ -47,7 +47,6 @@ public class VM {
 	private final StringBuilder buffer;
 	private final Object[] regs;
 	private final Loop[] loopStack;
-	private final Object[] localVars;
 	private int pc;
 	private int loopSP;
 	private Map<String, Object> vars;
@@ -83,7 +82,6 @@ public class VM {
 		}
 		this.regs = new Object[irep.getRegisterCount()];
 		this.loopStack = new Loop[irep.getLoopStackSize()];
-		this.localVars = new Object[irep.getLocalVariableCount()];
 
 		this.pc = 0;
 	}
@@ -198,12 +196,6 @@ public class VM {
 			case MOVE:
 				regs[code.a] = regs[code.b];
 				++pc;
-				break;
-			case SET_LVAR:
-				opSetLvar(code);
-				break;
-			case LOAD_LVAR:
-				opLoadLvar(code);
 				break;
 			case GET_ELEM: { // a[0], a['hoge']
 				this.opGetElem(code);
@@ -351,16 +343,6 @@ public class VM {
 				throw new RuntimeException("SHOULD NOT REACH HERE: " + code.op);
 			}
 		}
-	}
-
-	private void opLoadLvar(Code code) {
-		regs[code.b] = localVars[code.a];
-		++pc;
-	}
-
-	private void opSetLvar(Code code) {
-		localVars[code.a] = regs[code.b];
-		++pc;
 	}
 
 	/**

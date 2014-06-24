@@ -99,9 +99,9 @@ public class IrepBuilder {
 		return iseq.size();
 	}
 
-	public Irep build(int localVarsNum, int registerNum) {
+	public Irep build(int registerNum) {
 		return new Irep(iseq, pool, this.lineNumbers, this.source,
-				localVarsNum, this.loopStackSize, registerNum);
+				this.loopStackSize, registerNum);
 	}
 
 	public void increaseLoopStackSize() {
@@ -109,7 +109,7 @@ public class IrepBuilder {
 	}
 
 	public String toString() {
-		return new Disassembler().disasm(build(0, 0), -1);
+		return new Disassembler().disasm(build(0), -1);
 	}
 
 }
