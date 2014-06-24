@@ -478,7 +478,14 @@ public class TTParserTest {
     @Test
     public void testLoop() throws ParserError {
         assertEquals(
-                "(template (expression (loop)))",
+                "(template (expression (loop_index)))",
+                parse("[% loop %]").toString());
+    }
+
+    @Test
+    public void testLoopIndex() throws ParserError {
+        assertEquals(
+                "(template (expression (loop_index)))",
                 parse("[% loop %]").toString());
     }
 
