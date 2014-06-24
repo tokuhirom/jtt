@@ -38,7 +38,7 @@ public class Disassembler {
 				buffer.append(String.format("  %6d null\n", i));
 			} else {
 				buffer.append(String.format("  %6d %s(%s)\n", i,
-						pool[i].toString(), pool[i].getClass().toString()));
+						escape(pool[i].toString()), escape(pool[i].getClass().toString())));
 			}
 		}
 
